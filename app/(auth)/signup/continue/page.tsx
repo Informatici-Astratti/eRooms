@@ -14,14 +14,15 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BedDouble, CalendarIcon } from "lucide-react";
-import Link from "next/link";
 import { useActionState, useState } from "react";
 import * as React from "react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
-import { signUpContinue } from "../../action";
+import {  signUpContinue } from "../../action";
 import ErrorForm from "@/components/ErrorForm";
-import { error } from "console";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { Genere } from "@/constants/genere";
+
 
 export default function ConfirmSignupPage() {
     const [date, setDate] = useState<Date>()
@@ -55,7 +56,11 @@ export default function ConfirmSignupPage() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="telefono">Numero di Telefono</Label>
-                    <Input name="telefono" type="text" required />
+                    <PhoneInput
+                    placeholder="Inserisci numero di telefono"
+                    name="telefono"
+                    defaultCountry="IT"
+                    />
                     <ErrorForm errors={state?.errors.telefono}/>
                   </div>
                   <div className="grid gap-2">
@@ -70,47 +75,43 @@ export default function ConfirmSignupPage() {
                             <Button
                             variant={"outline"}
                             className={cn(
-                                "w-[240px] justify-start text-left font-normal",
+                                "justify-start text-left font-normal",
                                 !date && "text-muted-foreground"
                             )}
                             >
                             <CalendarIcon />
-                            {date ? format(date, "PPP") : <span>Seleziona</span>}
+                            {date ? format(date, "dd/MM/yyyy") : <span>Seleziona</span>}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
+                        <PopoverContent className="w-auto p-0" align="center">
                             <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={setDate}
-                            initialFocus
+                              mode="single"
+                              captionLayout="dropdown-buttons"
+                              selected={date}
+                              onSelect={setDate}
+                              fromYear={1960}
+                              toYear={2030}
                             />
                         </PopoverContent>
                     </Popover>
-                    <Input type="hidden" value={date?.toDateString()} name="dataNascita"/>
+                    <Input type="hidden" value={date ? format(date, "yyyy-MM-dd") : ''} name="dataNascita"/>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="genere">Genere</Label>
-                    <Select>
-                      <SelectTrigger className="w-[180px]">
+                    <Select name="genere">
+                      <SelectTrigger >
                         <SelectValue placeholder="Seleziona il genere" />
                       </SelectTrigger>
                       <SelectContent>
-                          <SelectItem value="uomo">Uomo</SelectItem>
-                          <SelectItem value="donna">Donna</SelectItem>
-                          <SelectItem value="ns">Non voglio specificarlo</SelectItem> 
+                          <SelectItem value={Genere.UOMO}>Uomo</SelectItem>
+                          <SelectItem value={Genere.DONNA}>Donna</SelectItem>
+                          <SelectItem value={Genere.NS}>Non voglio specificarlo</SelectItem> 
                       </SelectContent>
                     </Select>
                   </div>
                   <Button type="submit" className="w-full">
                     Conferma Registrazione
                   </Button>
-                </div>
-                <div className="text-center text-sm">
-                  Hai già un account?{" "}
-                  <Link href="/login" className="underline underline-offset-4">
-                    Accedi
-                  </Link>
                 </div>
               </div>
             </form>
