@@ -1,11 +1,17 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BedDouble } from "lucide-react";
 import Link from "next/link";
+import { useActionState } from "react";
+import { loginWithMail } from "../action";
 
 export default function LoginPage() {
+    const [state, formAction] = useActionState(loginWithMail, undefined);
+
     return (
         <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
             <div className="flex w-full max-w-sm flex-col gap-6">
@@ -23,17 +29,18 @@ export default function LoginPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form>
+                        <form action={formAction}>
                             <div className="grid gap-6">
                                 <div className="grid gap-6">
                                     <div className="grid gap-2">
                                         <Label htmlFor="email">Email</Label>
                                         <Input
-                                            id="email"
+                                            name="email"
                                             type="email"
                                             placeholder="m@example.com"
                                             required
                                         />
+                                        <p className=" text-sm text-red-500">{state?.errors.email ? state.errors.email.map((str) => str) : ""}</p>
                                     </div>
                                     <div className="grid gap-2">
                                         <div className="flex items-center">
@@ -45,7 +52,8 @@ export default function LoginPage() {
                                                 Password Dimenticata?
                                             </Link>
                                         </div>
-                                        <Input id="password" type="password" required />
+                                        <Input name="password" type="password" required />
+                                        <p className="text-sm text-red-500">{state?.errors.password ? state.errors.password.map((str) => str) : ""}</p>
                                     </div>
                                     <Button type="submit" className="w-full">
                                         Login
