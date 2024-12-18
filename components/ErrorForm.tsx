@@ -1,5 +1,5 @@
 interface ErrorFormProps{
-    errors: string | string[] | undefined
+    errors: string | string[] | undefined  
 }
 
 const ErrorForm: React.FC<ErrorFormProps> = ({ errors }) => {

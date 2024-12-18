@@ -19,10 +19,13 @@ import { useActionState, useState } from "react";
 import * as React from "react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { signUpContinue } from "../../action";
+import ErrorForm from "@/components/ErrorForm";
+import { error } from "console";
 
 export default function ConfirmSignupPage() {
     const [date, setDate] = useState<Date>()
-    //const [state, formAction] = useActionState()
+    const [state, formAction] = useActionState(signUpContinue, undefined);
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
@@ -39,7 +42,7 @@ export default function ConfirmSignupPage() {
             <CardDescription>Conferma il tuo account e-Rooms</CardDescription>
           </CardHeader>
           <CardContent>
-            <form action = {() => { }}>
+            <form action = {formAction}>
               <div className="grid gap-6">
                 <div className="grid gap-6">
                   <div className="grid gap-2">
@@ -52,11 +55,13 @@ export default function ConfirmSignupPage() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="telefono">Numero di Telefono</Label>
-                    <Input name="telefono" type="tel" required />
+                    <Input name="telefono" type="text" required />
+                    <ErrorForm errors={state?.errors.telefono}/>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="cf">Codice Fiscale</Label>
                     <Input name="cf" type="text" required />
+                    <ErrorForm errors={state?.errors.cf}/>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="dataNascita">Data di Nascita</Label>
@@ -70,7 +75,7 @@ export default function ConfirmSignupPage() {
                             )}
                             >
                             <CalendarIcon />
-                            {date ? format(date, "PPP") : <span>Pick a date</span>}
+                            {date ? format(date, "PPP") : <span>Seleziona</span>}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">

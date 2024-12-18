@@ -23,6 +23,17 @@ const signUpSchema = z.object({
     path: ["confirmPassword"], // path of error
 });
 
+const signUpContinueSchema = z.object({
+    nome: z.string().min(2).max(50, {message: "Nome non valido"}),
+    cognome: z.string().min(2).max(50, {message: "Cognome non valido"}),
+    cf: z.string().length(16)
+        .regex(/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/i, {message: "Codice Fiscale non valido"}),
+    telefono: z.string().max(11, {message: "Numero di Telefono non valido"}),
+    dataNascita: z.date(),  // TO DO
+    genere: z.string()
+});
+
+
 export async function loginWithMail(prevState: any, formData: FormData) {
     const supabase = await createClient()
 
@@ -83,4 +94,19 @@ export async function logout() {
     await supabase.auth.signOut()
 
     redirect("/")
+}
+
+
+export async function signUpContinue(prevState: any, formData: FormData){
+    const supabase = await createClient();
+
+    const result = signUpContinueSchema.safeParse(Object.fromEntries(formData))
+
+    if (!result.success){
+        return {
+            errors: result.error.flatten().fieldErrors
+        }
+    }
+
+    // CONTINUA DATABASE
 }
