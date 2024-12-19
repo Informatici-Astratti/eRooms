@@ -60,8 +60,6 @@ export async function signUpWithEmailAndPassword(prevState: any, formData: FormD
         }
     }
 
-    // ERROR: NON FUNZIONA LA REGISTRAZIONE DA AGGIUSTARE
-
     const { data, error } = await supabase.auth.signUp({
         email: result.data.email,
         password: result.data.password,

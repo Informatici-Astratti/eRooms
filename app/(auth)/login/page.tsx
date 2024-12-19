@@ -8,6 +8,7 @@ import { BedDouble } from "lucide-react";
 import Link from "next/link";
 import { useActionState } from "react";
 import { loginWithMail } from "../action";
+import ErrorForm from "@/components/ErrorForm";
 
 export default function LoginPage() {
     const [state, formAction] = useActionState(loginWithMail, undefined);
@@ -40,7 +41,7 @@ export default function LoginPage() {
                                             placeholder="m@example.com"
                                             required
                                         />
-                                        <p className=" text-sm text-red-500">{state?.errors.email ? state.errors.email.map((str) => str) : ""}</p>
+                                        <ErrorForm errors={state?.errors.email}/>
                                     </div>
                                     <div className="grid gap-2">
                                         <div className="flex items-center">
@@ -53,7 +54,7 @@ export default function LoginPage() {
                                             </Link>
                                         </div>
                                         <Input name="password" type="password" required />
-                                        <p className="text-sm text-red-500">{state?.errors.password ? state.errors.password.map((str) => str) : ""}</p>
+                                        <ErrorForm errors={state?.errors.password}/>
                                     </div>
                                     <Button type="submit" className="w-full">
                                         Login

@@ -1,0 +1,125 @@
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Ospiti {
+  idOspite        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome            String?
+  cognome         String?
+  cf              String?
+  tipoDocumento   tipo_documento?
+  idDocumento     String?
+  dataRilascio    DateTime?       @db.Date
+  dataScadenza    DateTime?       @db.Date
+  fotoDocumento   String?
+  codPrenotazione String          @db.Uuid
+  Prenotazioni    Prenotazioni    @relation(fields: [codPrenotazione], references: [idPrenotazione])
+
+  
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Pagamenti {
+  idPagamento     String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  metodo          String?
+  importo         Float         @db.Real
+  dataSaldo       DateTime?     @db.Timestamp(6)
+  codPrenotazione String?       @db.Uuid
+  Prenotazioni    Prenotazioni? @relation(fields: [codPrenotazione], references: [idPrenotazione], onDelete: Restrict)
+
+  
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Prenotazioni {
+  idPrenotazione                           String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dataCreazione                            DateTime           @default(now()) @db.Timestamptz(6)
+  dataInizio                               DateTime           @db.Timestamp(6)
+  dataFine                                 DateTime           @db.Timestamp(6)
+  codStanza                                String             @db.Uuid
+  codProfilo                               String             @db.Uuid
+  codPulizie                               String             @db.Uuid
+  stato                                    stato_prenotazione @default(PRENOTATA)
+  Ospiti                                   Ospiti[]
+  Pagamenti                                Pagamenti[]
+  Profili_Prenotazioni_codProfiloToProfili Profili            @relation("Prenotazioni_codProfiloToProfili", fields: [codProfilo], references: [idProfilo])
+  Profili_Prenotazioni_codPulizieToProfili Profili            @relation("Prenotazioni_codPulizieToProfili", fields: [codPulizie], references: [idProfilo])
+  Stanze                                   Stanze             @relation(fields: [codStanza], references: [idStanza])
+
+  
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Profili {
+  idProfilo                                     String         @id @default(dbgenerated("auth.uid()")) @db.Uuid
+  nome                                          String
+  cognome                                       String
+  telefono                                      String?
+  cf                                            String?
+  piva                                          String?
+  dataNascita                                   DateTime       @db.Date
+  genere                                        genere
+  indirizzo                                     String?
+  ruolo                                         ruolo
+  Prenotazioni_Prenotazioni_codProfiloToProfili Prenotazioni[] @relation("Prenotazioni_codProfiloToProfili")
+  Prenotazioni_Prenotazioni_codPulizieToProfili Prenotazioni[] @relation("Prenotazioni_codPulizieToProfili")         
+
+  
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Stanze {
+  idStanza     String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome         String?
+  capienza     Int?           @db.SmallInt
+  descrizione  String?
+  foto         String[]
+  Prenotazioni Prenotazioni[]
+  Tariffe      Tariffe[]
+
+  
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Tariffe {
+  codStanza      String    @db.Uuid
+  dataInizio     DateTime  @db.Date
+  dataFine       DateTime? @db.Date
+  costoProcapite Float     @db.Real
+  Stanze         Stanze    @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
+
+  @@id([codStanza, dataInizio])
+  
+}
+
+enum genere {
+  UOMO
+  DONNA
+  NS
+}
+
+enum ruolo {
+  CLIENTE
+  PROPRIETARIO
+  PULIZIE
+}
+
+enum stato_prenotazione {
+  PRENOTATA
+  CONFERMATA
+  ANNULLATA_UTENTE
+  ANNULLATA_HOST
+}
+
+enum tipo_documento {
+  CARTAIDENTITA
+  PATENTE
+  PASSAPORTO
+}
