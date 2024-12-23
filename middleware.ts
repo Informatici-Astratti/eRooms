@@ -1,19 +1,45 @@
-import { type NextRequest } from 'next/server'
-import { updateSession } from '@/utils/supabase/middleware'
+import { betterFetch } from "@better-fetch/fetch";
+import type { auth } from "@/lib/auth";
+import { NextResponse, type NextRequest } from "next/server";
+ 
+type Session = typeof auth.$Infer.Session;
 
-export async function middleware(request: NextRequest) {
-  return await updateSession(request)
-}
+const authRoutes = ["/login", "/signup"];
+const protectedRoutes = ["/dashboard"];
+ 
+export default async function authMiddleware(request: NextRequest) {
+    const pathName = request.nextUrl.pathname;
+    const isAuthRoute = authRoutes.includes(pathName);
+    const isProtectedRoute = protectedRoutes.includes(pathName);
 
-export const config = { 
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+    // PRENDO LA SESSIONE
+
+	const { data: session } = await betterFetch<Session>(
+		"/api/auth/get-session",
+		{
+			baseURL: process.env.BETTER_AUTH_URL,
+			headers: {
+				//get the cookie from the request
+				cookie: request.headers.get("cookie") || "",
+			},
+		},
+	);
+    // CONTROLLI PER LA SESSIONE
+
+	if (!session) {
+
+        if(isProtectedRoute){
+            return NextResponse.redirect(new URL("/login", request.url));
+        }
+    }
+
+    if (isAuthRoute) {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    return NextResponse.next();
 }
+ 
+export const config = {
+    matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+};

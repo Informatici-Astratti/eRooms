@@ -1,12 +1,16 @@
 "use server"
-
-import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { subYears, parseISO } from "date-fns";
 
 import { z } from "zod"
-import { Genere } from "@/constants/genere";
+
+import prisma from "@/lib/db";
+import { genere, ruolo } from "@prisma/client";
+import { authClient } from "@/lib/authClient";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { APIError } from "better-auth/api";
 
 const loginSchema = z.object({
     email: z.string().email({message: "Email non valida"}).trim(),
@@ -14,7 +18,6 @@ const loginSchema = z.object({
 })
 
 export async function loginWithMail(prevState: any, formData: FormData) {
-    const supabase = await createClient()
 
     const result = loginSchema.safeParse(Object.fromEntries(formData))
 
@@ -24,9 +27,15 @@ export async function loginWithMail(prevState: any, formData: FormData) {
         }
     }
 
-    const { error } = await supabase.auth.signInWithPassword(result.data)
+    const response = await auth.api.signInEmail({
+        body: {
+            email: result.data.email,
+            password: result.data.password
+        },
+        asResponse: true
+    })
 
-    if (error){
+    if (!response.ok){
         return {
             errors: {
                 email: ["Email o Password non validi"]
@@ -51,7 +60,6 @@ const signUpSchema = z.object({
 });
 
 export async function signUpWithEmailAndPassword(prevState: any, formData: FormData) {
-    const supabase = await createClient();
 
     const result = signUpSchema.safeParse(Object.fromEntries(formData))
     if (!result.success){
@@ -60,15 +68,22 @@ export async function signUpWithEmailAndPassword(prevState: any, formData: FormD
         }
     }
 
-    const { data, error } = await supabase.auth.signUp({
-        email: result.data.email,
-        password: result.data.password,
-    })
-
-    if (error){
-        return {
-            errors: {
-                email: ["Registrazione Fallita"]
+    try{
+        await auth.api.signUpEmail({
+        
+            body: {
+                email: result.data.email,
+                password: result.data.password,
+                name:""
+            },
+            asResponse: true
+        })
+    }catch(error){
+        if (error instanceof APIError) {
+            return {
+                errors: {
+                    email: ["Registrazione Fallita"]
+                }
             }
         }
     }
@@ -85,24 +100,60 @@ const signUpContinueSchema = z.object({
     cf: z.string().trim().length(16)
         .regex(/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/i, {message: "Codice Fiscale non valido"}),
     telefono: z.string().trim(),
-    dataNascita: z.string().date().refine((date) => {
+    dataNascita: z.string().datetime().refine((date) => {
         const parsedDate = parseISO(date);
         const minAgeDate = subYears(new Date(), 18);
         return parsedDate <= minAgeDate;
     }, {
         message: "L'Utente deve avere più di 18 anni"
     }),
-    genere: z.nativeEnum(Genere, {message: "Genere non Valido"})
+    genere: z.nativeEnum(genere, {message: "Genere non Valido"})
 });
 
 export async function signUpContinue(prevState: any, formData: FormData){
-    //TODO: Completare la registrazione con ORM o altro
 
+    const result = signUpContinueSchema.safeParse(Object.fromEntries(formData))
+    if (!result.success){
+        return {
+            errors: result.error.flatten().fieldErrors
+        }
+    }
+
+    const {data} = await authClient.getSession()
+
+    if(!data ){
+        redirect("/error")
+    }
+
+    const user = data.user;
+
+    try{
+        const dbUser = await prisma.profili.create({
+            data: {
+                idProfilo: user.id,
+                nome: result.data.nome ?? "",
+                cognome: result.data.cognome ?? "",
+                telefono: result.data.telefono ?? "",
+                cf: result.data.cf ?? "",
+                dataNascita: result.data.dataNascita ?? "",
+                genere: result.data.genere ?? genere.NS,
+                ruolo: ruolo.CLIENTE 
+            }
+        })
+    }
+    catch(e){
+        console.log(e)
+    }
+
+    
+
+    revalidatePath('/', 'layout')
+    redirect("/dashboard")
 }
 
 export async function logout() {
-    const supabase = await createClient()
-    await supabase.auth.signOut()
-
+    await auth.api.signOut({
+        headers: await headers()
+    });
     redirect("/")
 }

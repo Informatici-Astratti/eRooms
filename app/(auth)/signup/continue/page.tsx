@@ -21,8 +21,7 @@ import { cn } from "@/lib/utils"
 import {  signUpContinue } from "../../action";
 import ErrorForm from "@/components/ErrorForm";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { Genere } from "@/constants/genere";
-
+import { genere } from "@prisma/client";
 
 export default function ConfirmSignupPage() {
     const [date, setDate] = useState<Date>()
@@ -103,9 +102,9 @@ export default function ConfirmSignupPage() {
                         <SelectValue placeholder="Seleziona il genere" />
                       </SelectTrigger>
                       <SelectContent>
-                          <SelectItem value={Genere.UOMO}>Uomo</SelectItem>
-                          <SelectItem value={Genere.DONNA}>Donna</SelectItem>
-                          <SelectItem value={Genere.NS}>Non voglio specificarlo</SelectItem> 
+                          <SelectItem value={genere.UOMO}>Uomo</SelectItem>
+                          <SelectItem value={genere.DONNA}>Donna</SelectItem>
+                          <SelectItem value={genere.NS}>Non voglio specificarlo</SelectItem> 
                       </SelectContent>
                     </Select>
                   </div>
