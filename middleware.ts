@@ -24,13 +24,13 @@ export default async function authMiddleware(request: NextRequest) {
 			},
 		},
 	);
-    // CONTROLLI PER LA SESSIONE
 
+    // CONTROLLI PER LE ROUTE
 	if (!session) {
-
         if(isProtectedRoute){
             return NextResponse.redirect(new URL("/login", request.url));
         }
+        return NextResponse.next()
     }
 
     if (isAuthRoute) {
