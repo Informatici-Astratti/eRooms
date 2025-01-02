@@ -27,15 +27,15 @@ export async function loginWithMail(prevState: any, formData: FormData) {
         }
     }
 
-    const response = await auth.api.signInEmail({
-        body: {
-            email: result.data.email,
-            password: result.data.password
-        },
-        asResponse: true
-    })
-
-    if (!response.ok){
+    try{
+        await auth.api.signInEmail({
+            body: {
+                email: result.data.email,
+                password: result.data.password
+            },
+            asResponse: true
+        })
+    }catch (e){
         return {
             errors: {
                 email: ["Email o Password non validi"]
