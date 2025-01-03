@@ -1,6 +1,7 @@
 import {
   ClerkProvider
 } from '@clerk/nextjs'
+import { itIT } from '@clerk/localizations'
 
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
@@ -23,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider localization={itIT}>
       <html lang="en">
       <body
         className={`${poppins.className} antialiased`}

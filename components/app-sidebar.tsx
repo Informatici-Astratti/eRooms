@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import Link from "next/link"
+import { SignOutButton } from "@clerk/nextjs"
 
 // Menu items.
 const items = [
@@ -99,7 +100,9 @@ export function AppSidebar() {
                         <span>Billing</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                        <span>Sign out</span>
+                        <SignOutButton>
+                          Sign Out
+                        </SignOutButton>
                     </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
