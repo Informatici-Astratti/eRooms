@@ -1,10 +1,10 @@
 "use server"
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { subYears, parseISO } from "date-fns";
+import { subYears, parseISO, formatISO } from "date-fns";
 import { z } from "zod"
 import prisma from "@/lib/db";
-import { genere, ruolo } from "@prisma/client";
+import { genere, Prisma, ruolo } from "@prisma/client";
 import { headers } from "next/headers";
 import { auth } from "@clerk/nextjs/server";
 
@@ -14,7 +14,7 @@ const signUpContinueSchema = z.object({
     cf: z.string().trim().length(16)
         .regex(/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/i, {message: "Codice Fiscale non valido"}),
     telefono: z.string().trim(),
-    dataNascita: z.string().datetime().refine((date) => {
+    dataNascita: z.string().date().refine((date) => {
         const parsedDate = parseISO(date);
         const minAgeDate = subYears(new Date(), 18);
         return parsedDate <= minAgeDate;
@@ -26,11 +26,7 @@ const signUpContinueSchema = z.object({
 
 export async function signUpContinue(prevState: any, formData: FormData){
 
-    console.log(Object.fromEntries(formData))
-
     const { userId } = await auth()
-
-    console.log(userId)
 
     const result = signUpContinueSchema.safeParse(Object.fromEntries(formData))
     if (!result.success){
@@ -51,14 +47,32 @@ export async function signUpContinue(prevState: any, formData: FormData){
                 cognome: result.data.cognome ?? "",
                 telefono: result.data.telefono ?? "",
                 cf: result.data.cf ?? "",
-                dataNascita: result.data.dataNascita ?? "",
+                dataNascita: formatISO(result.data.dataNascita) ?? "",
                 genere: result.data.genere ?? genere.NS,
                 ruolo: ruolo.CLIENTE 
             }
         })
     }
     catch(e){
-        console.log(e)
+        if (e instanceof Prisma.PrismaClientKnownRequestError) {
+            // Errore noto di Prisma
+            console.error("Errore noto di Prisma:", e.message, e.code);
+        } else if (e instanceof Prisma.PrismaClientUnknownRequestError) {
+            // Errore sconosciuto di Prisma
+            console.error("Errore sconosciuto di Prisma:", e.message);
+        } else if (e instanceof Prisma.PrismaClientRustPanicError) {
+            // Errore di panic di Prisma
+            console.error("Errore di panic di Prisma:", e.message);
+        } else if (e instanceof Prisma.PrismaClientInitializationError) {
+            // Errore di inizializzazione di Prisma
+            console.error("Errore di inizializzazione di Prisma:", e.message);
+        } else if (e instanceof Prisma.PrismaClientValidationError) {
+            // Errore di validazione di Prisma
+            console.error("Errore di validazione di Prisma:", e.message);
+        } else {
+            // Altro tipo di errore
+            console.error("Errore sconosciuto:", e);
+        }
     }
 
     
