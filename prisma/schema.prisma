@@ -10,67 +10,6 @@ datasource db {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model User {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
-
-  @@unique([email])
-  @@map("user")
-  Profili Profili[]
-}
-
-model Session {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  expiresAt DateTime
-  token     String
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String   @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([token])
-  @@map("session")
-}
-
-model Account {
-  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  accountId             String
-  providerId            String
-  userId                String    @db.Uuid
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime
-  updatedAt             DateTime
-
-  @@map("account")
-}
-
-model Verification {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime?
-  updatedAt  DateTime?
-
-  @@map("verification")
-}
-
 model Ospiti {
   idOspite        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   nome            String?
@@ -104,8 +43,8 @@ model Prenotazioni {
   dataInizio                               DateTime           @db.Timestamp(6)
   dataFine                                 DateTime           @db.Timestamp(6)
   codStanza                                String             @db.Uuid
-  codProfilo                               String             @db.Uuid
-  codPulizie                               String             @db.Uuid
+  codProfilo                               String             
+  codPulizie                               String             
   stato                                    stato_prenotazione @default(PRENOTATA)
   Ospiti                                   Ospiti[]
   Pagamenti                                Pagamenti[]
@@ -117,7 +56,7 @@ model Prenotazioni {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 model Profili {
-  idProfilo                                     String         @id @db.Uuid
+  idProfilo                                     String         @id 
   nome                                          String
   cognome                                       String
   telefono                                      String?
@@ -129,7 +68,6 @@ model Profili {
   ruolo                                         ruolo
   Prenotazioni_Prenotazioni_codProfiloToProfili Prenotazioni[] @relation("Prenotazioni_codProfiloToProfili")
   Prenotazioni_Prenotazioni_codPulizieToProfili Prenotazioni[] @relation("Prenotazioni_codPulizieToProfili")
-  User                                          User           @relation(fields: [idProfilo], references: [id])
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.

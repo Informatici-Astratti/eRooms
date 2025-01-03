@@ -48,10 +48,12 @@ export default function ConfirmSignupPage() {
                   <div className="grid gap-2">
                     <Label htmlFor="nome">Nome</Label>
                     <Input name="nome" type="text" required />
+                    <ErrorForm errors={state?.errors.nome}/>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="cognome">Cognome</Label>
                     <Input name="cognome" type="text" required />
+                    <ErrorForm errors={state?.errors.cognome}/>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="telefono">Numero di Telefono</Label>
@@ -94,6 +96,7 @@ export default function ConfirmSignupPage() {
                         </PopoverContent>
                     </Popover>
                     <Input type="hidden" value={date ? format(date, "yyyy-MM-dd") : ''} name="dataNascita"/>
+                    <ErrorForm errors={state?.errors.dataNascita}/>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="genere">Genere</Label>
@@ -107,6 +110,7 @@ export default function ConfirmSignupPage() {
                           <SelectItem value={genere.NS}>Non voglio specificarlo</SelectItem> 
                       </SelectContent>
                     </Select>
+                    <ErrorForm errors={state?.errors.genere}/>
                   </div>
                   <Button type="submit" className="w-full">
                     Conferma Registrazione

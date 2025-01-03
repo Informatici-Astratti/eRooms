@@ -1,45 +1,18 @@
-import { betterFetch } from "@better-fetch/fetch";
-import type { auth } from "@/lib/auth";
-import { NextResponse, type NextRequest } from "next/server";
- 
-type Session = typeof auth.$Infer.Session;
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-const authRoutes = ["/login", "/signup"];
-const protectedRoutes = ["/dashboard"];
- 
-export default async function authMiddleware(request: NextRequest) {
-    const pathName = request.nextUrl.pathname;
-    const isAuthRoute = authRoutes.includes(pathName);
-    const isProtectedRoute = protectedRoutes.includes(pathName);
+const isProtectedRoute = createRouteMatcher(['/dashboard(.*)'])
 
-    // PRENDO LA SESSIONE
+export default clerkMiddleware(async (auth, request) => {
+  if (isProtectedRoute(request)) {
+    await auth.protect()
+  }
+})
 
-	const { data: session } = await betterFetch<Session>(
-		"/api/auth/get-session",
-		{
-			baseURL: process.env.BETTER_AUTH_URL,
-			headers: {
-				//get the cookie from the request
-				cookie: request.headers.get("cookie") || "",
-			},
-		},
-	);
-
-    // CONTROLLI PER LE ROUTE
-	if (!session) {
-        if(isProtectedRoute){
-            return NextResponse.redirect(new URL("/login", request.url));
-        }
-        return NextResponse.next()
-    }
-
-    if (isAuthRoute) {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    return NextResponse.next();
-}
- 
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };
