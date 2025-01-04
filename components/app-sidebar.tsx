@@ -1,4 +1,4 @@
-import { BedDouble, BedSingle, Calendar, ChevronUp, Home, ReceiptText,User2,WashingMachine } from "lucide-react"
+import { BedDouble, BedSingle, Calendar, ChevronUp, Home, LogOut, ReceiptText,User2,UserRoundCog,WashingMachine } from "lucide-react"
 
 import {
   Sidebar,
@@ -15,6 +15,18 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import Link from "next/link"
 import { SignOutButton } from "@clerk/nextjs"
+import getUser from "@/app/lib/user"
+import { auth } from "@clerk/nextjs/server"
+import prisma from "@/lib/db"
+import { redirect } from "next/navigation"
+
+interface AppSidebarProps {
+  accountName: {
+    nome: string | undefined,
+    cognome: string | undefined
+  }
+}
+
 
 // Menu items.
 const items = [
@@ -45,7 +57,7 @@ const items = [
   },
 ]
 
-export function AppSidebar() {
+export function AppSidebar( {accountName} : AppSidebarProps) {
   return (
     <Sidebar>
         <SidebarHeader>
@@ -85,7 +97,7 @@ export function AppSidebar() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                     <SidebarMenuButton>
-                        <User2 /> Username
+                        <User2 /> {accountName?.nome + " " + accountName?.cognome}
                         <ChevronUp className="ml-auto" />
                     </SidebarMenuButton>
                     </DropdownMenuTrigger>
@@ -94,14 +106,15 @@ export function AppSidebar() {
                     className="w-[--radix-popper-anchor-width]"
                     >
                     <DropdownMenuItem>
-                        <span>Account</span>
+                        <UserRoundCog />
+                        <Link href={"#"}>
+                          Impostazioni Account
+                        </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                        <span>Billing</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
+                        <LogOut />
                         <SignOutButton>
-                          Sign Out
+                          Logout
                         </SignOutButton>
                     </DropdownMenuItem>
                     </DropdownMenuContent>
