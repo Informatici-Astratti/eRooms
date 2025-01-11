@@ -107,7 +107,7 @@ export function AppSidebar( {accountName} : AppSidebarProps) {
                     >
                     <DropdownMenuItem>
                         <UserRoundCog />
-                        <Link href={"#"}>
+                        <Link href={"/account"}>
                           Impostazioni Account
                         </Link>
                     </DropdownMenuItem>
