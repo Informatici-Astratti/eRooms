@@ -11,6 +11,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import Link from "next/link"
@@ -19,6 +22,9 @@ import getUser from "@/app/lib/user"
 import { auth } from "@clerk/nextjs/server"
 import prisma from "@/lib/db"
 import { redirect } from "next/navigation"
+import { Collapsible } from "@radix-ui/react-collapsible"
+import { CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible"
+
 
 interface AppSidebarProps {
   accountName: {
@@ -39,6 +45,12 @@ const items = [
     title: "Stanze",
     url: "/dashboard/stanze",
     icon: BedSingle,
+    collapsible: true,  // Indica che questo elemento è collapsible
+    subcategories: [
+      { title: "Stanza 1", url: "/dashboard/stanze/1" },
+      { title: "Stanza 2", url: "/dashboard/stanze/2" },
+      { title: "Stanza 3", url: "/dashboard/stanze/3" },
+    ], // Aggiungi qui le sottocategorie
   },
   {
     title: "Prenotazioni",
@@ -55,10 +67,12 @@ const items = [
     url: "/dashboard/pulizie",
     icon: WashingMachine,
   },
-]
+];
 
 export function AppSidebar( {accountName} : AppSidebarProps) {
+
   return (
+    <div className="">
     <Sidebar>
         <SidebarHeader>
             <div className="flex gap-2 justify-center items-center py-5">
@@ -69,25 +83,53 @@ export function AppSidebar( {accountName} : AppSidebarProps) {
             </div>
         </SidebarHeader>
 
-        <SidebarContent>
-            <SidebarGroup>
-            <SidebarGroupLabel>Menù</SidebarGroupLabel>
-            <SidebarGroupContent>
-                <SidebarMenu>
-                {items.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                        <Link href={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                        </Link>
+        <SidebarContent> 
+  <SidebarGroup>
+    <SidebarGroupLabel>Menù</SidebarGroupLabel>
+    <SidebarGroupContent>
+      <SidebarMenu>
+        {items.map((item) => {
+          if (item.collapsible) {
+            return (
+              <SidebarMenuItem key={item.title}>
+                <Collapsible defaultChecked className="group/collapsible">
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <item.icon />
+                      <span>{item.title}</span>
                     </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
-                </SidebarMenu>
-            </SidebarGroupContent>
-            </SidebarGroup>
-        </SidebarContent>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {item.subcategories.map((subcategory) => (
+                        <SidebarMenuSubItem key={subcategory.title}>
+                          <Link href={subcategory.url}>
+                            {subcategory.title}
+                          </Link>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </Collapsible>
+              </SidebarMenuItem>
+            );
+          } else {
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild>
+                  <Link href={item.url}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          }
+        })}
+      </SidebarMenu>
+    </SidebarGroupContent>
+  </SidebarGroup>
+</SidebarContent>
         {
             //TO DO: Da completare la parte per l'utente con il logout e il Nome Visualizzato
         }
@@ -123,5 +165,6 @@ export function AppSidebar( {accountName} : AppSidebarProps) {
             </SidebarMenu>
         </SidebarFooter>
     </Sidebar>
+    </div>
   )
 }
