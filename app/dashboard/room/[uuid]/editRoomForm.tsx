@@ -3,63 +3,43 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { addDays } from "date-fns"
-import type { DateRange } from "react-day-picker"
 
 import { toast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import NumericInput from "@/components/numericInputUI"
-import ScrollableDatePicker from "@/components/scrollableDatePicker"
 
 import "./scrollbar.css"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Label } from "@/components/ui/label"
-import { useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
-import { getRoom } from "./action"
-import { error } from "console"
 import { Stanze } from "@prisma/client"
 
 
 
 
 const FormSchema = z.object({
-  nomeStanza: z.string().min(1, {message: "Nome della stanza obbligatorio"}),
+  nome: z.string().min(1, {message: "Nome della stanza obbligatorio"}),
   descrizione: z.string().min(1, {message: "Descrizione obbligatoria"}),
-  capienza: z.number(),
-  tariffe: z.array(
-    z.object({
-      id: z.number(),
-      dateRange: z
-        .object({
-          from: z.date().optional(),
-          to: z.date().optional(),
-        })
-        .optional(),
-    }),
-  ),
+  capienza: z.number()
 })
 
-export default function EditRoomForm( room : Stanze ) {
-  
-  
-  
-  
+interface EditRoomFormProps {
+  room: Stanze | null
+}
+
+export default function EditRoomForm({ room }: EditRoomFormProps) {
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      nomeStanza: room.nome ?? "",
-      descrizione: "",
-      capienza: 0,
-      tariffe: [{ id: 1, dateRange: undefined }],
+      nome: room?.nome ?? "",
+      descrizione: room?.descrizione ?? "",
+      capienza: room?.capienza ?? 0
     },
   })
 
   
-
+  /*
   // Funzione per aggiungere un nuovo campo
   const handleAddItem = () => {
     const newId =
@@ -81,6 +61,8 @@ export default function EditRoomForm( room : Stanze ) {
     form.setValue("tariffe", updatedTariffe)
   }
 
+  
+  */
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({
       title: "You submitted the following values:",
@@ -99,10 +81,10 @@ export default function EditRoomForm( room : Stanze ) {
           <div className="mt-[25]">
             <FormField
               control={form.control}
-              name="nomeStanza"
+              name="nome"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{form.formState.errors.nomeStanza?.message || "Nome della Stanza"}</FormLabel>
+                  <FormLabel>{form.formState.errors.nome?.message || "Nome della Stanza"}</FormLabel>
                   <FormControl>
                     <Input placeholder="" {...field} />
                   </FormControl>
@@ -129,7 +111,7 @@ export default function EditRoomForm( room : Stanze ) {
               </FormItem>
             )}
           />
-
+          {/*
           <FormField
             control={form.control}
             name="tariffe"
@@ -150,6 +132,7 @@ export default function EditRoomForm( room : Stanze ) {
             )}
           />
         </div>
+        */}
 
         <div className="col-start-2 row-start-1 flex justify-center">
           <FormField
@@ -166,39 +149,6 @@ export default function EditRoomForm( room : Stanze ) {
             )}
           />
         </div>
-
-        <div className="col-start-2 row-start-2 flex justify-center">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline">Open popover</Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="grid gap-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium leading-none">Dimensions</h4>
-                  <p className="text-sm text-muted-foreground">Set the dimensions for the layer.</p>
-                </div>
-                <div className="grid gap-2">
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="width">Width</Label>
-                    <Input id="width" defaultValue="100%" className="col-span-2 h-8" />
-                  </div>
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="maxWidth">Max. width</Label>
-                    <Input id="maxWidth" defaultValue="300px" className="col-span-2 h-8" />
-                  </div>
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="height">Height</Label>
-                    <Input id="height" defaultValue="25px" className="col-span-2 h-8" />
-                  </div>
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="maxHeight">Max. height</Label>
-                    <Input id="maxHeight" defaultValue="none" className="col-span-2 h-8" />
-                  </div>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
         </div>
 
         <div className="col-start-1 row-start-2">

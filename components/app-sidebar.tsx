@@ -47,10 +47,10 @@ const items = [
     icon: BedSingle,
     collapsible: true,  // Indica che questo elemento è collapsible
     subcategories: [
-      { title: "Stanza 1", url: "/dashboard/room?uuid=6299c3c7-3416-48c6-bd5e-c8781515e78d" },
-      { title: "Stanza 2", url: "/dashboard/room?uuid=2" },
-      { title: "Stanza 3", url: "/dashboard/room?uuid=3" },
-      { title: "Stanza 4", url: "/dashboard/room?uuid=4" },
+      { title: "Stanza 1", url: "/dashboard/room/6299c3c7-3416-48c6-bd5e-c8781515e78d" },
+      { title: "Stanza 2", url: "/dashboard/room/2" },
+      { title: "Stanza 3", url: "/dashboard/room/3" },
+      { title: "Stanza 4", url: "/dashboard/room/4" },
     ], // Aggiungi qui le sottocategorie
   },
   {

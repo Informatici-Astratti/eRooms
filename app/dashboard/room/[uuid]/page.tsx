@@ -1,5 +1,3 @@
-
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Carousel,
@@ -12,10 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import EditRoomForm from "./editRoomForm";
 import { getRoom } from "./action";
-import { useEffect, useState } from "react";
-import { redirect, useSearchParams } from "next/navigation"
-
-
+import { redirect} from "next/navigation"
 
 export default async function EditRooms( {
   params,
