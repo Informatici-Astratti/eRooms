@@ -1,0 +1,20 @@
+/* Aggiungi questo CSS per personalizzare la scrollbar */
+textarea::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  
+  textarea::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  textarea::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  
+  textarea::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
