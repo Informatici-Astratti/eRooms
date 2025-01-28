@@ -1,41 +1,47 @@
 import type React from "react"
-import { forwardRef, useEffect, useState } from "react"
-import { Input } from "./ui/input"
-import { FormLabel } from "./ui/form"
+import { forwardRef, useRef } from "react"
 
 interface NumericInputProps {
   min?: number
   max?: number
   step?: number
-  value: number
-  onChange: (value: number) => void
+  defaultValue: number
+  name: string
 }
 
 const NumericInput = forwardRef<HTMLInputElement, NumericInputProps>(
-  ({ min = 0, max = 100, step = 1, value, onChange }, ref) => {
-    const [localValue, setLocalValue] = useState(value)
+  ({ min = 0, max = 100, step = 1, defaultValue, name }, ref) => {
+    const inputRef = useRef<HTMLInputElement>(null)
 
-    useEffect(() => {
-      setLocalValue(value)
-    }, [value])
+    const updateValue = (newValue: number) => {
+      if (inputRef.current) {
+        inputRef.current.value = newValue.toString()
+        // Trigger a change event to ensure form data is updated
+        const event = new Event("input", { bubbles: true })
+        inputRef.current.dispatchEvent(event)
+      }
+    }
 
     const handleIncrease = () => {
-      const newValue = Math.min(localValue + step, max)
-      setLocalValue(newValue)
-      onChange(newValue)
+      if (inputRef.current) {
+        const currentValue = Number(inputRef.current.value)
+        const newValue = Math.min(currentValue + step, max)
+        updateValue(newValue)
+      }
     }
 
     const handleDecrease = () => {
-      const newValue = Math.max(localValue - step, min)
-      setLocalValue(newValue)
-      onChange(newValue)
+      if (inputRef.current) {
+        const currentValue = Number(inputRef.current.value)
+        const newValue = Math.max(currentValue - step, min)
+        updateValue(newValue)
+      }
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = Number.parseInt(event.target.value, 10)
-      if (!isNaN(newValue) && newValue >= min && newValue <= max) {
-        setLocalValue(newValue)
-        onChange(newValue)
+      const newValue = Number(event.target.value)
+      if (!isNaN(newValue)) {
+        updateValue(Math.max(min, Math.min(newValue, max)))
       }
     }
 
@@ -50,11 +56,18 @@ const NumericInput = forwardRef<HTMLInputElement, NumericInputProps>(
           -
         </button>
         <input
-          ref={ref}
+          ref={(node) => {
+            inputRef.current = node
+            if (typeof ref === "function") {
+              ref(node)
+            } else if (ref) {
+              ref.current = node
+            }
+          }}
           className="rounded border-2 border-zinc-200 shadow-2xl"
-          disabled
           type="numeric"
-          value={localValue}
+          defaultValue={defaultValue}
+          name={name}
           onChange={handleChange}
           style={{
             width: "30px",

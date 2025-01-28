@@ -43,15 +43,8 @@ const items = [
   },
   {
     title: "Stanze",
-    url: "/dashboard/stanze",
+    url: "/dashboard/room",
     icon: BedSingle,
-    collapsible: true,  // Indica che questo elemento è collapsible
-    subcategories: [
-      { title: "Stanza 1", url: "/dashboard/room/6299c3c7-3416-48c6-bd5e-c8781515e78d" },
-      { title: "Stanza 2", url: "/dashboard/room/2" },
-      { title: "Stanza 3", url: "/dashboard/room/3" },
-      { title: "Stanza 4", url: "/dashboard/room/4" },
-    ], // Aggiungi qui le sottocategorie
   },
   {
     title: "Prenotazioni",
@@ -90,31 +83,6 @@ export function AppSidebar( {accountName} : AppSidebarProps) {
     <SidebarGroupContent>
       <SidebarMenu>
         {items.map((item) => {
-          if (item.collapsible) {
-            return (
-              <SidebarMenuItem key={item.title}>
-                <Collapsible defaultChecked className="group/collapsible">
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.subcategories.map((subcategory) => (
-                        <SidebarMenuSubItem key={subcategory.title}>
-                          <Link href={subcategory.url}>
-                            {subcategory.title}
-                          </Link>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </Collapsible>
-              </SidebarMenuItem>
-            );
-          } else {
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild>
@@ -126,7 +94,7 @@ export function AppSidebar( {accountName} : AppSidebarProps) {
               </SidebarMenuItem>
             );
           }
-        })}
+        )}
       </SidebarMenu>
     </SidebarGroupContent>
   </SidebarGroup>

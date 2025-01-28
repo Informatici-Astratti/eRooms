@@ -20,7 +20,7 @@ export default async function EditRooms( {
   
   
   const uuid = (await params).uuid
-
+  
   if (!uuid) { redirect("/dashboard/room") }
   const room = await getRoom(uuid)
 
@@ -30,7 +30,7 @@ export default async function EditRooms( {
   return (
     <div className="flex h-full w-full">
       <div className="flex-1 bg-zinc-50 p-4 ml-[285] -mr-[10] rounded-tl-lg rounded-bl-lg border-2 border-zinc-100 shadow-2xl">
-        <CardTitle>MODIFICA STANZA</CardTitle>
+        <h1 className="text-2xl font-bold mb-4">Dettaglio Stanza</h1>
         <EditRoomForm room={room} />
       </div>
       <div className="w-[500px] bg-zinc-100 p-4 mr-[25] rounded-tr-lg rounded-br-lg rounded-tl-lg rounded-bl-lg border shadow-xl">
