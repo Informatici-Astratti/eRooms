@@ -13,7 +13,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
     <SidebarProvider>
       <AppSidebar accountName={accountName} />
       <main>
-        <SidebarTrigger />
         {children}
       </main>
     </SidebarProvider>

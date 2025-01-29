@@ -4,7 +4,7 @@ import { Pencil, Router, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Stanze } from "@prisma/client";
 import { redirect, useRouter } from "next/navigation";
-import { deleteRoom } from "@/app/dashboard/room/action";
+import { deleteRoom } from "@/app/admin/room/action";
 import { revalidatePath } from "next/cache";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 

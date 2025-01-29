@@ -1,5 +1,11 @@
-import { BedDouble, BedSingle, Calendar, ChevronUp, Home, LogOut, ReceiptText,User2,UserRoundCog,WashingMachine } from "lucide-react"
+import * as React from "react"
+import { BedDouble, BedSingle, Calendar, ChevronRight, ChevronUp, Home, Info, LogOut, ReceiptText, SquareActivity, User2, UserRoundCog, Users, WashingMachine } from "lucide-react"
 
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import {
   Sidebar,
   SidebarContent,
@@ -14,17 +20,78 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarRail,
 } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
-import Link from "next/link"
 import { SignOutButton } from "@clerk/nextjs"
-import getUser from "@/app/lib/user"
-import { auth } from "@clerk/nextjs/server"
-import prisma from "@/lib/db"
-import { redirect } from "next/navigation"
-import { Collapsible } from "@radix-ui/react-collapsible"
-import { CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible"
+import Link from "next/link"
 
+// This is sample data.
+const data = {
+  versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
+  navMain: [
+    {
+      title: "Home",
+      url: "#",
+      items: [
+        {
+          title: "Dashboard",
+          url:"/admin/dashboard",
+          icon: SquareActivity
+        }
+      ],
+    },
+    {
+      title: "Bookings",
+      url: "#",
+      items: [
+        {
+          title: "Prenotazioni",
+          url: "/admin/booking",
+          icon: Calendar,
+        },
+        {
+          title: "Pulizie",
+          url: "/admin/pulizie",
+          icon: WashingMachine,
+        },
+      ],
+    },
+    {
+      title: "Gestione Proprietà",
+      url: "#",
+      items: [
+        {
+          title: "Proprietà",
+          url: "#",
+          icon: Home,
+          items: [
+            {
+              title: "Generale",
+              url: "#",
+              icon: Info,
+            },
+            {
+              title: "Stanze",
+              url: "/admin/room",
+              icon: BedSingle,
+            },
+          ]
+        },
+        {
+          title: "Clienti",
+          url: "/admin/customers",
+          icon: Users,
+        },
+        {
+          title: "Fatturazioni",
+          url: "/admin/payments",
+          icon: ReceiptText,
+        },
+      ],
+    }
+  ]
+}
 
 interface AppSidebarProps {
   accountName: {
@@ -33,40 +100,8 @@ interface AppSidebarProps {
   }
 }
 
-
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "/dashboard",
-    icon: Home,
-  },
-  {
-    title: "Stanze",
-    url: "/dashboard/room",
-    icon: BedSingle,
-  },
-  {
-    title: "Prenotazioni",
-    url: "/dashboard/booking",
-    icon: Calendar,
-  },
-  {
-    title: "Fatturazioni",
-    url: "/dashboard/payments",
-    icon: ReceiptText,
-  },
-  {
-    title: "Pulizie",
-    url: "/dashboard/pulizie",
-    icon: WashingMachine,
-  },
-];
-
-export function AppSidebar( {accountName} : AppSidebarProps) {
-
+export function AppSidebar({accountName} : AppSidebarProps) {
   return (
-    <div className="">
     <Sidebar>
         <SidebarHeader>
             <div className="flex gap-2 justify-center items-center py-5">
@@ -76,33 +111,60 @@ export function AppSidebar( {accountName} : AppSidebarProps) {
                 <p className="font-bold">e-Rooms</p>
             </div>
         </SidebarHeader>
-
-        <SidebarContent> 
-  <SidebarGroup>
-    <SidebarGroupLabel>Menù</SidebarGroupLabel>
-    <SidebarGroupContent>
-      <SidebarMenu>
-        {items.map((item) => {
-            return (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
-                  <Link href={item.url}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            );
-          }
-        )}
-      </SidebarMenu>
-    </SidebarGroupContent>
-  </SidebarGroup>
-</SidebarContent>
-        {
-            //TO DO: Da completare la parte per l'utente con il logout e il Nome Visualizzato
-        }
-        <SidebarFooter>
+      <SidebarContent className="gap-0">
+        {/* We create a SidebarGroup for each parent. */}
+        {data.navMain.map((item, index) => (
+          <SidebarGroup key={index}>
+          <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+          <SidebarMenu>
+            {item.items.map((item) => (
+              item.items ? (
+              <Collapsible
+                key={item.title}
+                asChild
+                className="group/collapsible"
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip={item.title}>
+                      {item.icon && <item.icon />}
+                      <p>{item.title}</p>
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {item.items?.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton asChild>
+                            <Link href={subItem.url}>
+                              {subItem.icon && <subItem.icon />}
+                              <p>{subItem.title}</p>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+              ) : (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <Link href={item.url}>
+                      <item.icon />
+                      <p>{item.title}</p>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+        ))}
+      </SidebarContent>
+      <SidebarRail />
+      <SidebarFooter>
             <SidebarMenu>
                 <SidebarMenuItem>
                 <DropdownMenu>
@@ -122,18 +184,17 @@ export function AppSidebar( {accountName} : AppSidebarProps) {
                           Impostazioni Account
                         </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <SignOutButton>
+                      <DropdownMenuItem>
                         <LogOut />
-                        <SignOutButton>
-                          Logout
-                        </SignOutButton>
-                    </DropdownMenuItem>
+                        Logout
+                      </DropdownMenuItem>
+                    </SignOutButton>
                     </DropdownMenuContent>
                 </DropdownMenu>
                 </SidebarMenuItem>
             </SidebarMenu>
         </SidebarFooter>
     </Sidebar>
-    </div>
   )
 }
