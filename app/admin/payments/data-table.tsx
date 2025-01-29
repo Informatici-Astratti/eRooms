@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import type { Profili, Prenotazioni, Pagamenti } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
@@ -32,7 +31,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<Profili, TValue>) {
+export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -61,10 +60,10 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<Profi
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filtra i nomi..."
-          value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("nome")?.setFilterValue(event.target.value)}
-          className="max-w-sm bg-white"
+          placeholder="Filter prenotazioni..."
+          value={(table.getColumn("Prenotazioni")?.getFilterValue() as string) ?? ""}
+          onChange={(event) => table.getColumn("Prenotazioni")?.setFilterValue(event.target.value)}
+          className="max-w-sm"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -93,12 +92,12 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<Profi
       </div>
       <div className="rounded-md border">
         <Table>
-          <TableHeader className="bg-black">
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow className="hover:bg-black" key={headerGroup.id}>
+              <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead className="text-white" key={header.id}>
+                    <TableHead key={header.id}>
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   )
@@ -109,18 +108,18 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<Profi
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row, index) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}
-                className={cn(
-                    "transition-colors hover:bg-zinc-200",
-                    index % 2 === 0 ? "bg-white" : "bg-zinc-100"
-                  )}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className={cn("transition-colors hover:bg-muted/50", index % 2 === 0 ? "bg-white" : "bg-muted/30")}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
-              <TableRow className="h-24 text-center">
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   No results.
                 </TableCell>
@@ -130,10 +129,10 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<Profi
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-    {/*    <div className="flex-1 text-sm text-muted-foreground">
+        <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
           selected.
-        </div>*/}
+        </div>
         <div className="space-x-2">
           <Button
             variant="outline"

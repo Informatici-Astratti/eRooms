@@ -11,7 +11,7 @@ export default async function Clients() {
     <div className="">
       
         <Suspense fallback={<div>Loading...</div>}>
-            <div className="m-10">
+            <div className="p-10">
           <DataTable columns={columns} data={profiles} />
           </div>
         </Suspense>
