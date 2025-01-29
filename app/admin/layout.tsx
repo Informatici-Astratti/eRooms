@@ -12,7 +12,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   return (
     <SidebarProvider>
       <AppSidebar accountName={accountName} />
-      <SidebarInset className="bg-primary-foreground">
+      <SidebarInset className="bg-primary-foreground w-full">
         {children}
       </SidebarInset>
       
