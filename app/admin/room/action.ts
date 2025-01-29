@@ -57,9 +57,9 @@ export async function deleteRoom(idStanza: string): Promise<StanzeResponse> {
 export async function updateRoomById(prevState: StanzeResponse, formData: FormData): Promise<StanzeResponse> {
   const data: Stanze = {
     idStanza: formData.get("idStanza") as string,
-    nome: formData.get("idStanza") as string,
-    descrizione: formData.get("idStanza") as string,
-    capienza: Number(formData.get("idStanza") as string),
+    nome: formData.get("nome") as string,
+    descrizione: formData.get("descrizione") as string,
+    capienza: Number(formData.get("capienza") as string),
     foto: []
   }
 

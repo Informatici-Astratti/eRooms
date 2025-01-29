@@ -22,7 +22,6 @@ export default function RoomCard({
 
     const handleDeleteRoom = async () => {
       const res = await deleteRoom(idStanza)
-      console.log(res)
 
       if (!res.success){
         toast({
@@ -30,6 +29,8 @@ export default function RoomCard({
           title: "Errore",
           description: res.errors ? res.errors.toString() : "Errore Sconosciuto"
         })
+
+        return
       }
       
       router.refresh()

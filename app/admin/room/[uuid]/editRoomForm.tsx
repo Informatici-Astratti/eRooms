@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Stanze } from "@prisma/client";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
@@ -25,6 +25,18 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
     success: false,
     fields: room ?? { idStanza: "", nome: "", capienza: 0, descrizione: "", foto: [] },
   })
+
+  useEffect(() => {
+    if (state.success){
+      toast({
+        title: "Successo",
+        description: state.message,
+        variant: "success",
+      })
+    }
+  }, [state.success])
+
+
   return (
     <form action={formAction}
     className="space-y-5 max-w-3xl mx-auto mr-2">
@@ -57,8 +69,5 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
       </div>
     </form>
   );
-}
-function updateRoom(state: undefined): Promise<undefined> | undefined {
-  throw new Error("Function not implemented.");
 }
 
