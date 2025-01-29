@@ -9,8 +9,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import EditRoomForm from "./editRoomForm";
-import { getRoom } from "./action";
 import { redirect} from "next/navigation"
+import { getRoomById } from "../action";
+import { Stanze } from "@prisma/client";
 
 export default async function EditRooms( {
   params,
@@ -20,12 +21,8 @@ export default async function EditRooms( {
   
   
   const uuid = (await params).uuid
-  
   if (!uuid) { redirect("/dashboard/room") }
-  const room = await getRoom(uuid)
-
-  
-
+  const room = uuid !== "new" ? await getRoomById(uuid) : null
 
   return (
     <div className="flex h-full w-full">

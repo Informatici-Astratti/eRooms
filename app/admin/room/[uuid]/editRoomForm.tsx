@@ -8,11 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Stanze } from "@prisma/client";
 import { useActionState } from "react";
-import { updateRoom } from "./action";
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
 import './scrollbar.css'
+import { createRoom, updateRoomById } from "../action";
 
 interface EditRoomFormProps {
   room: Stanze | null;
@@ -20,43 +20,32 @@ interface EditRoomFormProps {
 
 export default function EditRoomForm({ room }: EditRoomFormProps) {
   const { toast } = useToast()
-  /*
-  //const {toast} = useToast()
-  */
-  const [state, formAction] = useActionState(updateRoom, undefined)
-  
-/*
-  const onSubmit = () => {
-    toast({
-      title: "Room updated successfully",
-      description: "The room details have been updated in the database.",
-      action: (
-        <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
-      ),
-    })
-    redirect('/dashboard/room')
-  }*/
+
+  const [state, formAction] = useActionState(room ? updateRoomById : createRoom, {
+    success: false,
+    fields: room ?? { idStanza: "", nome: "", capienza: 0, descrizione: "", foto: [] },
+  })
   return (
     <form action={formAction}
     className="space-y-5 max-w-3xl mx-auto mr-2">
       <div className="grid grid-cols-12 gap-4">
-          <Input name="idStanza" className="hidden" defaultValue={room?.idStanza} />
+          <Input name="idStanza" className="hidden" defaultValue={state?.fields?.idStanza} />
         {/*FIELD*/}
         <div className="col-span-6">
           <Label>Nome</Label>
-          <Input name="nome" type="text" defaultValue={room?.nome ?? ""} required/>
+          <Input name="nome" type="text" defaultValue={state?.fields?.nome ?? ""} required/>
           <ErrorForm errors={state?.errors?.nome} />
         </div>
 
         <div className="col-span-6">
           <Label>Capienza</Label>
-          <NumericInput name="capienza" defaultValue={room?.capienza ?? 0} />
+          <NumericInput name="capienza" defaultValue={state?.fields?.capienza ?? 0} />
           <ErrorForm errors={state?.errors?.capienza} />
         </div>
 
         <div className="col-span-12">
           <Label>Descrizione</Label>
-          <Textarea name="descrizione" className="h-40" defaultValue={room?.descrizione ?? ""}/>
+          <Textarea name="descrizione" className="h-40" defaultValue={state?.fields?.descrizione ?? ""}/>
           <ErrorForm errors={state?.errors?.descrizione} />
         </div>
 
@@ -69,3 +58,7 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
     </form>
   );
 }
+function updateRoom(state: undefined): Promise<undefined> | undefined {
+  throw new Error("Function not implemented.");
+}
+

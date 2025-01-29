@@ -2,34 +2,45 @@ import RoomCard from "@/components/roomCardUI";
 import { Suspense } from "react";
 import RoomsList from "./roomsList";
 import { Skeleton } from "@/components/ui/skeleton";
-import getRoomsList from "./action";
+import getAllRooms from "./action";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { CirclePlus } from "lucide-react";
 
 export default async function Rooms() {
 
-const rooms = await getRoomsList();
+const rooms = await getAllRooms();
 
   return (
-    <div className="flex w-screen">
-      <div className="w-full m-5 bg-zinc-100 rounded-xl border-2 border-zinc-100 shadow-2xl">
-        <div className="container mx-auto p-4">
-          <h1 className="text-2xl font-bold mb-4">Lista Stanze</h1>
-          <Suspense fallback={<RoomListSkeleton />}>
-            <RoomsList></RoomsList>
-            <div className="space-y-4">
-                    {rooms.map((room) => (
-                      <RoomCard
-                        key={room.idStanza}
-                        idStanza={room.idStanza}
-                        nome={room.nome}
-                        descrizione={room.descrizione}
-                        capienza={room.capienza}
-                        foto={room.foto}
-                      />
-                    ))}
-                  </div>
-          </Suspense>
+    <div className="p-5 w-full">
+      <div className="mb-4 flex flex-col  ">
+        <div className="flex justify-between items-center">
+          <h1 className="text-4xl font-bold">Lista Stanze</h1>
+          <Button asChild>
+            <Link href={"/admin/room/new"}>
+              <CirclePlus />
+              <p>Crea nuova Stanza</p>
+            </Link>
+          </Button>
         </div>
       </div>
+
+      <div className="flex flex-col items-center gap-3">
+        
+          {rooms.map((room) => (
+            <RoomCard
+              key={room.idStanza}
+              idStanza={room.idStanza}
+              nome={room.nome}
+              descrizione={room.descrizione}
+              capienza={room.capienza}
+              foto={room.foto}
+            />
+          ))}
+      </div>
+
+      
+      
     </div>
   );
 }
