@@ -102,7 +102,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({accountName} : AppSidebarProps) {
   return (
-    <Sidebar variant="inset" collapsible="none">
+    <Sidebar variant="inset" collapsible="none" className="h-screen bg-white">
         <SidebarHeader>
             <div className="flex gap-2 justify-center items-center py-5">
                 <div className="flex size-6 bg-primarflex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
