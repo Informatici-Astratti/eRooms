@@ -68,7 +68,7 @@ const data = {
           items: [
             {
               title: "Generale",
-              url: "#",
+              url: "/admin/general",
               icon: Info,
             },
             {

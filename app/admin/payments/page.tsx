@@ -4,6 +4,7 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { getPayments } from "./action";
 
+
 export default async function PaymentView() {
   const payments = await getPayments();
   return (
