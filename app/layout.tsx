@@ -28,7 +28,7 @@ export default function RootLayout({
     <ClerkProvider localization={itIT}>
       <html lang="en">
       <body
-        className={`${poppins.className} antialiased`}
+        className={`${poppins.className} antialiased h-screen`}
       >
         <main>
         {children}
