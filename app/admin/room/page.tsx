@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CirclePlus } from "lucide-react";
 import { Tariffe } from "@prisma/client";
-import TariffaCard from "@/components/TariffaCardUI";
-import EditTariffaForm from "./EditTariffaForm";
+//import TariffaCard from "@/components/TariffaCardUI";
+//import EditTariffaForm from "./EditTariffaForm";
 
 export default async function Rooms() {
 
@@ -38,15 +38,16 @@ const rooms: StanzeConTariffe[] = await getAllRooms();
               nome={room.nome}
               descrizione={room.descrizione}
               capienza={room.capienza}
+              costoStandard={room.costoStandard}
               foto={room.foto}
-            />
+            />{/*
             <div className="flex flex-col items-end w-full gap-3">
               {room.Tariffe.map((Tariffa: Tariffe) => (
                 <TariffaCard tariffa={Tariffa}/>
               ))}
               <EditTariffaForm tariffa={null} />
 
-            </div>
+            </div>*/}
             </>
           ))
           }

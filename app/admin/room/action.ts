@@ -68,7 +68,7 @@ export async function updateRoomById(prevState: StanzeResponse, formData: FormDa
     nome: formData.get("nome") as string,
     descrizione: formData.get("descrizione") as string,
     capienza: Number(formData.get("capienza") as string),
-    
+    costoStandard: Number(formData.get("costoStandard") as string),
     foto: []
   }
 
@@ -89,6 +89,7 @@ export async function updateRoomById(prevState: StanzeResponse, formData: FormDa
           nome: result.data.nome,
           capienza: result.data.capienza,
           descrizione: result.data.descrizione,
+          costoStandard: result.data.costoStandard,
       //foto: [],
       },
     })
@@ -113,12 +114,14 @@ export async function createRoom(prevState: StanzeResponse, formData: FormData):
     nome: formData.get("nome") as string,
     descrizione: formData.get("descrizione") as string,
     capienza: Number(formData.get("capienza") as string),
+    costoStandard: Number(formData.get("costoStandard") as string),
     foto: []
   }
 
   const result = formSchema.safeParse(data)
 
   if (!result.success) {
+    console.log("Errore")
     return {
       success: false,
       errors: result.error.flatten().fieldErrors,
@@ -132,6 +135,7 @@ export async function createRoom(prevState: StanzeResponse, formData: FormData):
         nome: result.data.nome,
         capienza: result.data.capienza,
         descrizione: result.data.descrizione,
+        costoStandard: result.data.costoStandard
         //foto: [],
       },
     })

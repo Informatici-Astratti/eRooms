@@ -15,6 +15,7 @@ export default function RoomCard({
   nome,
   descrizione,
   capienza,
+  costoStandard,
   foto,
 }: Stanze) {
     const router = useRouter()
@@ -51,6 +52,7 @@ export default function RoomCard({
       <div className="w-2/3 p-4 flex flex-col justify-between">
         <h2 className="text-xl font-semibold mb-2">{nome}</h2>
         <p className="text-gray-600">Capienza: {capienza}</p>
+        <p className="text-gray-600">Costo Standard: {costoStandard?.toFixed(2)} €</p>
         <div className="flex justify-end space-x-2">
           <Button asChild>
             <Link href={`/admin/room/${idStanza}`}>

@@ -33,7 +33,7 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
 
   const [state, formAction] = useActionState(room ? updateRoomById : createRoom, {
     success: false,
-    fields: room ?? { idStanza: "", nome: "", capienza: 0, descrizione: "", foto: [] },
+    fields: room ?? { idStanza: "", nome: "", capienza: 0, descrizione: "", costoStandard: 0, foto: [] },
   })
 
   useEffect(() => {
@@ -89,9 +89,9 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             <div className="flex flex-col gap-1 ">
-              <Label>Nome</Label>
-              <Input name="nome" type="number" defaultValue={state?.fields?.costoStandard ?? ""} required />
-              <ErrorForm errors={state?.errors?.nome} />
+              <Label>Prezzo Standard</Label>
+              <Input name="costoStandard" type="number" defaultValue={state?.fields?.costoStandard ?? ""} required />
+              <ErrorForm errors={state?.errors?.costoStandard} />
             </div>
           </CardContent>
         </Card>
