@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import prisma from "@/lib/db"
-import { Prisma, Stanze, stato_prenotazione } from "@prisma/client"
+import { Prisma, Stanze, stato_prenotazione, Tariffe } from "@prisma/client"
 import { promises } from "dns"
 import { redirect } from "next/navigation"
 import { formSchema } from "./roomFormSchema"
@@ -14,9 +14,17 @@ interface StanzeResponse{
   message?: string
 }
 
+export type StanzeConTariffe = Prisma.StanzeGetPayload<{
+  include: {Tariffe: true}
+}>
 
-export default async function getAllRooms(): Promise<Stanze[]> {
-  const roomsList = await prisma.stanze.findMany()
+
+export default async function getAllRooms(): Promise<StanzeConTariffe[]> {
+  const roomsList: StanzeConTariffe[] = await prisma.stanze.findMany({
+    include:{
+      Tariffe: true
+    }
+  })
   return roomsList
 }
 
@@ -60,6 +68,7 @@ export async function updateRoomById(prevState: StanzeResponse, formData: FormDa
     nome: formData.get("nome") as string,
     descrizione: formData.get("descrizione") as string,
     capienza: Number(formData.get("capienza") as string),
+    
     foto: []
   }
 

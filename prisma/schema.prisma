@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -24,8 +23,6 @@ model Ospiti {
   Prenotazioni    Prenotazioni    @relation(fields: [codPrenotazione], references: [idPrenotazione])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-
 model Pagamenti {
   idPagamento     String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   metodo          String?
@@ -35,28 +32,22 @@ model Pagamenti {
   Prenotazioni    Prenotazioni? @relation(fields: [codPrenotazione], references: [idPrenotazione], onDelete: Restrict)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-
 model Prenotazioni {
   idPrenotazione                           String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   dataCreazione                            DateTime           @default(now()) @db.Timestamptz(6)
   dataInizio                               DateTime           @db.Timestamp(6)
   dataFine                                 DateTime           @db.Timestamp(6)
   codStanza                                String             @db.Uuid
-  codProfilo                               String             
-  codPulizie                               String             
+  codProfilo                               String
   stato                                    stato_prenotazione @default(PRENOTATA)
   Ospiti                                   Ospiti[]
   Pagamenti                                Pagamenti[]
   Profili_Prenotazioni_codProfiloToProfili Profili            @relation("Prenotazioni_codProfiloToProfili", fields: [codProfilo], references: [idProfilo])
-  Profili_Prenotazioni_codPulizieToProfili Profili            @relation("Prenotazioni_codPulizieToProfili", fields: [codPulizie], references: [idProfilo])
   Stanze                                   Stanze             @relation(fields: [codStanza], references: [idStanza])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-
 model Profili {
-  idProfilo                                     String         @id 
+  idProfilo                                     String         @id
   nome                                          String
   cognome                                       String
   telefono                                      String?
@@ -67,22 +58,23 @@ model Profili {
   indirizzo                                     String?
   ruolo                                         ruolo
   Prenotazioni_Prenotazioni_codProfiloToProfili Prenotazioni[] @relation("Prenotazioni_codProfiloToProfili")
-  Prenotazioni_Prenotazioni_codPulizieToProfili Prenotazioni[] @relation("Prenotazioni_codPulizieToProfili")
+  TurniPulizie                                  TurniPulizie[]
 }
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 model Stanze {
-  idStanza     String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  nome         String?
-  capienza     Int?           @db.SmallInt
-  descrizione  String?
-  foto         String[]
-  Prenotazioni Prenotazioni[]
-  Tariffe      Tariffe[]
+  idStanza      String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome          String?
+  capienza      Int?           @db.SmallInt
+  descrizione   String?
+  foto          String[]
+  costoStandard Float?         @db.Real
+  codProprieta  String?        @db.Uuid
+  Prenotazioni  Prenotazioni[]
+  Pulizie       Pulizie?
+  Proprieta     Proprieta?     @relation(fields: [codProprieta], references: [id], onDelete: Restrict)
+  Tariffe       Tariffe[]
+  TurniPulizie  TurniPulizie[]
 }
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 model Tariffe {
   codStanza      String    @db.Uuid
@@ -94,7 +86,37 @@ model Tariffe {
   @@id([codStanza, dataInizio])
 }
 
+model Proprieta {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome                 String
+  email                String?
+  telefono             String?
+  registrazioneSocieta String
+  indirizzo            String
+  citta                String
+  CAP                  String
+  paese                String
+  Stanze               Stanze[]
+}
+
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Pulizie {
+  codStanza           String        @id @db.Uuid
+  stato               stato_pulizia
+  ultimoAggiornamento DateTime      @db.Timestamp(6)
+  Stanze              Stanze        @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model TurniPulizie {
+  idTurno       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codStanza     String    @db.Uuid
+  codGovernante String
+  dataInizio    DateTime  @db.Date
+  dataFine      DateTime? @db.Date
+  Profili       Profili   @relation(fields: [codGovernante], references: [idProfilo], onDelete: Cascade)
+  Stanze        Stanze    @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
+}
 
 enum genere {
   UOMO
@@ -105,7 +127,7 @@ enum genere {
 enum ruolo {
   CLIENTE
   PROPRIETARIO
-  PULIZIE
+  GOVERNANTE
 }
 
 enum stato_prenotazione {
@@ -121,4 +143,14 @@ enum tipo_documento {
   PASSAPORTO
 }
 
+enum stato_pulizia {
+  PULITA
+  DA_PULIRE
+}
 
+enum tipo_variazione {
+  AUMENTO_PERCENTUALE
+  SCONTO_PERCENTUALE
+  AUMENTO_FISSO
+  SCONTO_FISSO
+}
