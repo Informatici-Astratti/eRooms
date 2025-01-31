@@ -31,6 +31,7 @@ import {
 import { Button } from "@/components/ui/button"
 import React from "react"
 import { Input } from "@/components/ui/input"
+import { ChevronDown } from "lucide-react"
 
 
 interface DataTableProps<TData, TValue> {
@@ -69,21 +70,21 @@ export function DataTable<TData, TValue>({
     })
 
     return (
-        <div className="flex flex-col h-full w-full items-center justify-center">
-            <div className="flex items-center py-4 mb-4">
+        <div className="w-full">
+            <div className="flex items-center py-4">
                 <Input
                     placeholder="Filtra per cliente..."
                     value={(table.getColumn("cliente")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
                         table.getColumn("cliente")?.setFilterValue(event.target.value)
                     }
-                    className="max-w-sm"
+                    className="max-w-sm bg-white"
                 />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
-                            Colonne
-                        </Button>
+                            Colonne <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button> 
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         {table
@@ -110,12 +111,12 @@ export function DataTable<TData, TValue>({
             </div>
             <div className="rounded-md border">
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="bg-black">
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
+                            <TableRow className="hover: bg-black" key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id}>
+                                        <TableHead className="text-white" key={header.id}>
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -152,6 +153,25 @@ export function DataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
+              <div className="flex items-center justify-end space-x-2 py-4">
+                {/*    <div className="flex-1 text-sm text-muted-foreground">
+                      {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
+                      selected.
+                    </div>*/}
+                    <div className="space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                      >
+                        Precedente
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+                        Sucessivo
+                      </Button>
+                    </div>
+                  </div>
         </div>
     )
 }

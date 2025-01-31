@@ -1,6 +1,6 @@
 "use client"
 
-import type { stato_prenotazione, Prenotazioni as PrenotazioniType, Stanze, Ospiti } from "@prisma/client"
+import type { Prenotazioni as PrenotazioniType, Stanze, Ospiti, Profili } from "@prisma/client"
 import type { ColumnDef } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 
@@ -25,27 +25,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import ModificaPrenotazione from "./editFormPrenotazioni"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { getAllRooms } from "./action"
 
 export type PrenotazioneWithRelations = PrenotazioniType & {
   Stanze: Stanze
   Ospiti: Ospiti[]
+  Profili_Prenotazioni_codProfiloToProfili: Profili
 }
 
-export type Prenotazioni = PrenotazioneWithRelations
-
 export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
-  {
-    accessorKey: "stato",
-    header: ({ column }) => {
-      return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Stato
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
   {
     accessorKey: "idPrenotazione",
     header: "Codice Prenotazione",
@@ -54,18 +43,15 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
     accessorKey: "cliente",
     header: "Cliente",
     cell: ({ row }) => {
-      const nomeOspite = row.original.Ospiti[0];
-      return (nomeOspite?.nome && nomeOspite?.cognome)
-        ? nomeOspite.nome.concat(' ', nomeOspite.cognome)
-        : 'N/A';
+      const nomeOspite = row.original.Profili_Prenotazioni_codProfiloToProfili
+      return nomeOspite?.nome && nomeOspite?.cognome ? nomeOspite.nome.concat(" ", nomeOspite.cognome) : "N/A"
     },
     filterFn: (row, columnId, value) => {
-      const nomeOspite = row.original.Ospiti[0];
-      const nomeCompleto = nomeOspite?.nome && nomeOspite?.cognome
-        ? nomeOspite.nome.concat(' ', nomeOspite.cognome)
-        : 'N/A';
-  
-      return nomeCompleto.toLowerCase().includes(value.toLowerCase());
+      const nomeOspite = row.original.Profili_Prenotazioni_codProfiloToProfili
+      const nomeCompleto =
+        nomeOspite?.nome && nomeOspite?.cognome ? nomeOspite.nome.concat(" ", nomeOspite.cognome) : "N/A"
+
+      return nomeCompleto.toLowerCase().includes(value.toLowerCase())
     },
   },
   {
@@ -104,15 +90,35 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
     },
   },
   {
+    accessorKey: "stato",
+    header: ({ column }) => {
+      return (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Stato
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const prenotazione = row.original
       const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+      const [allRooms, setAllRooms] = useState<Stanze[]>([])
+
+      useEffect(() => {
+        const fetchRooms = async () => {
+          const rooms = await getAllRooms()
+          setAllRooms(rooms)
+        }
+        fetchRooms()
+      }, [])
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+          <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-400 bg-gray-200">
               <span className="sr-only">Apri menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
@@ -121,7 +127,7 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
             <DropdownMenuLabel>Azioni</DropdownMenuLabel>
             <Dialog>
               <DialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Info ospite</DropdownMenuItem>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Info cliente</DropdownMenuItem>
               </DialogTrigger>
               <GuestsTable ospiti={prenotazione.Ospiti} />
             </Dialog>
@@ -137,7 +143,11 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
                   Modifica
                 </DropdownMenuItem>
               </DialogTrigger>
-              <ModificaPrenotazione prenotazione={prenotazione} onClose={() => setIsEditModalOpen(false)} /> 
+              <ModificaPrenotazione
+                prenotazione={prenotazione}
+                onClose={() => setIsEditModalOpen(false)}
+                allRooms={allRooms}
+              />
             </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -150,11 +160,11 @@ export default function GuestsTable({ ospiti }: { ospiti: Ospiti[] }) {
   return (
     <DialogContent className="max-w-4xl">
       <DialogHeader>
-        <DialogTitle>Guest Information</DialogTitle>
-        <DialogDescription>Detailed information about the guests.</DialogDescription>
+        <DialogTitle>Info Cliente</DialogTitle>
+        <DialogDescription>Dettagli sul cliente.</DialogDescription>
       </DialogHeader>
       <Table>
-        <TableCaption>Elenco dettagliato degli ospiti registrati.</TableCaption>
+        <TableCaption>Elenco dettagliato del cliente.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[150px]">Nome</TableHead>
