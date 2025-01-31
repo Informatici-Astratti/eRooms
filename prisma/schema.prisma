@@ -68,26 +68,24 @@ model Stanze {
   descrizione   String?
   foto          String[]
   costoStandard Float?         @db.Real
-  codProprieta  String?        @db.Uuid
   Prenotazioni  Prenotazioni[]
   Pulizie       Pulizie?
-  Proprieta     Proprieta?     @relation(fields: [codProprieta], references: [id], onDelete: Restrict)
   Tariffe       Tariffe[]
   TurniPulizie  TurniPulizie[]
 }
 
 model Tariffe {
-  codStanza      String    @db.Uuid
-  dataInizio     DateTime  @db.Date
-  dataFine       DateTime? @db.Date
-  costoProcapite Float     @db.Real
-  Stanze         Stanze    @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
-
-  @@id([codStanza, dataInizio])
+  idTariffa      String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codStanza      String          @db.Uuid
+  dataInizio     DateTime        @db.Date
+  dataFine       DateTime        @db.Date
+  tipoVariazione tipo_variazione
+  variazione     Float           @db.Real
+  Stanze         Stanze          @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
 }
 
 model Proprieta {
-  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                   String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   nome                 String
   email                String?
   telefono             String?
@@ -96,7 +94,6 @@ model Proprieta {
   citta                String
   CAP                  String
   paese                String
-  Stanze               Stanze[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
