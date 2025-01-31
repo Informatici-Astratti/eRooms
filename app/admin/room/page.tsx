@@ -2,20 +2,23 @@ import RoomCard from "@/components/roomCardUI";
 import { Suspense } from "react";
 import RoomsList from "./roomsList";
 import { Skeleton } from "@/components/ui/skeleton";
-import getAllRooms from "./action";
+import getAllRooms, { StanzeConTariffe } from "./action";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CirclePlus } from "lucide-react";
+import { Tariffe } from "@prisma/client";
+import TariffaCard from "@/components/TariffaCardUI";
+import EditTariffaForm from "./EditTariffaForm";
 
 export default async function Rooms() {
 
-const rooms = await getAllRooms();
+const rooms: StanzeConTariffe[] = await getAllRooms();
 
   return (
     <div className="p-5 w-full">
       <div className="mb-4 flex flex-col  ">
         <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold">Lista Stanze</h1>
+          <h1 className="text-4xl font-bold">Le tue Stanze</h1>
           <Button asChild>
             <Link href={"/admin/room/new"}>
               <CirclePlus />
@@ -24,10 +27,11 @@ const rooms = await getAllRooms();
           </Button>
         </div>
       </div>
-
-      <div className="flex flex-col items-center gap-3">
-        
-          {rooms.map((room) => (
+      <div className="flex w-full justify-center">
+        <div className="flex flex-col items-center w-1/2 gap-3">
+          
+          {rooms.map((room: StanzeConTariffe) => (
+            <>
             <RoomCard
               key={room.idStanza}
               idStanza={room.idStanza}
@@ -36,8 +40,19 @@ const rooms = await getAllRooms();
               capienza={room.capienza}
               foto={room.foto}
             />
-          ))}
+            <div className="flex flex-col items-end w-full gap-3">
+              {room.Tariffe.map((Tariffa: Tariffe) => (
+                <TariffaCard tariffa={Tariffa}/>
+              ))}
+              <EditTariffaForm tariffa={null} />
+
+            </div>
+            </>
+          ))
+          }
+        </div>
       </div>
+      
 
       
       

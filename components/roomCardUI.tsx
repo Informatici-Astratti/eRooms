@@ -44,7 +44,7 @@ export default function RoomCard({
     }
 
   return (
-    <div className="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-2xl w-full">
+    <div className="flex bg-white rounded-lg shadow-lg overflow-hidden min-w-2xl w-full">
       <div className="w-1/3 relative m-2">
         <img src={foto.length > 0 ? foto[0] : "/placeholder.svg"} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
       </div>
