@@ -1,7 +1,9 @@
-export default function DashboardPage() {
+import { getStatistics } from "./action";
+import Dashboard from "./dashboard";
+
+export default async function getInformazioni(){
+    const info = await getStatistics()
     return(
-        <div>
-            <h1>Questa è la Dashboard</h1>
-        </div>
-    )
+        <Dashboard initialStats={info} />
+    );
 }
