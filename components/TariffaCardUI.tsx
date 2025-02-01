@@ -57,8 +57,8 @@ export default function TariffaCard({ tariffa }: TariffaCardProps) {
       <p className="font-bold">{formatEnumValue(tariffa.tipoVariazione)}</p>
       <p>{tariffa.variazione + " " + (tariffa.tipoVariazione === tipo_variazione.AUMENTO_PERCENTUALE || tariffa.tipoVariazione === tipo_variazione.SCONTO_PERCENTUALE ? "%" : "€")}</p>
       <div className="flex flex-col gap-2 text-sm">
-        <p>{format(tariffa.dataInizio, 'dd/MM/yyyy')}</p>
-        <p>{format(tariffa.dataFine, 'dd/MM/yyyy')}</p>
+        <p><span className="font-bold">Da:</span> {format(tariffa.dataInizio, 'dd/MM/yyyy')}</p>
+        <p><span className="font-bold">A:</span> {format(tariffa.dataFine, 'dd/MM/yyyy')}</p>
       </div>
 
       <DropdownMenu>
@@ -68,8 +68,6 @@ export default function TariffaCard({ tariffa }: TariffaCardProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel className="font-bold">Azioni</DropdownMenuLabel>
-          <DropdownMenuSeparator />
           <div className="flex flex-col gap-2 w-full">
 
             <DropdownMenuItem asChild>
