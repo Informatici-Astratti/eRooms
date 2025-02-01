@@ -150,4 +150,5 @@ enum tipo_variazione {
   SCONTO_PERCENTUALE
   AUMENTO_FISSO
   SCONTO_FISSO
+  NULLA
 }

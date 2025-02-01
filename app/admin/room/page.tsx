@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CirclePlus } from "lucide-react";
 import { Tariffe } from "@prisma/client";
+import TariffaCard from "@/components/TariffaCardUI";
+import EditTariffaForm from "./EditTariffaForm";
 //import TariffaCard from "@/components/TariffaCardUI";
 //import EditTariffaForm from "./EditTariffaForm";
 
@@ -28,9 +30,9 @@ const rooms: StanzeConTariffe[] = await getAllRooms();
         </div>
       </div>
       <div className="flex w-full justify-center">
-        <div className="flex flex-col items-center w-1/2 gap-3">
+        <div key={crypto.randomUUID()} className="flex flex-col items-center w-1/2 gap-3">
           
-          {rooms.map((room: StanzeConTariffe) => (
+          {rooms.map((room: StanzeConTariffe, index) => (
             <>
             <RoomCard
               key={room.idStanza}
@@ -40,14 +42,14 @@ const rooms: StanzeConTariffe[] = await getAllRooms();
               capienza={room.capienza}
               costoStandard={room.costoStandard}
               foto={room.foto}
-            />{/*
-            <div className="flex flex-col items-end w-full gap-3">
+            />
+            <div key={index} className="flex flex-col items-end w-full gap-3">
               {room.Tariffe.map((Tariffa: Tariffe) => (
-                <TariffaCard tariffa={Tariffa}/>
+                <TariffaCard key={Tariffa.idTariffa} tariffa={Tariffa}/>
               ))}
-              <EditTariffaForm tariffa={null} />
+              <EditTariffaForm key={"form_"+index} codStanza={room.idStanza} tariffa={null} />
 
-            </div>*/}
+            </div>
             </>
           ))
           }
