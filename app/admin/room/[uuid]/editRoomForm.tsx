@@ -7,13 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Stanze } from "@prisma/client";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
 import './scrollbar.css'
 import { createRoom, updateRoomById } from "../action";
 import { Plus } from "lucide-react";
+import Image from "next/image";
 
 import {
   Card,
@@ -23,6 +24,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
+import { UploadButton } from "@/app/lib/uploadthing";
 
 interface EditRoomFormProps {
   room: Stanze | null;
@@ -36,6 +39,8 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
     fields: room ?? { idStanza: "", nome: "", capienza: 0, descrizione: "", costoStandard: 0, foto: [] },
   })
 
+  const [foto, setFoto] = useState<string[]>(room?.foto ?? [])
+
   useEffect(() => {
     if (state.success){
       toast({
@@ -46,9 +51,11 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
     }
   }, [state.success])
 
-  const addFormTariffa = () => {
-
-  }
+  useEffect(() => {
+    if(state.fields?.foto){
+      setFoto(state.fields.foto)
+    }
+  }, [state.fields?.foto])
 
 
   return (
@@ -101,10 +108,32 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
             <CardTitle className="text-xl">Immagini</CardTitle>
             <CardDescription>Inserisci le immagini per la tua stanza</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <p>Qui andranno le immagini</p>
+          <CardContent className="flex items-center gap-3">
+            <UploadButton 
+              className="p-4 items-center"
+              endpoint={"roomPicture"}
+              onClientUploadComplete={(res) => {
+                if (res) {
+                  const newFoto = res.map((foto) => foto.url)
+                  setFoto((prev) => [...prev, ...newFoto])
+                }
+              }}
+            />
+            <div className="border rounded-md p-4 grid grid-cols-5 w-full">
+              {foto.map((foto) => (
+                <Image
+                  key={foto}
+                  src={foto}
+                  width={200}
+                  height={200}
+                  alt=""
+                />
+              ))}
+
+            </div>
           </CardContent>
         </Card>
+        <Input type="hidden" name="foto" value={JSON.stringify(foto)} />
         
         <div className="flex w-full justify-end">
           <Button type="submit" className="col-span-4">

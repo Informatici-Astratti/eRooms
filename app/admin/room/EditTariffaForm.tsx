@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/card"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { addDays, format, parseISO } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { updateTariffa,  createTariffa } from "./tariffeAction";

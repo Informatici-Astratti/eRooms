@@ -1,6 +1,6 @@
 "use server"
 
-import prisma from "@/lib/db"
+import prisma from "@/app/lib/db"
 
 // Funzione per ottenere le prenotazioni di oggi
 async function getTodayBookings() {

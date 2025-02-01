@@ -1,6 +1,6 @@
 "use server"
 
-import prisma from "@/lib/db";
+import prisma from "@/app/lib/db";
 import { Proprieta } from "@prisma/client";
 import { error } from "console";
 import { da } from "date-fns/locale";

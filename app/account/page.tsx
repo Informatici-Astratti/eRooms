@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { BedDouble } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
-import prisma from "@/lib/db";
+import prisma from "@/app/lib/db";
 import { redirect } from "next/navigation";
 import EditAccountForm from "./editAccountForm";
 

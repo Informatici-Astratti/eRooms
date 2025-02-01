@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import prisma from "@/app/lib/db";
 
 export async function getPayments() {
     const payments = await prisma.pagamenti.findMany({

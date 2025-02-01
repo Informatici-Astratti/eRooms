@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { subYears, parseISO, formatISO } from "date-fns";
 import { z } from "zod"
-import prisma from "@/lib/db";
+import prisma from "@/app/lib/db";
 import { genere, Prisma, ruolo } from "@prisma/client";
 import { headers } from "next/headers";
 import { auth } from "@clerk/nextjs/server";

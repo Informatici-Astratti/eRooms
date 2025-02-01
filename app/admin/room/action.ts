@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import prisma from "@/lib/db"
+import prisma from "@/app/lib/db"
 import { Prisma, Stanze, stato_prenotazione, Tariffe } from "@prisma/client"
 import { promises } from "dns"
 import { redirect } from "next/navigation"
@@ -69,7 +69,7 @@ export async function updateRoomById(prevState: StanzeResponse, formData: FormDa
     descrizione: formData.get("descrizione") as string,
     capienza: Number(formData.get("capienza") as string),
     costoStandard: Number(formData.get("costoStandard") as string),
-    foto: []
+    foto: JSON.parse(formData.get("foto") as string) as string[]
   }
 
   const result = formSchema.safeParse(data)
@@ -90,7 +90,7 @@ export async function updateRoomById(prevState: StanzeResponse, formData: FormDa
           capienza: result.data.capienza,
           descrizione: result.data.descrizione,
           costoStandard: result.data.costoStandard,
-      //foto: [],
+          foto: result.data.foto
       },
     })
     return{
@@ -115,7 +115,7 @@ export async function createRoom(prevState: StanzeResponse, formData: FormData):
     descrizione: formData.get("descrizione") as string,
     capienza: Number(formData.get("capienza") as string),
     costoStandard: Number(formData.get("costoStandard") as string),
-    foto: []
+    foto: JSON.parse(formData.get("foto") as string) as string[]
   }
 
   const result = formSchema.safeParse(data)
@@ -135,8 +135,8 @@ export async function createRoom(prevState: StanzeResponse, formData: FormData):
         nome: result.data.nome,
         capienza: result.data.capienza,
         descrizione: result.data.descrizione,
-        costoStandard: result.data.costoStandard
-        //foto: [],
+        costoStandard: result.data.costoStandard,
+        foto: result.data.foto
       },
     })
   } catch (error) {

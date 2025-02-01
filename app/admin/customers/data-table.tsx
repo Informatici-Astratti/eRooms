@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import type { Profili, Prenotazioni, Pagamenti } from "@prisma/client"
-import { cn } from "@/lib/utils"
+import { cn } from "@/app/lib/utils"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

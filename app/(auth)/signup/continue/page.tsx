@@ -8,7 +8,7 @@ import {
 import { BedDouble } from "lucide-react";
 import SignUpContinueForm from "./RegisterForm";
 import { auth } from "@clerk/nextjs/server";
-import prisma from "@/lib/db";
+import prisma from "@/app/lib/db";
 import { redirect } from "next/navigation";
 
 

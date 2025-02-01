@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import prisma from "../../lib/db";
+import prisma from "./db";
 
 export default async function getUser(){
     const { userId } = await auth()

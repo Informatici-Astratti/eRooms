@@ -1,6 +1,6 @@
 "use server"
 
-import prisma from "@/lib/db";
+import prisma from "@/app/lib/db";
 import { Tariffe, tipo_variazione } from "@prisma/client";
 import { parseISO, formatISO } from "date-fns";
 import { redirect } from "next/navigation";

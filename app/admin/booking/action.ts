@@ -1,6 +1,6 @@
 "use server"
 
-import prisma from "@/lib/db"
+import prisma from "@/app/lib/db"
 import { revalidatePath } from "next/cache"
 import type { stato_prenotazione } from "@prisma/client"
 

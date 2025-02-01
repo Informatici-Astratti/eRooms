@@ -9,7 +9,7 @@ import { BedDouble, CalendarIcon } from "lucide-react";
 import { useActionState, useState } from "react";
 import * as React from "react"
 import { format } from "date-fns"
-import { cn } from "@/lib/utils"
+import { cn } from "@/app/lib/utils"
 import {  signUpContinue } from "../../action";
 import ErrorForm from "@/components/ErrorForm";
 import { PhoneInput } from "@/components/ui/phone-input";
