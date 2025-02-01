@@ -16,15 +16,19 @@ import {
   } from "@/components/ui/select"
 import { useActionState, useEffect } from "react";
 import { editPropertyForm } from "./action";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { Proprieta } from "@prisma/client";
 
+interface EditPropertyFormProps {
+  property: Proprieta | null;
+}
 
-
-export default function EditPropertyForm() {
+export default function EditPropertyForm({ property }: EditPropertyFormProps) {
+    const { toast } = useToast()
 
     const [state, formAction] = useActionState(editPropertyForm, {
         success: false,
-        fields: { nome: "", email: "", telefono: "", societa: 0, indirizzo: "", citta: "", CAP: "", paese: "" },
+        fields: property ?? {id: "", nome: "", email: "", telefono: "", registrazioneSocieta: "", indirizzo: "", citta: "", CAP: "", paese: "" },
       })
     
       useEffect(() => {
@@ -42,9 +46,10 @@ export default function EditPropertyForm() {
             <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 space-y-5">
                     <h1 className="text-xl font-bold">Informazioni di Contatto</h1>
+                        <Input className="hidden" name="id" type="text" defaultValue={state.fields?.id}/>
                         <div className="w-[80%]">
                             <Label>Nome della Proprietà</Label>
-                            <Input name="nome" type="text" placeholder="Dove mi trovo?" defaultValue={state.fields?.nome ?? ""} required/>
+                            <Input name="nome" type="text" placeholder="Dove mi trovo?" defaultValue={state.fields?.nome} required/>
                             <ErrorForm errors={state?.errors?.nome}/>
                         </div>
                         <div className="w-[80%]">
@@ -54,18 +59,13 @@ export default function EditPropertyForm() {
                         </div>
                         <div className="w-[80%]">
                             <Label>Numero di Telefono</Label>
-                            <PhoneInput
-                            placeholder="123 456 7890"
-                            name="telefono"
-                            defaultCountry="IT"
-                            value={state.fields?.telefono ?? ""}
-                            />
+                            <Input name="telefono" type="text" placeholder="123 456 7890" defaultValue={state.fields?.telefono ?? ""} required/>
                             <ErrorForm errors={state?.errors?.telefono}/>
                         </div>
                         <div className="w-[80%]">
                             <Label>Numero di Registrazione della Società</Label>
-                            <Input name="societa" type="number" placeholder="1357924680" defaultValue={state.fields?.societa ?? ""} required/>
-                            <ErrorForm errors={state?.errors?.societa}/>
+                            <Input name="registrazioneSocieta" type="text" placeholder="1357924680" defaultValue={state.fields?.registrazioneSocieta} required/>
+                            <ErrorForm errors={state?.errors?.registrazioneSocieta}/>
                         </div>
 
                 </div>
@@ -73,22 +73,22 @@ export default function EditPropertyForm() {
                     <h1 className="text-xl font-bold">Indirizzo Proprietà</h1>
                         <div className="w-[80%]">
                             <Label>Indirizzo</Label>
-                            <Input name="indirizzo" type="text" placeholder="Via Roma" defaultValue={state.fields?.indirizzo ?? ""} required/>
+                            <Input name="indirizzo" type="text" placeholder="Via Roma" defaultValue={state.fields?.indirizzo} required/>
                             <ErrorForm errors={state?.errors?.indirizzo}/>
                         </div>
                         <div className="w-[80%]">
                             <Label>Città</Label>
-                            <Input name="citta" type="text" placeholder="Roma" defaultValue={state.fields?.citta ?? ""} required/>
+                            <Input name="citta" type="text" placeholder="Roma" defaultValue={state.fields?.citta} required/>
                             <ErrorForm errors={state?.errors?.citta}/>
                         </div>
                         <div className="w-[80%]">
                             <Label>CAP</Label>
-                            <Input name="CAP" type="text" placeholder="70032" defaultValue={state.fields?.CAP ?? ""} required/>
+                            <Input name="CAP" type="text" placeholder="70032" defaultValue={state.fields?.CAP} required/>
                             <ErrorForm errors={state?.errors?.CAP}/>
                         </div>
                         <div className="w-[80%]">
                             <Label>Paese</Label>
-                            <Select name="paese" defaultValue={state.fields?.paese ?? ""}>
+                            <Select name="paese" defaultValue={state.fields?.paese}>
                                 <SelectTrigger className="w-[280px]">
                                     <SelectValue placeholder="Seleziona" />
                                 </SelectTrigger>

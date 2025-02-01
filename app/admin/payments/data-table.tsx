@@ -92,12 +92,12 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
       </div>
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-black">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow className="hover:bg-black" key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead className="text-white" key={header.id}>
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   )
@@ -111,7 +111,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={cn("transition-colors hover:bg-muted/50", index % 2 === 0 ? "bg-white" : "bg-muted/30")}
+                  className={cn("transition-colors hover:bg-zinc-200", index % 2 === 0 ? "bg-white" : "bg-zinc-100")}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
@@ -129,10 +129,10 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+        {/*<div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
           selected.
-        </div>
+        </div>*/}
         <div className="space-x-2">
           <Button
             variant="outline"

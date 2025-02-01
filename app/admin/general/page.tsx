@@ -1,8 +1,11 @@
+import getProperty from "./action";
 import EditPropertyForm from "./EditpropertyForm";
 
 
 
 export default async function GeneralInfo() {
+
+    const property = await getProperty()
 
     return (
         <div className="p-5 w-full">
@@ -14,7 +17,7 @@ export default async function GeneralInfo() {
             </div>
 
             <div className="flex flex-col">
-                <EditPropertyForm></EditPropertyForm>   
+                <EditPropertyForm property={property ?? null} ></EditPropertyForm>   
                      
             </div>
         </div>
