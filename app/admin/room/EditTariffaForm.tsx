@@ -110,7 +110,7 @@ export default function EditTariffaForm({ tariffa, codStanza}: EditTariffaFormPr
               <SelectTrigger className="w-fit">
                 <SelectValue placeholder="Tipo di Variazione" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent key={crypto.randomUUID()}>
                 {Object.values(tipo_variazione).map((tipo, index) => ( tipo !== tipo_variazione.NULLA ?
                   <SelectItem key={tipo} value={tipo}>{formatEnumValue(tipo)}</SelectItem>
                   :

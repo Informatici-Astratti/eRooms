@@ -106,9 +106,9 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
           </CardContent>
         </Card>
         
-        <div>
+        <div className="flex w-full justify-end">
           <Button type="submit" className="col-span-4">
-            Conferma Dettaglio
+            {room ? "Modifica Stanza" : "Aggiungi Stanza"}
           </Button>
         </div>
       </div>

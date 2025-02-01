@@ -4,7 +4,6 @@ import { Ellipsis, Pencil, Router, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Stanze, Tariffe, tipo_variazione } from "@prisma/client";
 import { redirect, useRouter } from "next/navigation";
-import { deleteRoom } from "@/app/admin/room/action";
 import { revalidatePath } from "next/cache";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import Link from "next/link";
@@ -21,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import EditTariffaForm from "@/app/admin/room/EditTariffaForm";
+import { deleteTariffa } from "@/app/admin/room/tariffeAction";
 
 interface TariffaCardProps {
   tariffa: Tariffe
@@ -30,7 +30,7 @@ export default function TariffaCard({ tariffa }: TariffaCardProps) {
   const router = useRouter()
   const { toast } = useToast()
   const handleDeleteTariffa = async () => {
-    const res = await deleteRoom(tariffa.idTariffa)
+    const res = await deleteTariffa(tariffa.idTariffa)
 
     if (!res.success){
       toast({
@@ -47,7 +47,7 @@ export default function TariffaCard({ tariffa }: TariffaCardProps) {
     toast({
       variant: "success",
       title: "Successo",
-      description: "La stanza è stata eliminata con successo"
+      description: "La Tariffa è stata eliminata con successo"
     })
     
   }
