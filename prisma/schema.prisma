@@ -66,8 +66,8 @@ model Stanze {
   nome          String?
   capienza      Int?           @db.SmallInt
   descrizione   String?
-  foto          String[]
   costoStandard Float?         @db.Real
+  FotoStanze    FotoStanze[]
   Prenotazioni  Prenotazioni[]
   Pulizie       Pulizie?
   Tariffe       Tariffe[]
@@ -113,6 +113,13 @@ model TurniPulizie {
   dataFine      DateTime? @db.Date
   Profili       Profili   @relation(fields: [codGovernante], references: [idProfilo], onDelete: Cascade)
   Stanze        Stanze    @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model FotoStanze {
+  idFoto    String  @id
+  codStanza String? @db.Uuid
+  Stanze    Stanze? @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
 }
 
 enum genere {

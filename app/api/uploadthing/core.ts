@@ -18,12 +18,11 @@ export const uploadRouter = {
 
             return {userId: userId}
         })
-        .onUploadComplete( async ({metadata, file}) => {
-            console.log("foto url:", file.url)
+        .onUploadComplete( async ({file}) => {
 
-            return {url: file.url}
+            return {key: file.key}
         })
 
 } satisfies FileRouter;
 
-export type UploadRouter = typeof uploadRouter
+export type UploadRouter = typeof uploadRouter;

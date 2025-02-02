@@ -4,11 +4,14 @@ import { Pencil, Router, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Stanze } from "@prisma/client";
 import { redirect, useRouter } from "next/navigation";
-import { deleteRoom } from "@/app/admin/room/action";
+import { deleteRoom, getFotoURL, StanzeForm } from "@/app/admin/room/action";
 import { revalidatePath } from "next/cache";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { AspectRatio } from "@radix-ui/react-aspect-ratio";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function RoomCard({
   idStanza,
@@ -17,9 +20,23 @@ export default function RoomCard({
   capienza,
   costoStandard,
   foto,
-}: Stanze) {
+}: StanzeForm) {
     const router = useRouter()
     const {toast} = useToast()
+
+    const [roomFoto, setRoomFoto] = useState<string>("https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80")
+
+    useEffect(() => {
+      
+      const fetchFotoURL = async () => {
+        if (foto && foto.length > 0) {
+          const url = await getFotoURL(foto[0]);
+          setRoomFoto(url);
+        }
+      };
+  
+      fetchFotoURL();
+    }, [foto]);
 
     const handleDeleteRoom = async () => {
       const res = await deleteRoom(idStanza)
@@ -44,10 +61,16 @@ export default function RoomCard({
       
     }
 
+    const handleGetFotoURL = async (idFoto: string): Promise<string> => {
+      return await getFotoURL(idFoto)
+    }
+
   return (
     <div className="flex bg-white rounded-lg shadow-lg overflow-hidden min-w-2xl w-full">
       <div className="w-1/3 relative m-2">
-        <img src={foto.length > 0 ? foto[0] : "/placeholder.svg"} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+        <AspectRatio ratio={16/9}>
+          <Image fill src={roomFoto} alt="Immagine Vetrina Stanza" className="rounded-md object-cover"  />
+        </AspectRatio>
       </div>
       <div className="w-2/3 p-4 flex flex-col justify-between">
         <h2 className="text-xl font-semibold mb-2">{nome}</h2>

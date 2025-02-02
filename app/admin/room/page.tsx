@@ -2,7 +2,7 @@ import RoomCard from "@/components/roomCardUI";
 import { Suspense } from "react";
 import RoomsList from "./roomsList";
 import { Skeleton } from "@/components/ui/skeleton";
-import getAllRooms, { StanzeConTariffe } from "./action";
+import getAllRooms, { StanzeConTariffeFoto } from "./action";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CirclePlus } from "lucide-react";
@@ -14,7 +14,7 @@ import EditTariffaForm from "./EditTariffaForm";
 
 export default async function Rooms() {
 
-  const rooms: StanzeConTariffe[] = await getAllRooms();
+  const rooms: StanzeConTariffeFoto[] = await getAllRooms();
 
   return (
     <div className="p-5 w-full">
@@ -32,7 +32,7 @@ export default async function Rooms() {
       <div className="flex w-full justify-center">
         <div className="flex flex-col items-center w-1/2 gap-3">
 
-          {rooms.map((room: StanzeConTariffe, index) => (
+          {rooms.map((room: StanzeConTariffeFoto, index) => (
 
             <div key={crypto.randomUUID()} className="flex flex-col items-end w-full gap-3">
               <RoomCard
@@ -42,7 +42,7 @@ export default async function Rooms() {
                 descrizione={room.descrizione}
                 capienza={room.capienza}
                 costoStandard={room.costoStandard}
-                foto={room.foto}
+                foto={room.FotoStanze.map((foto) => foto.idFoto)}
               />
 
               {room.Tariffe.map((Tariffa: Tariffe) => (

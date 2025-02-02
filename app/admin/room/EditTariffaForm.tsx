@@ -36,18 +36,18 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/app/lib/utils";
 import { addDays, format, parseISO } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { updateTariffa,  createTariffa } from "./tariffeAction";
+import { updateTariffa, createTariffa } from "./tariffeAction";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatEnumValue } from "@/app/lib/formatEnum";
 
 
 interface EditTariffaFormProps {
   tariffa: Tariffe | null
-  codStanza? : string
+  codStanza?: string
 };
 
-export default function EditTariffaForm({ tariffa, codStanza}: EditTariffaFormProps) {
-  const {toast} = useToast()
+export default function EditTariffaForm({ tariffa, codStanza }: EditTariffaFormProps) {
+  const { toast } = useToast()
   const router = useRouter()
 
   const [state, formAction] = useActionState(tariffa ? updateTariffa : createTariffa, {
@@ -62,7 +62,7 @@ export default function EditTariffaForm({ tariffa, codStanza}: EditTariffaFormPr
     }
   }
   );
-  
+
 
   const [data, setData] = useState<DateRange | undefined>({
     from: state.fields?.dataInizio,
@@ -70,7 +70,7 @@ export default function EditTariffaForm({ tariffa, codStanza}: EditTariffaFormPr
   })
 
   useEffect(() => {
-    if (state.success){
+    if (state.success) {
       toast({
         title: "Successo",
         description: state.message,
@@ -106,19 +106,22 @@ export default function EditTariffaForm({ tariffa, codStanza}: EditTariffaFormPr
         <form action={formAction} className="flex flex-col gap-3">
           <div className="flex flex-col gap-2">
             <Label>Seleziona Tipo di Variazione</Label>
-            <Select name="tipoVariazione" {...(state.fields?.tipoVariazione !== tipo_variazione.NULLA ? {defaultValue: state.fields?.tipoVariazione}: {})}>
+            <Select key={crypto.randomUUID()} name="tipoVariazione" {...(state.fields?.tipoVariazione !== tipo_variazione.NULLA ? { defaultValue: state.fields?.tipoVariazione } : {})}>
               <SelectTrigger className="w-fit">
                 <SelectValue placeholder="Tipo di Variazione" />
               </SelectTrigger>
               <SelectContent key={crypto.randomUUID()}>
-                {Object.values(tipo_variazione).map((tipo, index) => ( tipo !== tipo_variazione.NULLA ?
-                  <SelectItem key={tipo} value={tipo}>{formatEnumValue(tipo)}</SelectItem>
-                  :
-                  <></>
-                ))}
+                {Object.values(tipo_variazione)
+                  .filter(tipo => tipo !== tipo_variazione.NULLA)
+                  .map(tipo => (
+                    <SelectItem key={`${tariffa?.idTariffa ?? 'new'}-${tipo}`} value={tipo}>
+                      {formatEnumValue(tipo)}
+                    </SelectItem>
+                  ))
+                }
               </SelectContent>
             </Select>
-            <ErrorForm errors={typeof state.errors === 'object' ? state.errors?.tipoVariazione : undefined}/>
+            <ErrorForm errors={typeof state.errors === 'object' ? state.errors?.tipoVariazione : undefined} />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -131,45 +134,45 @@ export default function EditTariffaForm({ tariffa, codStanza}: EditTariffaFormPr
               defaultValue={state.fields?.variazione}
               required
             />
-            <ErrorForm errors={typeof state.errors === 'object' ? state.errors?.variazione : undefined}/>
+            <ErrorForm errors={typeof state.errors === 'object' ? state.errors?.variazione : undefined} />
           </div>
 
           <div className="flex flex-col gap-2">
             <Label>Periodo Validità</Label>
             <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="date"
-                    variant={"outline"}
-                    className={cn("col-span-3 justify-start text-left font-normal", !data && "text-muted-foreground")}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {data?.from ? (
-                      data.to ? (
-                        <>
-                          {format(data.from, "dd/MM/yyyy")} - {format(data.to, "dd/MM/yyyy")}
-                        </>
-                      ) : (
-                        format(data.from, "dd/MM/yyyy")
-                      )
+              <PopoverTrigger asChild>
+                <Button
+                  id="date"
+                  variant={"outline"}
+                  className={cn("col-span-3 justify-start text-left font-normal", !data && "text-muted-foreground")}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {data?.from ? (
+                    data.to ? (
+                      <>
+                        {format(data.from, "dd/MM/yyyy")} - {format(data.to, "dd/MM/yyyy")}
+                      </>
                     ) : (
-                      <span>Seleziona un intervallo di date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={data?.from}
-                    selected={data}
-                    onSelect={setData}
-                    numberOfMonths={2}
-                  />
-                </PopoverContent>
-              </Popover>
-            <ErrorForm errors={typeof state.errors === 'object' ? state.errors?.dataInizio : undefined}/>
-            <ErrorForm errors={typeof state.errors === 'object' ? state.errors?.dataFine : undefined}/>
+                      format(data.from, "dd/MM/yyyy")
+                    )
+                  ) : (
+                    <span>Seleziona un intervallo di date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={data?.from}
+                  selected={data}
+                  onSelect={setData}
+                  numberOfMonths={2}
+                />
+              </PopoverContent>
+            </Popover>
+            <ErrorForm errors={typeof state.errors === 'object' ? state.errors?.dataInizio : undefined} />
+            <ErrorForm errors={typeof state.errors === 'object' ? state.errors?.dataFine : undefined} />
             <Input type="hidden" value={data?.from ? format(data.from, "yyyy-MM-dd") : ''} name="dataInizio" />
             <Input type="hidden" value={data?.to ? format(data.to, "yyyy-MM-dd") : ''} name="dataFine" />
           </div>
