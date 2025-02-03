@@ -5,6 +5,7 @@ import { DataTable } from "./data-table"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { CirclePlus } from "lucide-react"
+import { CreateReservationSheet } from "./create-reservation"
 
 
 
@@ -18,12 +19,7 @@ export default async function DemoPage() {
           <div className="flex flex-col gap-4">
           <div className="flex justify-between items-center">
           <h1 className="text-4xl font-bold">Prenotazioni</h1>
-          <Button asChild>
-            <Link href={"/admin/booking/new"}>
-              <CirclePlus />
-              <p>Crea nuova Prenotazione</p>
-            </Link>
-          </Button>
+          <CreateReservationSheet></CreateReservationSheet>
         </div>
             <DataTable columns={columns} data={data} />
           </div>
