@@ -99,8 +99,8 @@ model Proprieta {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Pulizie {
   codStanza           String        @id @db.Uuid
-  stato               stato_pulizia
-  ultimoAggiornamento DateTime      @db.Timestamp(6)
+  stato               stato_pulizia @default(PULITA)
+  ultimoAggiornamento DateTime      @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamptz(6)
   Stanze              Stanze        @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
 }
 
