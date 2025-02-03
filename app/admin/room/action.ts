@@ -200,18 +200,25 @@ export async function createRoom(prevState: StanzeResponse, formData: FormData):
       }
     })
 
-    const updatedFoto = await prisma.fotoStanze.updateMany({
-      where: {idFoto: {
-        in: validatedData.data.foto
-      }},
-      data: {
-        codStanza: createdRoom.idStanza
-      }
+    const createPulizieRow = await prisma.pulizie.create({
+      data: {codStanza: createdRoom.idStanza}
     })
 
-    const createPulizieRow = await prisma.pulizie.create({
-      data: {codStanza: validatedData.data.idStanza}
-    })
+    if(validatedData.data.foto){
+      const updatedFoto = await prisma.fotoStanze.updateMany({
+        where: {idFoto: {
+          in: validatedData.data.foto
+        }},
+        data: {
+          codStanza: createdRoom.idStanza
+        }
+      })
+    }
+
+    
+
+    
+
   } catch (error) {
     let errorMessage = "Si è verificato un errore nella creazione della stanza, ripovare più tardi."
     let errorFields = {}
