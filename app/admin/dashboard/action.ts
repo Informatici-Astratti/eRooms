@@ -10,7 +10,6 @@ async function getTodayBookings() {
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
 
-
   const bookings = await prisma.prenotazioni.findMany({
     where: {
       OR: [
@@ -40,7 +39,7 @@ async function getTodayBookings() {
     },
   })
 
-  // Funzione per mappare le prenotazioni 
+  // Funzione per mappare le prenotazioni
   const mapBookings = (bookings: any[]) =>
     bookings.map((booking) => ({
       idPrenotazione: booking.idPrenotazione,
@@ -62,9 +61,25 @@ async function getTodayBookings() {
     }))
 
   // Filtra le prenotazioni per arrivi, partenze e soggiorni attuali
-  const todayArrivals = bookings.filter((b) => b.dataInizio >= today && b.dataInizio < tomorrow)
-  const todayDepartures = bookings.filter((b) => b.dataFine >= today && b.dataFine < tomorrow)
-  const todayCurrentStays = bookings.filter((b) => b.dataInizio < tomorrow && b.dataFine > today)
+  const todayArrivals = bookings.filter( //ARRIVI
+    (b) =>
+      b.dataInizio >= today &&
+      b.dataInizio < tomorrow &&
+      b.stato !== "ANNULLATA_UTENTE" &&
+      b.stato !== "ANNULLATA_HOST",
+  )
+  const todayDepartures = bookings.filter( //PARTENZE
+    (b) =>
+      b.dataFine >= today && b.dataFine < tomorrow && b.stato !== "ANNULLATA_UTENTE" && b.stato !== "ANNULLATA_HOST",
+  )
+  const todayCurrentStays = bookings.filter( //PERNOTTAMENTI (ESCLUDENDO LE PARTENZE)
+    (b) =>
+      b.dataInizio < tomorrow &&
+      b.dataFine > today &&
+      b.dataFine >= tomorrow && // Esclude le prenotazioni che terminano oggi
+      b.stato !== "ANNULLATA_UTENTE" &&
+      b.stato !== "ANNULLATA_HOST",
+  )
 
   return {
     todayArrivals: mapBookings(todayArrivals),
@@ -79,7 +94,6 @@ export async function getStatistics() {
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
   const firstDayOfYear = new Date(today.getFullYear(), 0, 1)
   const lastDayOfYear = new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999)
-
 
   const [newBookingsThisMonth, confirmedPaymentsThisMonth, confirmedPaymentsThisYear, dailyStats, todayBookings] =
     await Promise.all([
@@ -143,7 +157,6 @@ async function getDailyStatistics() {
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
 
-
   const [newBookings, arrivals, departures, currentStays] = await Promise.all([
     // Nuove prenotazioni create oggi
     prisma.prenotazioni.count({
@@ -161,6 +174,9 @@ async function getDailyStatistics() {
           gte: today,
           lt: tomorrow,
         },
+        NOT: {
+          stato: { in: ["ANNULLATA_UTENTE", "ANNULLATA_HOST"] },
+        },
       },
     }),
     // Partenze (prenotazioni che terminano oggi)
@@ -170,12 +186,20 @@ async function getDailyStatistics() {
           gte: today,
           lt: tomorrow,
         },
+        NOT: {
+          stato: { in: ["ANNULLATA_UTENTE", "ANNULLATA_HOST"] },
+        },
       },
     }),
     // Soggiorni attuali (prenotazioni che includono oggi, escluse le partenze)
     prisma.prenotazioni.count({
       where: {
-        AND: [{ dataInizio: { lt: tomorrow } }, { dataFine: { gt: today } }],
+        AND: [
+          { dataInizio: { lt: tomorrow } },
+          { dataFine: { gt: today } },
+          { dataFine: { gte: tomorrow } }, // Esclude le prenotazioni che terminano oggi
+          { NOT: { stato: { in: ["ANNULLATA_UTENTE", "ANNULLATA_HOST"] } } },
+        ],
       },
     }),
   ])
@@ -196,15 +220,14 @@ export async function searchBookings(query: string) {
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
 
-
   const bookings = await prisma.prenotazioni.findMany({
     where: query
       ? {
-          OR: [
-            { Profili_Prenotazioni_codProfiloToProfili: { nome: { contains: query, mode: "insensitive" } } },
-            { Profili_Prenotazioni_codProfiloToProfili: { cognome: { contains: query, mode: "insensitive" } } },
-          ],
-        }
+        OR: [
+          { Profili_Prenotazioni_codProfiloToProfili: { nome: { contains: query, mode: "insensitive" } } },
+          { Profili_Prenotazioni_codProfiloToProfili: { cognome: { contains: query, mode: "insensitive" } } },
+        ],
+      }
       : {},
     include: {
       Profili_Prenotazioni_codProfiloToProfili: {
@@ -251,9 +274,28 @@ export async function searchBookings(query: string) {
 
   // Filtra le prenotazioni per oggi
   return {
-    todayArrivals: mappedBookings.filter((b) => new Date(b.dataInizio) >= today && new Date(b.dataInizio) < tomorrow),
-    todayDepartures: mappedBookings.filter((b) => new Date(b.dataFine) >= today && new Date(b.dataFine) < tomorrow),
-    todayCurrentStays: mappedBookings.filter((b) => new Date(b.dataInizio) < tomorrow && new Date(b.dataFine) > today),
+    todayArrivals: mappedBookings.filter(
+      (b) =>
+        new Date(b.dataInizio) >= today &&
+        new Date(b.dataInizio) < tomorrow &&
+        b.stato !== "ANNULLATA_UTENTE" &&
+        b.stato !== "ANNULLATA_HOST",
+    ),
+    todayDepartures: mappedBookings.filter(
+      (b) =>
+        new Date(b.dataFine) >= today &&
+        new Date(b.dataFine) < tomorrow &&
+        b.stato !== "ANNULLATA_UTENTE" &&
+        b.stato !== "ANNULLATA_HOST",
+    ),
+    todayCurrentStays: mappedBookings.filter(
+      (b) =>
+        new Date(b.dataInizio) < tomorrow &&
+        new Date(b.dataFine) > today &&
+        new Date(b.dataFine) >= tomorrow && // Esclude le prenotazioni che terminano oggi
+        b.stato !== "ANNULLATA_UTENTE" &&
+        b.stato !== "ANNULLATA_HOST",
+    ),
   }
 }
 
