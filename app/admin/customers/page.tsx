@@ -17,12 +17,17 @@ export default async function Clients() {
           <div className="flex flex-col gap-4">
           <div className="flex justify-between items-center">
           <h1 className="text-4xl font-bold">I Tuoi Clienti</h1>
-          <Button asChild>
+          {
+            /*  DA SVILUPPARE IN FUTURO
+            <Button asChild>
             <Link href={"/admin/customers/new"}>
               <CirclePlus />
               <p>Crea nuova Cliente</p>
             </Link>
-          </Button>
+            </Button>
+            */
+          }
+          
         </div>
             <DataTable columns={columns} data={profiles} />
           </div>
