@@ -193,7 +193,7 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
                 });
               }}
             />
-            <div className="border rounded-md p-4 grid grid-cols-5 w-full">
+            <div className="border rounded-md p-4 grid grid-cols-5 w-full gap-3">
               {foto.map((idFoto, index) => (
                 fotoURLs[index] && (
                   <RoomPicture
@@ -210,7 +210,7 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
         
         <div className="flex w-full justify-end">
           <Button type="submit" className="col-span-4">
-            {room ? "Modifica Stanza" : "Aggiungi Stanza"}
+            {room ? "Salva modifiche" : "Aggiungi Stanza"}
           </Button>
         </div>
       </div>
