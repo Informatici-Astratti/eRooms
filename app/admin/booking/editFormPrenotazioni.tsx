@@ -9,6 +9,7 @@ import { type Prenotazioni, type Stanze, stato_prenotazione } from "@prisma/clie
 import { updateBooking } from "./action"
 import { useActionState } from "react"
 import { useRouter } from "next/navigation"
+import { formatEnumValue } from "@/app/lib/formatEnum"
 
 interface ModificaPrenotazioneProps {
   prenotazione: Prenotazioni
@@ -50,6 +51,9 @@ export default function ModificaPrenotazione({ prenotazione, onClose, allRooms }
     }
   }, [state?.message, onClose, router])
 
+
+
+
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
@@ -78,7 +82,7 @@ export default function ModificaPrenotazione({ prenotazione, onClose, allRooms }
               <SelectContent>
                 {Object.values(stato_prenotazione).map((stato) => (
                   <SelectItem key={stato} value={stato}>
-                    {stato}
+                    {formatEnumValue(stato)}
                   </SelectItem>
                 ))}
               </SelectContent>

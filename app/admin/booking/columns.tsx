@@ -2,7 +2,7 @@
 
 import type { Prenotazioni as PrenotazioniType, Stanze, Ospiti, Profili } from "@prisma/client"
 import type { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
+import { FileUser, MoreHorizontal, Pencil } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -27,6 +27,7 @@ import {
 import ModificaPrenotazione from "./editFormPrenotazioni"
 import { useState, useEffect } from "react"
 import { getAllRooms } from "./action"
+import { Badge } from "@/components/ui/badge"
 
 export type PrenotazioneWithRelations = PrenotazioniType & {
   Stanze: Stanze
@@ -99,7 +100,19 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
         </Button>
       )
     },
+    cell: ({ row }) => {
+      const stato = row.original
+      if (stato.stato === "PRENOTATA") {
+        return (<Badge variant="attesa">PRENOTATA</Badge>)
+      } else if(stato.stato === "CONFERMATA") {
+        return (<Badge variant="success">PRENOTATA</Badge>)
+      }else if(stato.stato === "ANNULLATA_HOST"){
+        return (<Badge variant="destructive">ANNULLATA DALL'HOST</Badge>)
+      }else if(stato.stato === "ANNULLATA_UTENTE"){
+        return (<Badge variant="destructive">ANNULLATA DALL'UTENTE</Badge>)
+      } 
   },
+},
   {
     id: "actions",
     cell: ({ row }) => {
@@ -127,7 +140,7 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
             <DropdownMenuLabel>Azioni</DropdownMenuLabel>
             <Dialog>
               <DialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Info cliente</DropdownMenuItem>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}><FileUser />Info cliente</DropdownMenuItem>
               </DialogTrigger>
               <GuestsTable ospiti={prenotazione.Ospiti} />
             </Dialog>
@@ -140,6 +153,7 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
                     setIsEditModalOpen(true)
                   }}
                 >
+                  <Pencil />
                   Modifica
                 </DropdownMenuItem>
               </DialogTrigger>
