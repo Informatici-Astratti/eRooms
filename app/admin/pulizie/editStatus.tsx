@@ -21,7 +21,7 @@ export default function ModificaStatus({ pulizie, onClose }: ModificaStatusProps
     stato: pulizie?.stato,
   })
 
-  const initialState = { message: "", errors: { descrizione: "" } }
+  const initialState = { message: "", success:false, errors: { descrizione: "" } }
   const [state, formAction] = useActionState(updatePuliziaStato, initialState)
 
   const router = useRouter()
@@ -47,7 +47,7 @@ export default function ModificaStatus({ pulizie, onClose }: ModificaStatusProps
       }, 2000)
       return () => clearTimeout(timer)
     }
-  }, [state.message, onClose, router])
+  }, [state.success])
 
   const availableStates: stato_pulizia[] = ["PULITA", "DA_PULIRE"]
 

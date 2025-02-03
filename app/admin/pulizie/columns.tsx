@@ -7,13 +7,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import type { Stanze as StanzaType, Pulizie, TurniPulizie, Profili, Prenotazioni } from "@prisma/client"
 import type { ColumnDef } from "@tanstack/react-table"
 import { CirclePlus, MoreHorizontal, Pencil } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ModificaStatus from "./editStatus"
+import AddPulizie from "./addPulizie"
+import getGovernanti from "./action"
 
 export type StanzeWithRelations = StanzaType & {
-  Pulizie: Pulizie | null
+  Pulizie: Pulizie 
   TurniPulizie: (TurniPulizie & {
-    Profili: Profili
+    Profili: Profili 
   })[]
   Prenotazioni?: Prenotazioni[]
 }
@@ -92,7 +94,17 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
     cell: ({ row }) => {
       const pulizie = row.original.Pulizie
       const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+      const [governanti, setGovernanti] = useState<Profili[]>([])
 
+      useEffect(() => {
+        const fetchRooms = async () => {
+          const governantiData = await getGovernanti();
+          setGovernanti(governantiData || []); // Ensure governantiData is always an array
+        };
+        fetchRooms();
+      }, []);
+      
+      
 
       return (
         <DropdownMenu>
@@ -109,7 +121,7 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
               <DialogTrigger asChild>
                 <DropdownMenuItem onSelect={(e) => e.preventDefault()}><CirclePlus />Assegna Pulizia</DropdownMenuItem>
               </DialogTrigger>
-              {/*<GuestsTable ospiti={prenotazione.Ospiti} /> -*/}
+              <AddPulizie stanza={row.original} governanti={governanti} onClose={() => setIsEditModalOpen(false)} />
             </Dialog>
             <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
               <DialogTrigger asChild>

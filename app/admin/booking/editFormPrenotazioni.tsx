@@ -49,7 +49,7 @@ export default function ModificaPrenotazione({ prenotazione, onClose, allRooms }
       }, 2000)
       return () => clearTimeout(timer)
     }
-  }, [state?.message, onClose, router])
+  }, [state?.message])
 
 
 
