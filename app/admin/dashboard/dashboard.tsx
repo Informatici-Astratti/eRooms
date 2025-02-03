@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { searchBookings } from "./action"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 
 interface Booking {
   idPrenotazione: string
@@ -140,19 +141,15 @@ export default function Dashboard({ initialStats }: { initialStats: Stats }) {
                       ))}
                     </TableCell>
                     <TableCell>
-                      {bookings.map((booking) => (
-                        <div
-                          key={booking.idPrenotazione}
-                          className={`text-sm font-medium ${booking.stato === "CONFERMATA"
-                            ? "status-confermata"
-                            : booking.stato === "PRENOTATA"
-                              ? "status-prenotata"
-                              : "status-default"
-                            }`}
-                        >
-                          {booking.stato}
-                        </div>
-                      ))}
+                      {bookings.map((booking) => {
+                        if (booking.stato === "PRENOTATA") {
+                          return <Badge key={booking.idPrenotazione} variant="attesa">PRENOTATA</Badge>;
+                        } else if (booking.stato === "CONFERMATA") {
+                          return <Badge key={booking.idPrenotazione} variant="success">CONFERMATA</Badge>;
+                        } else {
+                          return <Badge key={booking.idPrenotazione} variant="default">{booking.stato}</Badge>;
+                        }
+                      })}
                     </TableCell>
                     <TableCell className="text-right">
                       {bookings.map((booking) => (

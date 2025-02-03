@@ -8,25 +8,25 @@ export async function getPulizie() {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    const roomsWithCheckouts = await prisma.prenotazioni.findMany({
-      where: {
-        dataFine: {
-          gte: today,
-          lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-        },
-      },
-      select: {
-        codStanza: true,
-      },
-    })
+    // const roomsWithCheckouts = await prisma.prenotazioni.findMany({
+    //   where: {
+    //     dataFine: {
+    //       gte: today,
+    //       lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+    //     },
+    //   },
+    //   select: {
+    //     codStanza: true,
+    //   },
+    // })
 
-    for (const room of roomsWithCheckouts) {
-      await prisma.pulizie.upsert({
-        where: { codStanza: room.codStanza },
-        update: { stato: "DA_PULIRE", ultimoAggiornamento: new Date() },
-        create: { codStanza: room.codStanza, stato: "DA_PULIRE", ultimoAggiornamento: new Date() },
-      })
-    }
+    // for (const room of roomsWithCheckouts) {
+    //   await prisma.pulizie.upsert({
+    //     where: { codStanza: room.codStanza },
+    //     update: { stato: "DA_PULIRE", ultimoAggiornamento: new Date() },
+    //     create: { codStanza: room.codStanza, stato: "DA_PULIRE", ultimoAggiornamento: new Date() },
+    //   })
+    // }
 
     const stanze = await prisma.stanze.findMany({
       include: {
@@ -77,15 +77,7 @@ export async function updatePuliziaStato(prevState: any, formData: FormData) {
     }
 
     const now = new Date()
-    const lastUpdate = puliziaAttuale.ultimoAggiornamento
-    const isToday = lastUpdate.toDateString() === now.toDateString()
 
-    if (isToday && puliziaAttuale.stato === "DA_PULIRE" && newStato === "PULITA") {
-      return {
-        message: "",
-        errors: { descrizione: "Non è possibile cambiare lo stato da DA PULIRE a PULITA nello stesso giorno" },
-      }
-    }
 
     if (puliziaAttuale.stato === newStato) {
       return {
