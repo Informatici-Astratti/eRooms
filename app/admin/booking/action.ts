@@ -2,7 +2,8 @@
 
 import prisma from "@/app/lib/db";
 import { revalidatePath } from "next/cache";
-import type { Stanze, stato_prenotazione } from "@prisma/client";
+import type { Profili, Stanze, stato_prenotazione } from "@prisma/client";
+import { z } from "zod";
 
 export async function getPrenotazioni() {
   try {
@@ -171,15 +172,79 @@ export async function getAvailableRooms(
   }
 }
 
-export async function getOspiti() {
+export async function getOspiti(): Promise<Profili[]> {
   try {
     const users = await prisma.profili.findMany({
       where: { ruolo: "CLIENTE" },
-      select: { idProfilo: true, nome: true, cognome: true, cf: true },
     });
-    return users;
+    return users
   } catch (error) {
     console.error("Error fetching users:", error);
     throw new Error("Failed to fetch users.");
+  }
+}
+
+interface ReservationResponse {
+  success: boolean
+  errors?: any
+  message?: string
+}
+
+const ReservationFormSchema = z.object({
+  dateFrom: z.string().datetime(),
+  dateTo: z.string().datetime(),
+  roomId: z.string().min(1, { message: "Seleziona una stanza" }),
+  guestId: z.string().min(1, { message: "Seleziona un ospite" }),
+  numberOfGuests: z.number().min(1, { message: "Inserisci almeno un ospite" }),
+})
+
+export async function createNewReservation(
+  prevState: ReservationResponse,
+  formData: FormData,
+): Promise<ReservationResponse> {
+  const data = {
+    dateFrom: formData.get("dateFrom") as string,
+    dateTo: formData.get("dateTo") as string,
+    roomId: formData.get("roomId") as string,
+    guestId: formData.get("guestId") as string,
+    numberOfGuests: Number(formData.get("numberOfGuests")),
+  }
+
+  const result = ReservationFormSchema.safeParse(data)
+
+  if (!result.success) {
+    return {
+      success: false,
+      errors: result.error.flatten().fieldErrors,
+    }
+  }
+  console.log(data)
+  try {
+    /*
+    const newReservation = await prisma.prenotazioni.create({
+      data: {
+        dataInizio: new Date(result.data.dateFrom),
+        dataFine: new Date(result.data.dateTo),
+        codStanza: result.data.roomId,
+        codProfilo: result.data.guestId,
+      },
+    })*/
+
+    revalidatePath("/admin/booking")
+    return {
+      success: true,
+      message: "La prenotazione è stata creata con successo",
+
+    }
+  } catch (error) {
+    console.error("Error creating reservation:", error)
+    return {
+      success: false,
+      errors: {
+        general:
+          "Si è verificato un errore nella creazione della prenotazione. Verificare i dati o riprovare più tardi",
+      },
+
+    }
   }
 }
