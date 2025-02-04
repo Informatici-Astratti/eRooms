@@ -39,14 +39,14 @@ export default function AddPulizie({ stanza, governanti, onClose }: AddPuliziePr
 
     useEffect(() => {
         if (state.message) {
-          const timer = setTimeout(() => {
-            onClose();
-            router.refresh();
-          }, 2000);
-          return () => clearTimeout(timer);
+            const timer = setTimeout(() => {
+                onClose();
+                router.refresh();
+            }, 2000);
+            return () => clearTimeout(timer);
         }
-      }, [state.success]); // oppure [state.message, state.success] se necessario
-      
+    }, [state.success]); // oppure [state.message, state.success] se necessario
+
 
     const isFormValid = () => {
         return (

@@ -13,9 +13,9 @@ import AddPulizie from "./addPulizie"
 import getGovernanti from "./action"
 
 export type StanzeWithRelations = StanzaType & {
-  Pulizie: Pulizie 
+  Pulizie: Pulizie
   TurniPulizie: (TurniPulizie & {
-    Profili: Profili 
+    Profili: Profili
   })[]
   Prenotazioni?: Prenotazioni[]
 }
@@ -63,7 +63,7 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
       if (dataInzio.TurniPulizie && dataInzio.TurniPulizie.length > 0) {
         return dataInzio.TurniPulizie[0].dataInizio.toLocaleDateString();
       } else {
-        return "Non definita"; 
+        return "Non definita";
       }
     },
   },
@@ -94,17 +94,18 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
     cell: ({ row }) => {
       const pulizie = row.original.Pulizie
       const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+      const [isAddModalOpen, setIsAddModalOpen] = useState(false)
       const [governanti, setGovernanti] = useState<Profili[]>([])
 
       useEffect(() => {
         const fetchRooms = async () => {
           const governantiData = await getGovernanti();
-          setGovernanti(governantiData || []); // Ensure governantiData is always an array
+          setGovernanti(governantiData || []);
         };
         fetchRooms();
       }, []);
-      
-      
+
+
 
       return (
         <DropdownMenu>
@@ -117,18 +118,28 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Azioni</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Dialog>
+
+            {/* Dialog per Assegnare Pulizia */}
+            <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
               <DialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}><CirclePlus />Assegna Pulizia</DropdownMenuItem>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <CirclePlus /> Assegna Pulizia
+                </DropdownMenuItem>
               </DialogTrigger>
-              <AddPulizie stanza={row.original} governanti={governanti} onClose={() => setIsEditModalOpen(false)} />
+              <AddPulizie
+                stanza={row.original}
+                governanti={governanti}
+                onClose={() => setIsAddModalOpen(false)} // Chiude il dialogo
+              />
             </Dialog>
+
+            {/* Dialog per Modifica Stato */}
             <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
               <DialogTrigger asChild>
                 <DropdownMenuItem
                   onSelect={(e) => {
-                    e.preventDefault()
-                    setIsEditModalOpen(true)
+                    e.preventDefault();
+                    setIsEditModalOpen(true); // Apre il dialogo per la modifica
                   }}
                 >
                   <Pencil />
@@ -137,12 +148,12 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
               </DialogTrigger>
               <ModificaStatus
                 pulizie={pulizie}
-                onClose={() => setIsEditModalOpen(false)}
+                onClose={() => setIsEditModalOpen(false)} // Chiude il dialogo
               />
             </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
 ]

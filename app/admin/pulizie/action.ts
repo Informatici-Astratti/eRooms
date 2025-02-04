@@ -117,14 +117,12 @@ export async function addTurnoPulizia(prevState: any, formData: FormData) {
         OR: [
           {
             dataInizio: {
-              gte: new Date(dataInizio),
-              lt: new Date(new Date(dataInizio).setDate(new Date(dataInizio).getDate() + 1)),
+              gte: new Date(dataInizio),  
             },
           },
           {
             dataFine: {
               gte: new Date(dataInizio),
-              lt: new Date(new Date(dataInizio).setDate(new Date(dataInizio).getDate() + 1)),
             },
           },
         ],
