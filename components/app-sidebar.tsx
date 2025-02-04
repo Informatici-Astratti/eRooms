@@ -1,5 +1,5 @@
 import * as React from "react"
-import { BedDouble, BedSingle, Calendar, ChevronRight, ChevronUp, Home, Info, LogOut, ReceiptText, SquareActivity, User2, UserRoundCog, Users, WashingMachine } from "lucide-react"
+import { BedDouble, BedSingle, Calendar, ChevronRight, ChevronUp, Home, Info, LogOut, ReceiptText, ShieldQuestion, SquareActivity, User2, UserRoundCog, Users, WashingMachine } from "lucide-react"
 
 import {
   Collapsible,
@@ -87,6 +87,11 @@ const data = {
           title: "Fatturazioni",
           url: "/admin/payments",
           icon: ReceiptText,
+        },
+        {
+          title: "Squadra",
+          url: "/admin/squadra",
+          icon: ShieldQuestion,
         },
       ],
     }
