@@ -6,7 +6,8 @@ import type { stato_pulizia } from "@prisma/client"
 export async function getPulizie() {
   try {
     const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const todayPrenotazioni = new Date()
+    todayPrenotazioni.setHours(0, 0, 0, 0)
 
     const stanze = await prisma.stanze.findMany({
       include: {
@@ -27,9 +28,11 @@ export async function getPulizie() {
         Prenotazioni: {
           where: {
             dataFine: {
-              gte: today,
-              lt: new Date(today.getTime() + 24 * 60 * 60 * 1000), // next day
+              gte: todayPrenotazioni,
             },
+            stato: {
+              notIn: ["ANNULLATA_HOST", "ANNULLATA_UTENTE"]
+            }
           },
         },
       },
