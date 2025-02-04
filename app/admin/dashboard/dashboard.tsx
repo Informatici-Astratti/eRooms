@@ -141,15 +141,17 @@ export default function Dashboard({ initialStats }: { initialStats: Stats }) {
                       ))}
                     </TableCell>
                     <TableCell>
-                      {bookings.map((booking) => {
-                        if (booking.stato === "PRENOTATA") {
-                          return <Badge key={booking.idPrenotazione} variant="attesa">PRENOTATA</Badge>;
-                        } else if (booking.stato === "CONFERMATA") {
-                          return <Badge key={booking.idPrenotazione} variant="success">CONFERMATA</Badge>;
-                        } else {
-                          return <Badge key={booking.idPrenotazione} variant="default">{booking.stato}</Badge>;
-                        }
-                      })}
+                      <div className="flex flex-col gap-2">
+                        {bookings.map((booking) => (
+                          <Badge
+                            key={booking.idPrenotazione}
+                            variant={booking.stato === "PRENOTATA" ? "attesa" : booking.stato === "CONFERMATA" ? "success" : "default"}
+                            className="w-fit"
+                          >
+                            {booking.stato}
+                          </Badge>
+                        ))}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       {bookings.map((booking) => (
