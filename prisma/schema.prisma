@@ -119,6 +119,7 @@ model TurniPulizie {
 model FotoStanze {
   idFoto    String  @id
   codStanza String? @db.Uuid
+  url       String
   Stanze    Stanze? @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
 }
 

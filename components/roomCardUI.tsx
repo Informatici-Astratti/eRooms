@@ -4,7 +4,7 @@ import { Pencil, Router, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Stanze } from "@prisma/client";
 import { redirect, useRouter } from "next/navigation";
-import { deleteRoom, getFotoURL, StanzeForm } from "@/app/admin/room/action";
+import { deleteRoom,  StanzeForm } from "@/app/admin/room/action";
 import { revalidatePath } from "next/cache";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import Link from "next/link";
@@ -19,24 +19,11 @@ export default function RoomCard({
   descrizione,
   capienza,
   costoStandard,
-  foto,
+  urlFoto
 }: StanzeForm) {
     const router = useRouter()
     const {toast} = useToast()
 
-    const [roomFoto, setRoomFoto] = useState<string>("https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80")
-
-    useEffect(() => {
-      
-      const fetchFotoURL = async () => {
-        if (foto && foto.length > 0) {
-          const url = await getFotoURL(foto[0]);
-          setRoomFoto(url);
-        }
-      };
-  
-      fetchFotoURL();
-    }, [foto]);
 
     const handleDeleteRoom = async () => {
       const res = await deleteRoom(idStanza)
@@ -61,15 +48,11 @@ export default function RoomCard({
       
     }
 
-    const handleGetFotoURL = async (idFoto: string): Promise<string> => {
-      return await getFotoURL(idFoto)
-    }
-
   return (
     <div className="flex bg-white rounded-lg shadow-lg overflow-hidden min-w-2xl w-full">
       <div className="w-1/3 relative m-2">
         <AspectRatio ratio={16/9}>
-          <Image fill src={roomFoto} alt="Immagine Vetrina Stanza" className="rounded-md object-cover"  />
+          <Image fill src={(urlFoto && urlFoto[0]) ?? "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"} alt="Immagine Vetrina Stanza" className="rounded-md object-cover"  />
         </AspectRatio>
       </div>
       <div className="w-2/3 p-4 flex flex-col justify-between">

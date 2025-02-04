@@ -42,7 +42,7 @@ export default async function Rooms() {
                 descrizione={room.descrizione}
                 capienza={room.capienza}
                 costoStandard={room.costoStandard}
-                foto={room.FotoStanze.map((foto) => foto.idFoto)}
+                urlFoto={room.FotoStanze.map(foto => foto.url)}
               />
 
               {room.Tariffe.map((Tariffa: Tariffe) => (

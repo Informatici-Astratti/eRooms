@@ -13,7 +13,6 @@ import {
   createRoom, 
   createRoomPicture, 
   deleteRoomPicture, 
-  getFotoURL, 
   StanzeForm, 
   updateRoomById 
 } from "../action";
@@ -43,23 +42,7 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
   // Stato per salvare gli ID delle foto
   const [foto, setFoto] = useState<string[]>(state?.fields?.foto ?? []);
   // Stato per salvare gli URL delle foto
-  const [fotoURLs, setFotoURLs] = useState<string[]>([]);
-
-  // Effetto per aggiornare gli URL ogni volta che cambia lo state "foto"
-  useEffect(() => {
-    const fetchFotoURLs = async () => {
-      if (foto.length > 0) {
-        const urls = await Promise.all(
-          foto.map(async (idFoto) => await getFotoURL(idFoto))
-        );
-        setFotoURLs(urls);
-      } else {
-        setFotoURLs([]);
-      }
-    };
-
-    fetchFotoURLs();
-  }, [foto]);
+  const [fotoURLs, setFotoURLs] = useState<string[]>(state?.fields?.urlFoto ?? []);
 
   const handleRemoveRoomPicture = async (idFoto: string) => {
     const res = await deleteRoomPicture(idFoto);
@@ -102,8 +85,7 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
       setFoto((prev) => [...prev, idFoto]);
 
       // Recupera l'URL della foto aggiunta e aggiorna lo state degli URL
-      const newUrl = await getFotoURL(idFoto);
-      setFotoURLs((prev) => [...prev, newUrl]);
+      setFotoURLs((prev) => [...prev, res.url]);
 
       toast({
         title: "Successo",
