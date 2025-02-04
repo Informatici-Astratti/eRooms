@@ -46,7 +46,7 @@ export default async function NavBar({propertyInfo} : NavBarProps) {
 
   return (
     <header className="border-b">
-      <div className="flex h-16 items-center px-4 max-w-7xl mx-auto">
+      <div className="flex h-20 items-center px-4 max-w-7xl mx-auto">
         <Link href="/v" className="mr-6 flex items-center space-x-2">
           {/* DA IMPLEMENTARE POI <Image src="/placeholder.svg" alt="Logo" width={40} height={40} className="rounded-full" />*/}
           <span className='rounded-full p-2 border'>
