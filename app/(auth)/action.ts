@@ -8,7 +8,7 @@ import { genere, Prisma, ruolo } from "@prisma/client";
 import { headers } from "next/headers";
 import { auth } from "@clerk/nextjs/server";
 
-const signUpContinueSchema = z.object({
+export const signUpContinueSchema = z.object({
     nome: z.string().min(2).max(50, {message: "Nome non valido"}),
     cognome: z.string().min(2).max(50, {message: "Cognome non valido"}),
     cf: z.string().trim().length(16)
