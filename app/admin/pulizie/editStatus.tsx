@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState, useEffect } from "react"
-import type { stato_pulizia, Pulizie } from "@prisma/client"
+import { stato_pulizia, Pulizie } from "@prisma/client"
 import { useRouter } from "next/navigation"
 import { updatePuliziaStato } from "./action"
 import { useActionState } from "react"
@@ -49,7 +49,6 @@ export default function ModificaStatus({ pulizie, onClose }: ModificaStatusProps
     }
   }, [state.success])
 
-  const availableStates: stato_pulizia[] = ["PULITA", "DA_PULIRE"]
 
 
   return (
@@ -71,11 +70,11 @@ export default function ModificaStatus({ pulizie, onClose }: ModificaStatusProps
                 <SelectValue placeholder="Seleziona uno stato" />
               </SelectTrigger>
               <SelectContent>
-              {availableStates.map((stato) => (
-                <SelectItem key={stato} value={stato}>
-                  {formatEnumValue(stato)} {/* Visualizza "DA PULIRE" anziché "DA_PULIRE" */}
-                </SelectItem>
-              ))}
+                {Object.values(stato_pulizia).map((stato) => (
+                  <SelectItem key={stato} value={stato}>
+                    {formatEnumValue(stato)}
+                  </SelectItem>
+                ))}
             </SelectContent>
             </Select>
           </div>

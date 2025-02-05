@@ -3,9 +3,10 @@
 import type { Profili } from "@prisma/client"
 import type { ColumnDef } from "@tanstack/react-table"
 
+export type ProfiliInfo = Profili & { email: string };
 
 
-export const columns: ColumnDef<Profili>[] = [
+export const columns: ColumnDef<ProfiliInfo>[] = [
   {
     accessorKey: "nome",
     header: "Nome",
@@ -25,7 +26,8 @@ export const columns: ColumnDef<Profili>[] = [
     accessorKey: "email",
     header: "Email",
     cell: ({ row }) => {
-
+      const email = row.original.email
+      return email
     },
   },
   {
