@@ -67,9 +67,9 @@ export async function addSquadra(prevState: any, formData: FormData) {
     const response = await client.invitations.createInvitation({
       emailAddress: email,
       redirectUrl: `${process.env.APP_URL}/signup`,
+      publicMetadata: { ruolo }, 
     })
 
-    // Se l'invito è stato inviato correttamente
     return { success: true, message: "Invito inviato con successo!", errors: {} };
   } catch (error) {
     console.error(error);
