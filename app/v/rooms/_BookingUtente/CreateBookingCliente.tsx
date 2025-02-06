@@ -12,10 +12,10 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from '../../../../components/ui/button'
-import { BedDouble, CalendarFold, CalendarSearch, ChevronLeft, CircleUserRound, Search, SquareArrowOutUpRight, UserCircle2, UsersRound } from 'lucide-react'
+import { BedDouble, CalendarCheck, CalendarFold, CalendarSearch, ChevronLeft, CircleUserRound, ReceiptEuro, Search, SquareArrowOutUpRight, UserCircle2, UserRound, UsersRound } from 'lucide-react'
 import { defineStepper } from "@stepperize/react";
 import { DateRange } from 'react-day-picker'
-import { addDays, differenceInDays, format } from 'date-fns'
+import { addDays, differenceInDays, format, formatDate } from 'date-fns'
 import { Label } from '@/components/ui/label'
 import { Calendar } from '@/components/ui/calendar'
 import NumericInput from '@/components/numericInputUI'
@@ -85,7 +85,7 @@ export default function CreateBookingCliente() {
                     <ConfirmBooking />
                     <CloseBookingForm />
                 </SheetContent>
-                
+
             </Sheet>
         </BookingStepper.Scoped>
 
@@ -390,7 +390,7 @@ const ViewUserData: React.FC = () => {
 
                                 <div className='flex flex-col gap-2'>
                                     <Label>Data di Nascita</Label>
-                                    <Input disabled value={user?.dataNascita.toDateString()} />
+                                    <Input disabled value={user?.dataNascita ? format(user?.dataNascita ?? "", "dd/MM/yyyy") : "Non definito"} />
                                 </div>
 
                                 <div className='flex flex-col gap-2'>
@@ -448,8 +448,8 @@ const ViewUserData: React.FC = () => {
 
 const ViewBookingData: React.FC = () => {
     const stepper = BookingStepper.useStepper()
-    const bookingData: BookingData = {...stepper.getMetadata("step1"), ...stepper.getMetadata("step2"), ...stepper.getMetadata("step3")} as BookingData
-    const {toast} = useToast()
+    const bookingData: BookingData = { ...stepper.getMetadata("step1"), ...stepper.getMetadata("step2"), ...stepper.getMetadata("step3") } as BookingData
+    const { toast } = useToast()
 
 
     return stepper.when("step4", () => (
@@ -477,23 +477,23 @@ const ViewBookingData: React.FC = () => {
 
                 <div className='flex gap-3'>
                     <UserCircle2 />
-                    <p><span className='font-bold'>Ospiti: </span>{bookingData.ospiti}</p>
+                    <p><span className='font-medium'>Ospiti: </span>{bookingData.ospiti}</p>
                 </div>
 
                 <div className='flex gap-3'>
                     <BedDouble />
-                    <p><span className='font-bold'>Stanza: </span>{bookingData.nomeStanza}</p>
+                    <p><span className='font-medium'>Stanza: </span>{bookingData.nomeStanza}</p>
                 </div>
 
                 <div className='flex gap-3'>
-                    <BedDouble />
-                    <p><span className='font-bold'>Totale: </span>{`${bookingData.ospiti * bookingData.costoUnitario * differenceInDays(bookingData.dataFine, bookingData.dataInizio)} €`}</p>
+                    <ReceiptEuro />
+                    <p><span className='font-medium'>Totale: </span>{`${bookingData.ospiti * bookingData.costoUnitario * differenceInDays(bookingData.dataFine, bookingData.dataInizio)} €`}</p>
                 </div>
 
                 <div className='flex gap-3'>
-                    <span className='flex gap-2 items-center font-bold'>
-                    <BedDouble />
-                    Cliente:
+                    <span className='flex gap-2 items-center font-medium'>
+                        <UserRound />
+                        Cliente:
                     </span>
                     <div className='basis-1/3 flex flex-col gap-2'>
                         <Label>Nome</Label>
@@ -527,9 +527,9 @@ const ViewBookingData: React.FC = () => {
                             costoUnitario: bookingData.costoUnitario,
                         })
 
-                        if (!res){
+                        if (!res) {
                             toast({
-                                title:"Errore",
+                                title: "Errore",
                                 description: "C'è stato un'errore nella prenotazione",
                                 variant: "destructive"
                             })
@@ -550,18 +550,45 @@ const ViewBookingData: React.FC = () => {
 const ConfirmBooking: React.FC = () => {
     const stepper = BookingStepper.useStepper()
     return stepper.when("step5", () => (
-        <p>Tutto Ok</p>
+        <React.Fragment>
+        <SheetHeader>
+                <SheetTitle></SheetTitle>
+                <SheetDescription>
+                </SheetDescription>
+        </SheetHeader>
+        <div className='p-4 rounded-md border flex flex-col gap-4 justify-center items-center h-full'>
+
+            <CalendarCheck className='size-10' />
+            <h1 className='font-bold text-2xl'>Prenotazione Confermata</h1>
+            <p>Per vedere tutte le prenotazioni clicca sul pulsante{":"} </p>
+            <Button variant={'outline'} className='p-4'>
+                <Link href={"#"} className='flex gap-2 items-center'>
+                    Le mie prenotazioni
+                    <SquareArrowOutUpRight/>
+                </Link>
+            </Button>
+
+        </div>
+        </React.Fragment>
     ))
 }
 
 const CloseBookingForm: React.FC = () => {
     const stepper = BookingStepper.useStepper()
 
-    return !stepper.isLast && (
-        <SheetClose  asChild>
-                    <Button variant={"destructive"} onClick={() => {stepper.resetMetadata(true); stepper.reset()}}>
-                        Annulla
-                    </Button>
-                </SheetClose>
+    return !stepper.isLast ? (
+        <SheetClose asChild>
+            <Button variant={"destructive"} onClick={() => { stepper.resetMetadata(true); stepper.reset() }}>
+                Annulla
+            </Button>
+        </SheetClose>
+    ) : (
+        <SheetClose asChild>
+            <Button onClick={() => { stepper.resetMetadata(true); stepper.reset() }}>
+                Chiudi
+            </Button>
+        </SheetClose>
     )
 }
+
+

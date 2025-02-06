@@ -6,85 +6,85 @@ import { format, formatDate } from "date-fns"
 import { z } from "zod"
 
 export interface SearchAvailableRoomsParams {
-    dataInizio: Date
-    dataFine: Date
-    ospiti: number
+  dataInizio: Date
+  dataFine: Date
+  ospiti: number
 }
 
 export type AvailableRooms = Stanze & {
-    fotoUrls: string[],
-    costoEffettivo: number
+  fotoUrls: string[],
+  costoEffettivo: number
 }
 
 export async function searchAvailableRooms(query: SearchAvailableRoomsParams): Promise<AvailableRooms[] | undefined> {
-    
-    const rooms = await prisma.stanze.findMany({
-        where: {
-          capienza: {
-            gte: query.ospiti,
-          },
-          Prenotazioni: {
-            // Se non esiste prenotazione che si sovrappone al periodo richiesto:
-            none: {
-              AND: [
-                { dataInizio: { lt: query.dataFine } },
-                { dataFine: { gt: query.dataInizio } }
-              ]
-            }
-          }
-        },
-        include: {
-          FotoStanze: {
-            select: { url: true },
-          },
-          // Supponendo che esista una relazione "Tariffe" sulla stanza
-          Tariffe: {
-            where: {
-              dataInizio: { lte: query.dataInizio },
-              dataFine: { gte: query.dataFine }
-            },
-            select: { tipoVariazione: true , variazione: true },
-            take: 1
-          },
-        }
-      });
 
-      if(!rooms){
-        return []
+  const rooms = await prisma.stanze.findMany({
+    where: {
+      capienza: {
+        gte: query.ospiti,
+      },
+      Prenotazioni: {
+        // Se non esiste prenotazione che si sovrappone al periodo richiesto:
+        none: {
+          AND: [
+            { dataInizio: { lt: query.dataFine } },
+            { dataFine: { gt: query.dataInizio } }
+          ]
+        }
       }
+    },
+    include: {
+      FotoStanze: {
+        select: { url: true },
+      },
+      // Supponendo che esista una relazione "Tariffe" sulla stanza
+      Tariffe: {
+        where: {
+          dataInizio: { lte: query.dataInizio },
+          dataFine: { gte: query.dataFine }
+        },
+        select: { tipoVariazione: true, variazione: true },
+        take: 1
+      },
+    }
+  });
 
-      const avaiableRooms: AvailableRooms[] = rooms.map((room) => {
+  if (!rooms) {
+    return []
+  }
 
-        let costoEffettivo = room.costoStandard
+  const avaiableRooms: AvailableRooms[] = rooms.map((room) => {
 
-        if(room.Tariffe.length > 0){
-          switch(room.Tariffe[0].tipoVariazione){
-            case "AUMENTO_PERCENTUALE":
-              costoEffettivo = room.costoStandard * (1+(room.Tariffe[0].variazione/100))
-            case "SCONTO_PERCENTUALE":
-              costoEffettivo = room.costoStandard * (1-(room.Tariffe[0].variazione/100))
-            case "AUMENTO_FISSO":
-              costoEffettivo = room.costoStandard + room.Tariffe[0].variazione
-            case "SCONTO_FISSO":
-              costoEffettivo = room.costoStandard - room.Tariffe[0].variazione
-            case "NULLA":
-              costoEffettivo = room.costoStandard
-          }
-        }
+    let costoEffettivo = room.costoStandard
 
-        return {
-          idStanza: room.idStanza,
-          nome: room.nome,
-          capienza: room.capienza,
-          descrizione: room.descrizione,
-          costoStandard: room.costoStandard,
-          fotoUrls: room.FotoStanze.map(foto => foto.url),
-          costoEffettivo: costoEffettivo
-        }
+    if (room.Tariffe.length > 0) {
+      switch (room.Tariffe[0].tipoVariazione) {
+        case "AUMENTO_PERCENTUALE":
+          costoEffettivo = room.costoStandard * (1 + (room.Tariffe[0].variazione / 100))
+        case "SCONTO_PERCENTUALE":
+          costoEffettivo = room.costoStandard * (1 - (room.Tariffe[0].variazione / 100))
+        case "AUMENTO_FISSO":
+          costoEffettivo = room.costoStandard + room.Tariffe[0].variazione
+        case "SCONTO_FISSO":
+          costoEffettivo = room.costoStandard - room.Tariffe[0].variazione
+        case "NULLA":
+          costoEffettivo = room.costoStandard
+      }
+    }
 
-      })
+    return {
+      idStanza: room.idStanza,
+      nome: room.nome,
+      capienza: room.capienza,
+      descrizione: room.descrizione,
+      costoStandard: room.costoStandard,
+      fotoUrls: room.FotoStanze.map(foto => foto.url),
+      costoEffettivo: costoEffettivo
+    }
 
-      return avaiableRooms
+  })
+
+  return avaiableRooms
 }
 
 export interface BookingData {
@@ -109,12 +109,11 @@ const CreateBookingSchema = z.object({
   userId: z.string()
 })
 
-export async function createBooking(bookingData: Partial<BookingData>): Promise<boolean>{
-  console.log(bookingData)
+export async function createBooking(bookingData: Partial<BookingData>): Promise<boolean> {
 
   const validatedData = CreateBookingSchema.safeParse(bookingData)
 
-  try{
+  try {
     if (!validatedData.success) {
       console.log(validatedData.error.flatten().fieldErrors)
       throw new Error("Errore nei dati");
@@ -131,16 +130,16 @@ export async function createBooking(bookingData: Partial<BookingData>): Promise<
 
     if (!createdBooking) throw new Error("Prenotazione non è stata creata")
 
-    for (let i=0; i<validatedData.data.ospiti; i++){
-        const createdGuest = await prisma.ospiti.create({
-          data:{
-            codPrenotazione: createdBooking.idPrenotazione
-          }
-        })
+    for (let i = 0; i < validatedData.data.ospiti; i++) {
+      const createdGuest = await prisma.ospiti.create({
+        data: {
+          codPrenotazione: createdBooking.idPrenotazione
+        }
+      })
 
-        if (!createdGuest) throw new Error("Non è stato possibile creare gli ospiti")
+      if (!createdGuest) throw new Error("Non è stato possibile creare gli ospiti")
     }
-    
+
     const createPayment = await prisma.pagamenti.create({
       data: {
         codPrenotazione: createdBooking.idPrenotazione,
@@ -149,23 +148,8 @@ export async function createBooking(bookingData: Partial<BookingData>): Promise<
     })
 
     if (!createPayment) throw new Error("Non è stato possibile creare il pagamento")
-  }catch (e){
-    if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      console.error("[Prisma Known Request Error]", e.code, e.message);
-      // Aggiungi gestione specifica in base al codice (e.code) se necessario
-    }
-    // Errore di validazione di Prisma
-    else if (e instanceof Prisma.PrismaClientValidationError) {
-      console.error("[Prisma Client Validation Error]", e.message);
-    }
-    // Errore sconosciuto di Prisma
-    else if (e instanceof Prisma.PrismaClientUnknownRequestError) {
-      console.error("[Prisma Unknown Request Error]:", e.message);
-    }
-    // Altri errori
-    else {
-      console.error("[Errore Generico]:", e);
-    }
+  } catch (e) {
+   
     return false;
   }
 
