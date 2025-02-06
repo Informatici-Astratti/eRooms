@@ -8,13 +8,8 @@ import { genere, Prisma, ruolo } from "@prisma/client";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
 const signUpContinueSchema = z.object({
-<<<<<<< HEAD
-    nome: z.string().min(2).max(50, { message: "Nome non valido" }),
-    cognome: z.string().min(2).max(50, { message: "Cognome non valido" }),
-=======
     nome: z.string().min(2).max(50, {message: "Nome non valido"}),
     cognome: z.string().min(2).max(50, {message: "Cognome non valido"}),
->>>>>>> d7fd8af90469b608eb77c168d3fb4f03239b5a7b
     cf: z.string().trim().length(16)
         .regex(/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/i, { message: "Codice Fiscale non valido" }),
     telefono: z.string().trim(),
