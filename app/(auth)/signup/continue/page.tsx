@@ -25,7 +25,7 @@ export default async function ConfirmSignupPage() {
   })
 
   if (user){
-    redirect("/dashboard")
+    redirect("/admin/dashboard")
   }
 
 
