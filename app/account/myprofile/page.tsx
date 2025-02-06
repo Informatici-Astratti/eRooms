@@ -28,17 +28,6 @@ export default async function MyProfile() {
                         <h1 className="text-xl font-bold">Informazioni Generali</h1>
                         <EditAccountForm profile={userProfile ?? null} ></EditAccountForm>
                     </div>
-                    <div className="p-4 space-y-5">
-                        <h1 className="text-xl font-bold">Informazioni Sensibili</h1>
-                        <div className="w-[60%]">
-                            <Label>Email</Label>
-                            <div className="flex items-center gap-2">
-                                <Mail />
-                                <Input name="email" type="text" defaultValue={userClerk?.primaryEmailAddress?.emailAddress} disabled />
-                                <EmailDialog></EmailDialog>
-                            </div>
-                        </div>
-                    </div>
                 </div>  
             </div>
         </div>
