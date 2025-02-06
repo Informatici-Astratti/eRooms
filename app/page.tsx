@@ -1,14 +1,17 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import getUser from "./lib/user";
+import { redirect } from "next/navigation";
+import { ruolo } from "@prisma/client";
 
-export default function Home() {
-  return (
-    <div>
-      <h1>Questa è la HomePage</h1>
-      <Button asChild>
-        <Link href="/login">Login</Link>
-      </Button>
-    </div>
-    
-  );
+
+export default async function Home() {
+
+  const user = await getUser()
+
+  if (user && (user.ruolo === ruolo.PROPRIETARIO || user.ruolo === ruolo.GOVERNANTE)){
+    redirect("/admin")
+  }
+
+  redirect("/v")
+  
 }

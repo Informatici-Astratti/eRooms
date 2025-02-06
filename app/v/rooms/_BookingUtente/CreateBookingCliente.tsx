@@ -562,7 +562,7 @@ const ConfirmBooking: React.FC = () => {
             <h1 className='font-bold text-2xl'>Prenotazione Confermata</h1>
             <p>Per vedere tutte le prenotazioni clicca sul pulsante{":"} </p>
             <Button variant={'outline'} className='p-4'>
-                <Link href={"#"} className='flex gap-2 items-center'>
+                <Link href={"/account/mybookings"} className='flex gap-2 items-center'>
                     Le mie prenotazioni
                     <SquareArrowOutUpRight/>
                 </Link>

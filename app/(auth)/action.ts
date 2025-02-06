@@ -80,5 +80,5 @@ export async function signUpContinue(prevState: any, formData: FormData) {
 
 
     revalidatePath('/', 'layout')
-    redirect("/admin")
+    redirect("/")
 }

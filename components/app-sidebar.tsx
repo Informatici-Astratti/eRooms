@@ -189,7 +189,7 @@ export function AppSidebar({accountName} : AppSidebarProps) {
                           Impostazioni Account
                         </Link>
                     </DropdownMenuItem>
-                    <SignOutButton>
+                    <SignOutButton redirectUrl="/">
                       <DropdownMenuItem>
                         <LogOut />
                         Logout

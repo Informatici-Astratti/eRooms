@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/app/lib/db"
-import { Prisma, Stanze } from "@prisma/client"
+import { Prisma, Stanze, stato_prenotazione } from "@prisma/client"
 import { format, formatDate } from "date-fns"
 import { z } from "zod"
 
@@ -28,7 +28,8 @@ export async function searchAvailableRooms(query: SearchAvailableRoomsParams): P
         none: {
           AND: [
             { dataInizio: { lt: query.dataFine } },
-            { dataFine: { gt: query.dataInizio } }
+            { dataFine: { gt: query.dataInizio } },
+            { stato: { notIn: [stato_prenotazione.ANNULLATA_HOST, stato_prenotazione.ANNULLATA_UTENTE] } }
           ]
         }
       }

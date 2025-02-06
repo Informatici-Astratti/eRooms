@@ -78,19 +78,19 @@ export default async function NavBar({propertyInfo} : NavBarProps) {
                     <DropdownMenuLabel>Il Mio Profilo</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href={"#"}>
+                      <Link href={"/account/mybookings"}>
                         <CalendarCheck2 />
                         Le Mie Prenotazioni
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href={"#"}>
+                      <Link href={"/account/myprofile"}>
                         <UserRoundCog />
                         Impostazioni Account
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <SignOutButton>
+                    <SignOutButton redirectUrl="/">
                       <DropdownMenuItem>
                         <LogOut />
                         Logout

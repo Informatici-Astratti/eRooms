@@ -10,6 +10,7 @@ import SignUpContinueForm from "./RegisterForm";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/app/lib/db";
 import { redirect } from "next/navigation";
+import getUser from "@/app/lib/user";
 
 
 export default async function ConfirmSignupPage() {
@@ -20,12 +21,10 @@ export default async function ConfirmSignupPage() {
     redirect("/login")
   }
 
-  const user = await prisma.profili.findUnique({
-    where: {idProfilo: userId}
-  })
+  const user = await getUser()
 
   if (user){
-    redirect("/admin/dashboard")
+    redirect("/")
   }
 
 
