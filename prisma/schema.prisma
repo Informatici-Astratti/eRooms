@@ -63,10 +63,10 @@ model Profili {
 
 model Stanze {
   idStanza      String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  nome          String?
-  capienza      Int?           @db.SmallInt
-  descrizione   String?
-  costoStandard Float?         @db.Real
+  nome          String
+  capienza      Int            @db.SmallInt
+  descrizione   String
+  costoStandard Float          @db.Real
   FotoStanze    FotoStanze[]
   Prenotazioni  Prenotazioni[]
   Pulizie       Pulizie?
