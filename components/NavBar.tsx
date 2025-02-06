@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SignOutButton } from '@clerk/nextjs'
-import CreateBookingCliente from './CreateBookingCliente'
+import CreateBookingCliente from '../app/v/rooms/_BookingUtente/CreateBookingCliente'
 import { Proprieta } from '@prisma/client'
 
 interface NavBarProps{
