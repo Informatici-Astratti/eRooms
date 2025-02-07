@@ -31,7 +31,7 @@ export function AppSidebar() {
     },
     {
       title: "Le mie Prenotazioni",
-      url: "/account/bookings",
+      url: "/account/mybookings",
       icon: Calendar,
     },
   ]

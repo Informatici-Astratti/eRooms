@@ -2,6 +2,7 @@
 
 import prisma from "@/app/lib/db"
 import { auth, clerkClient } from "@clerk/nextjs/server"
+import { ruolo } from "@prisma/client"
 import { z } from "zod"
 
 //RESTITUISCE GLI UTENTI CCON IL RUOLO GOVERNANTE E PROPRIETARIO CON RELATIVA EMAIL
@@ -78,5 +79,12 @@ export async function addSquadra(prevState: any, formData: FormData) {
 }
 
 
-
+export async function removeTeamUser(id: string) {
+    // Il profilo non viene eliminato, ma cambiato in cliente
+    const profile = await prisma.profili.update({
+      where: {idProfilo: id},
+      data: {ruolo: ruolo.CLIENTE}
+    })
+    return {success: true}
+}
 
