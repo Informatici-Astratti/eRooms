@@ -12,6 +12,7 @@ export async function getPrenotazioni() {
         Stanze: true,
         Ospiti: true,
         Profili_Prenotazioni_codProfiloToProfili: true,
+        Pagamenti: true
       },
     });
     return prenotazioni;
