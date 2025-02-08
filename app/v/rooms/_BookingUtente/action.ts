@@ -2,7 +2,7 @@
 
 import prisma from "@/app/lib/db"
 import { Prisma, Stanze, stato_prenotazione } from "@prisma/client"
-import { format, formatDate } from "date-fns"
+import { differenceInDays, format, formatDate } from "date-fns"
 import { z } from "zod"
 
 export interface SearchAvailableRoomsParams {
@@ -144,7 +144,7 @@ export async function createBooking(bookingData: Partial<BookingData>): Promise<
     const createPayment = await prisma.pagamenti.create({
       data: {
         codPrenotazione: createdBooking.idPrenotazione,
-        importo: (validatedData.data.costoUnitario * validatedData.data.ospiti)
+        importo: (validatedData.data.costoUnitario * validatedData.data.ospiti * differenceInDays(validatedData.data.dataFine, validatedData.data.dataInizio)),
       }
     })
 

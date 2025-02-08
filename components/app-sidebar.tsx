@@ -173,10 +173,10 @@ export function AppSidebar({accountName} : AppSidebarProps) {
             <SidebarMenu>
                 <SidebarMenuItem>
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger className="group" asChild>
                     <SidebarMenuButton>
                         <User2 /> {accountName?.nome + " " + accountName?.cognome}
-                        <ChevronUp className="ml-auto" />
+                        <ChevronUp className="ml-auto transition-transform group-data-[state=open]:rotate-180" />
                     </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent

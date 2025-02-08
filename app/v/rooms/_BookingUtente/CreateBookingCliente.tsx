@@ -121,7 +121,7 @@ const SelectDateOspiti: React.FC = () => {
                 step2: {
                     idStanza: "",
                     nomeStanza: "",
-                    costoTotale: 0,
+                    costoUnitario: 0,
                 },
                 step3: {
                     idUser: "",
