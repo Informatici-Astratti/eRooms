@@ -308,24 +308,94 @@ interface UpdateOspitiProps {
     ospiti: Ospiti[]
 }
 
-interface UpdateOspitiResponse {
+export type UpdateOspitiFormErrors = z.inferFormattedError<typeof updateOspitiSchema>
+
+export interface UpdateOspitiResponse {
     success: boolean,
     message: string,
-    errors: z.inferFlattenedErrors<typeof updateOspitiSchema>["fieldErrors"]
+    errors?: z.inferFormattedError<typeof updateOspitiSchema> | null
 }
 
+
+
 // TODO : Implementare
-export async function updateOspiti({ idPrenotazione, ospiti }: UpdateOspitiProps) {
+export async function updateOspiti({idPrenotazione, ospiti}: UpdateOspitiProps): Promise<UpdateOspitiResponse> {
+
     const validatedDataOspiti = updateOspitiSchema.safeParse(ospiti)
+
+    if (!validatedDataOspiti.success) {
+        console.log(validatedDataOspiti.error.format())
+        return {
+            success: false,
+            message: "Errore nei dati",
+            errors: validatedDataOspiti.error.format()
+        }
+    }
 
     try {
 
-        if (!validatedDataOspiti.success) {
-            console.log(validatedDataOspiti.error.flatten().fieldErrors)
-            throw new Error("I dati non sono validi")
+        ospiti.forEach(async ospite => {
+            const updateOspiteRes = await prisma.ospiti.update({
+                data: {
+                    nome: ospite.nome,
+                    cognome: ospite.cognome,
+                    cf: ospite.cf,
+                    tipoDocumento: ospite.tipoDocumento,
+                    idDocumento: ospite.idDocumento,
+                    dataRilascio: ospite.dataRilascio,
+                    dataScadenza: ospite.dataScadenza
+                },
+                where: {
+                    idOspite: ospite.idOspite
+                }
+            })
+
+            if (!updateOspiteRes) {
+                throw new Error("Errore nell'aggiornamento dell'ospite")
+            }
+        })
+
+        return {
+            success: true,
+            message: "Ospiti aggiornati correttamente",
+            errors: null
         }
 
     } catch (error) {
-
+        return {
+            success: false,
+            message: "Errore nell'aggiornamento degli ospiti",
+            errors: null
+        }
     }
+    
 }
+
+interface GetGuestsActionResponse {
+    success: boolean,
+    guests?: Ospiti[]
+}
+
+export async function getGuestsAction(idPrenotazione: string): Promise<GetGuestsActionResponse> {
+    
+    try{
+        const guests = await prisma.ospiti.findMany({
+            where: {
+              codPrenotazione: idPrenotazione,
+            },
+        });
+
+        if (!guests) {
+            throw new Error("Nessun ospite trovato");
+        }
+
+        return {
+            success: true,
+            guests
+        }
+    } catch (e) {
+        return {
+            success: false
+        }
+    }
+  }

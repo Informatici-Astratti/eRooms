@@ -1,4 +1,4 @@
-import { stato_prenotazione } from '@prisma/client'
+import { ruolo, stato_prenotazione } from '@prisma/client'
 import React from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -22,27 +22,31 @@ import { formatEnumValue } from '@/app/lib/formatEnum'
 import AnnullaPrenotazioneDialog from '@/components/AnnullaPrenotazioneDialog'
 import { redirect } from 'next/navigation'
 import BadgeStatoPrenotazione from '@/components/BadgeStatoPrenotazione'
+import getUser from '@/app/lib/user'
+import { format } from 'date-fns'
 
 
 export default async function BookingInfoPage({ params }: { params: Promise<{ id: string }> }) {
 
     const idPrenotazione = (await params).id
 
-    const { userId } = await auth()
+    const user = await getUser()
 
-    if (!userId) {
+    if (!user) {
         redirect ("/")
     }
 
-    const checkUser = await prisma.prenotazioni.findUnique({
-        where: {
-            idPrenotazione: idPrenotazione,
-            codProfilo: userId
+    if (user.ruolo !== ruolo.PROPRIETARIO) {
+        const checkUser = await prisma.prenotazioni.findUnique({
+            where: {
+                idPrenotazione: idPrenotazione,
+                codProfilo: user.idProfilo
+            }
+        })
+    
+        if (!checkUser) {
+            redirect ("/account/mybookings")
         }
-    })
-
-    if (!checkUser) {
-        redirect ("/account/mybookings")
     }
 
     const bookingInfo = await prisma.prenotazioni.findUnique({
@@ -98,7 +102,7 @@ export default async function BookingInfoPage({ params }: { params: Promise<{ id
                         <p className='text-lg font-semibold'>{`CAMERA (${bookingInfo?.Stanze.capienza}) ${bookingInfo?.Stanze.nome}`}</p>
 
                         <div className='flex gap-2'>
-                            <UpdateAvaiableRoom disabled={!(bookingInfo.stato === stato_prenotazione.PRENOTATA)} idPrenotazione={bookingInfo?.idPrenotazione} dataInizio={bookingInfo?.dataInizio} dataFine={bookingInfo?.dataFine} ospiti={bookingInfo?.Ospiti.length} />
+                            {user.ruolo === ruolo.PROPRIETARIO && <UpdateAvaiableRoom disabled={!(bookingInfo.stato === stato_prenotazione.PRENOTATA)} idPrenotazione={bookingInfo?.idPrenotazione} dataInizio={bookingInfo?.dataInizio} dataFine={bookingInfo?.dataFine} ospiti={bookingInfo?.Ospiti.length} />}
                         </div>
                     </div>
 
@@ -120,32 +124,51 @@ export default async function BookingInfoPage({ params }: { params: Promise<{ id
                         </span>
                     </div>
                 </div>
-
+                    { !(bookingInfo?.stato === stato_prenotazione.ANNULLATA_HOST || bookingInfo?.stato === stato_prenotazione.ANNULLATA_UTENTE) &&
                     <div className='py-4 border rounded-md flex flex-col'>
                         <div className='flex items-center justify-between border-b px-8 pb-4 '>
                             <p className='font-semibold text-lg'>Documentazione</p>
-
+                            <div className='flex gap-2'>
                             {bookingInfo?.Ospiti.every(ospite => ospite.idDocumento !== null) ? null : (
-                                <div className='flex gap-2'>
-                                    <AddGuestIDsForm idPrenotazione={idPrenotazione} disabled={!(bookingInfo.stato === stato_prenotazione.PRENOTATA)}/>
-                                </div>
+                                <AddGuestIDsForm idPrenotazione={idPrenotazione} disabled={bookingInfo.stato !== stato_prenotazione.CONFERMATA}/>
                             )}
+                            </div>
                         </div>
 
-                        <div className='flex px-8 pt-4'>
+                        <div className='px-8 pt-4'>
                             {bookingInfo?.Ospiti.every(ospite => ospite.idDocumento === null) ?
                                 (
                                     <p>Carica i dati degli ospiti relativi alla prenotazione</p>
                                 ) : (
                                     <div>
-                                        <Tabs defaultValue={bookingInfo.Ospiti.at(0)?.idOspite} className="w-[400px]">
+                                        <Tabs defaultValue={bookingInfo.Ospiti.at(0)?.idOspite} className="w-full">
                                             <TabsList>
                                                 {bookingInfo?.Ospiti.map((ospite, i) => (
                                                     <TabsTrigger key={ospite.idOspite} value={ospite.idOspite}>{`Ospite ${i + 1}`}</TabsTrigger>
                                                 ))}
                                             </TabsList>
                                             {bookingInfo?.Ospiti.map((ospite, i) => (
-                                                <TabsContent key={ospite.idOspite} value={ospite.idOspite}>{`Nome: ${ospite.nome} Cognome: ${ospite.cognome}`}</TabsContent>
+                                                <TabsContent key={ospite.idOspite} value={ospite.idOspite} className='w-full'>
+                                                    <div className='flex justify-between border rounded-md p-4 '>
+                                                        <div className='flex flex-col gap-2'>
+                                                            <p>Nome: {ospite.nome}</p>
+                                                            <p>Cognome: {ospite.cognome}</p>
+                                                            <p>CF: {ospite.cf}</p>
+                                                        </div>
+                                                        <div className='flex flex-col gap-2'>
+                                                            <p className='font-semibold'>Documento</p>
+                                                            <p>{`Tipo: ${formatEnumValue(ospite.tipoDocumento ?? "")}`}</p>
+                                                            <p>{`Numero: ${ospite.idDocumento}`}</p>
+                                                            <div className='flex gap-2'>
+                                                                <p>{`Data Rilascio: ${format(ospite.dataRilascio ?? "", "dd/MM/yyyy")}`}</p>
+                                                                <p>{`Data Scadenza: ${format(ospite.dataScadenza ?? "", "dd/MM/yyyy")}`}</p>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </TabsContent>
                                             ))}
                                         </Tabs>
                                     </div>
@@ -153,6 +176,7 @@ export default async function BookingInfoPage({ params }: { params: Promise<{ id
                             }
                         </div>
                     </div>
+                    }   
             </div>
         </div>
     )
