@@ -1,6 +1,6 @@
 "use client"
 
-import type { Prenotazioni as PrenotazioniType, Stanze, Ospiti, Profili } from "@prisma/client"
+import type { Prenotazioni as PrenotazioniType, Stanze, Ospiti, Profili, Pagamenti } from "@prisma/client"
 import type { ColumnDef } from "@tanstack/react-table"
 import { FileUser, MoreHorizontal, Pencil } from "lucide-react"
 
@@ -33,26 +33,27 @@ export type PrenotazioneWithRelations = PrenotazioniType & {
   Stanze: Stanze
   Ospiti: Ospiti[]
   Profili_Prenotazioni_codProfiloToProfili: Profili
+  Pagamenti: Pagamenti[]
 }
 
 export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
   {
-    accessorKey: "idPrenotazione",
-    header: "Codice Prenotazione",
-  },
-  {
     accessorKey: "cliente",
-    header: "Cliente",
+    header: "Cliente e Prenotazione",
     cell: ({ row }) => {
-      const nomeOspite = row.original.Profili_Prenotazioni_codProfiloToProfili
-      return nomeOspite?.nome && nomeOspite?.cognome ? nomeOspite.nome.concat(" ", nomeOspite.cognome) : "N/A"
-    },
-    filterFn: (row, columnId, value) => {
-      const nomeOspite = row.original.Profili_Prenotazioni_codProfiloToProfili
-      const nomeCompleto =
-        nomeOspite?.nome && nomeOspite?.cognome ? nomeOspite.nome.concat(" ", nomeOspite.cognome) : "N/A"
+      const nomeOspite = row.original.Profili_Prenotazioni_codProfiloToProfili;
+      const idPrenotazione = row.original.idPrenotazione;
 
-      return nomeCompleto.toLowerCase().includes(value.toLowerCase())
+      return (
+        <>
+          <div className="font-medium">
+            {nomeOspite?.nome && nomeOspite?.cognome
+              ? nomeOspite.nome.concat(" ", nomeOspite.cognome)
+              : "N/A"}
+          </div>
+          <div className="text-sm text-muted-foreground">Rif:{idPrenotazione}</div>
+        </>
+      );
     },
   },
   {
@@ -65,21 +66,22 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
     },
   },
   {
-    accessorKey: "dataInizio",
-    header: "Data Inizio",
+    accessorKey: "data",
+    header: "Check-in / Check-out",
     cell: ({ row }) => {
       const date = row.original
-      const formattedDate = new Date(date.dataInizio).toLocaleDateString()
-      return formattedDate
-    },
-  },
-  {
-    accessorKey: "dataFine",
-    header: "Data Fine",
-    cell: ({ row }) => {
-      const date = row.original
-      const formattedDate = new Date(date.dataFine).toLocaleDateString()
-      return formattedDate
+      const dataInizio = new Date(date.dataInizio).toLocaleDateString()
+      const dataFine = new Date(date.dataFine).toLocaleDateString()
+      return (
+        <>
+          <div>
+            {dataInizio}
+          </div>
+          <div>
+            {dataFine}
+          </div>
+        </>
+      );
     },
   },
   {
@@ -90,6 +92,29 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
       return stanze.nome
     },
   },
+  {
+    accessorKey: "importo",
+    header: "Importo",
+    cell: ({ row }) => {
+      const pagamenti = row.original.Pagamenti ?? [];
+      const prenotazioni = row.original
+
+      return (
+        <>
+          <div className="text-sm font-bold text-green-600">
+            {prenotazioni.stato === "CONFERMATA" && pagamenti[0].importo.toFixed(2).concat(" €")}
+          </div>
+          <div className="text-sm font-bold text-red-600">
+            {(prenotazioni.stato === "ANNULLATA_HOST" || prenotazioni.stato === "ANNULLATA_UTENTE" || prenotazioni.stato === "PRENOTATA") && pagamenti[0].importo.toFixed(2).concat(" €")}
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {pagamenti[0].dataSaldo?.toLocaleDateString() ?? "Non pagata"}
+          </div>
+        </>
+      );
+    },
+  },
+
   {
     accessorKey: "stato",
     header: ({ column }) => {
@@ -104,15 +129,15 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
       const stato = row.original
       if (stato.stato === "PRENOTATA") {
         return (<Badge variant="attesa">PRENOTATA</Badge>)
-      } else if(stato.stato === "CONFERMATA") {
+      } else if (stato.stato === "CONFERMATA") {
         return (<Badge variant="success">CONFERMATA</Badge>)
-      }else if(stato.stato === "ANNULLATA_HOST"){
+      } else if (stato.stato === "ANNULLATA_HOST") {
         return (<Badge variant="destructive">ANNULLATA DALL'HOST</Badge>)
-      }else if(stato.stato === "ANNULLATA_UTENTE"){
+      } else if (stato.stato === "ANNULLATA_UTENTE") {
         return (<Badge variant="destructive">ANNULLATA DALL'UTENTE</Badge>)
-      } 
+      }
+    },
   },
-},
   {
     id: "actions",
     cell: ({ row }) => {
@@ -131,38 +156,40 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-400 bg-gray-200">
+            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-400 bg-gray-200">
               <span className="sr-only">Apri menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Azioni</DropdownMenuLabel>
+            <DropdownMenuSeparator />
             <Dialog>
               <DialogTrigger asChild>
                 <DropdownMenuItem onSelect={(e) => e.preventDefault()}><FileUser />Info cliente</DropdownMenuItem>
               </DialogTrigger>
               <GuestsTable ospiti={prenotazione.Ospiti} />
             </Dialog>
-            <DropdownMenuSeparator />
-            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-              <DialogTrigger asChild>
-                <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault()
-                    setIsEditModalOpen(true)
-                  }}
-                >
-                  <Pencil />
-                  Modifica
-                </DropdownMenuItem>
-              </DialogTrigger>
-              <ModificaPrenotazione
-                prenotazione={prenotazione}
-                onClose={() => setIsEditModalOpen(false)}
-                allRooms={allRooms}
-              />
-            </Dialog>
+            {(prenotazione.stato === "PRENOTATA") && (
+              <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsEditModalOpen(true);
+                    }}
+                  >
+                    <Pencil />
+                    Modifica
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <ModificaPrenotazione
+                  prenotazione={prenotazione}
+                  onClose={() => setIsEditModalOpen(false)}
+                  allRooms={allRooms}
+                />
+              </Dialog>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -188,20 +215,21 @@ export default function GuestsTable({ ospiti }: { ospiti: Ospiti[] }) {
             <TableHead>ID Documento</TableHead>
             <TableHead>Data Rilascio</TableHead>
             <TableHead>Data Scadenza</TableHead>
-            <TableHead>Foto Documento</TableHead>
+            {/* <TableHead>Foto Documento</TableHead> */}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {ospiti.map((ospite: Ospiti) => (
-            <TableRow key={ospite.idDocumento}>
-              <TableCell>{ospite.nome}</TableCell>
-              <TableCell>{ospite.cognome}</TableCell>
-              <TableCell className="font-medium">{ospite.cf}</TableCell>
-              <TableCell>{ospite.tipoDocumento}</TableCell>
-              <TableCell>{ospite.idDocumento}</TableCell>
-              <TableCell>{ospite.dataRilascio?.toLocaleDateString()}</TableCell>
-              <TableCell>{ospite.dataScadenza?.toLocaleDateString()}</TableCell>
-              <TableCell>
+          {ospiti.length > 0 ? (
+            ospiti.map((ospite: Ospiti) => (
+              <TableRow key={ospite.idDocumento}>
+                <TableCell>{ospite.nome}</TableCell>
+                <TableCell>{ospite.cognome}</TableCell>
+                <TableCell className="font-medium">{ospite.cf}</TableCell>
+                <TableCell>{ospite.tipoDocumento}</TableCell>
+                <TableCell>{ospite.idDocumento}</TableCell>
+                <TableCell>{ospite.dataRilascio?.toLocaleDateString()}</TableCell>
+                <TableCell>{ospite.dataScadenza?.toLocaleDateString()}</TableCell>
+                {/* <TableCell>
                 {ospite.fotoDocumento ? (
                   <img
                     src={ospite.fotoDocumento || "/placeholder.svg"}
@@ -211,12 +239,19 @@ export default function GuestsTable({ ospiti }: { ospiti: Ospiti[] }) {
                 ) : (
                   "N/A"
                 )}
+              </TableCell> */}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center">
+                Nessun ospite registrato
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </DialogContent>
-  )
+  );
 }
 
