@@ -151,17 +151,18 @@ export default async function BookingInfoPage({ params }: { params: Promise<{ id
                                                 <TabsContent key={ospite.idOspite} value={ospite.idOspite} className='w-full'>
                                                     <div className='flex justify-between border rounded-md p-4 '>
                                                         <div className='flex flex-col gap-2'>
-                                                            <p>Nome: {ospite.nome}</p>
-                                                            <p>Cognome: {ospite.cognome}</p>
-                                                            <p>CF: {ospite.cf}</p>
+                                                            <p className='font-semibold'>Generalità</p>
+                                                            <p><span className='font-semibold'>{`Nome: `}</span> {ospite.nome}</p>
+                                                            <p><span className='font-semibold'>{`Cognome: `}</span>{ospite.cognome}</p>
+                                                            <p><span className='font-semibold'>{`CF: `}</span>{ospite.cf}</p>
                                                         </div>
                                                         <div className='flex flex-col gap-2'>
                                                             <p className='font-semibold'>Documento</p>
-                                                            <p>{`Tipo: ${formatEnumValue(ospite.tipoDocumento ?? "")}`}</p>
-                                                            <p>{`Numero: ${ospite.idDocumento}`}</p>
+                                                            <p><span className='font-semibold'>{`Tipo: `}</span>{formatEnumValue(ospite.tipoDocumento ?? "")}</p>
+                                                            <p><span className='font-semibold'>{`Numero: `}</span>{ospite.idDocumento}</p>
                                                             <div className='flex gap-2'>
-                                                                <p>{`Data Rilascio: ${format(ospite.dataRilascio ?? "", "dd/MM/yyyy")}`}</p>
-                                                                <p>{`Data Scadenza: ${format(ospite.dataScadenza ?? "", "dd/MM/yyyy")}`}</p>
+                                                                <p><span className='font-semibold'>{`Data Rilascio: `}</span>{format(ospite.dataRilascio ?? "", "dd/MM/yyyy")}</p>
+                                                                <p><span className='font-semibold'>{`Data Scadenza: `}</span>{format(ospite.dataScadenza ?? "", "dd/MM/yyyy")}</p>
 
                                                             </div>
 

@@ -46,7 +46,8 @@ export default async function MyBookingsPage() {
       
       (bookings.map(booking => (
         <div className='flex gap-2'>
-          <BookingCard 
+          <BookingCard
+            key={booking.idPrenotazione} 
             idPrenotazione={booking.idPrenotazione} 
             nome={booking.Stanze.nome} 
             dataInizio={booking.dataInizio} 
