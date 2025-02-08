@@ -61,9 +61,9 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<Profi
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filtra i nomi..."
-          value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("nome")?.setFilterValue(event.target.value)}
+          placeholder="Filtra per cognome..."
+          value={(table.getColumn("cognome")?.getFilterValue() as string) ?? ""}
+          onChange={(event) => table.getColumn("cognome")?.setFilterValue(event.target.value)}
           className="max-w-sm bg-white"
         />
         <DropdownMenu>

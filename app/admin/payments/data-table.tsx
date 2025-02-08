@@ -60,9 +60,9 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter prenotazioni..."
-          value={(table.getColumn("Prenotazioni")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("Prenotazioni")?.setFilterValue(event.target.value)}
+          placeholder="Filtra per clienti..."
+          value={(table.getColumn("cliente")?.getFilterValue() as string) ?? ""}
+          onChange={(event) => table.getColumn("cliente")?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>

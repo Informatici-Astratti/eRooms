@@ -24,14 +24,28 @@ type Payment = {
 
 export const columns: ColumnDef<Payment>[] = [
   {
-    accessorKey: "Prenotazioni",
-    header: "Prenotazione",
+    accessorKey: "cliente",
+    header: "Cliente e Prenotazione",
     cell: ({ row }) => {
-      const prenotazione = row.getValue("Prenotazioni") as Payment["Prenotazioni"]
-      return prenotazione
-        ? `${prenotazione.Profili_Prenotazioni_codProfiloToProfili.nome} ${prenotazione.Profili_Prenotazioni_codProfiloToProfili.cognome}`
-        : "N/A"
+      const nomeOspite = row.original.Prenotazioni?.Profili_Prenotazioni_codProfiloToProfili;
+      const idPrenotazione = row.original.Prenotazioni?.idPrenotazione;
+
+      return (
+        <>
+          <div className="font-medium">
+            {nomeOspite?.nome && nomeOspite?.cognome
+              ? nomeOspite.nome.concat(" ", nomeOspite.cognome)
+              : "N/A"}
+          </div>
+          <div className="text-sm text-muted-foreground">Rif:{idPrenotazione}</div>
+        </>
+      );
     },
+    filterFn: (row, columId, value) => {
+      const nomeCliente = row.original.Prenotazioni?.Profili_Prenotazioni_codProfiloToProfili
+      const nomeCompleto = nomeCliente?.nome && nomeCliente.cognome ? nomeCliente.nome.concat(" ", nomeCliente.cognome) : "N/A" 
+      return nomeCompleto.toLowerCase().includes(value.toLowerCase());
+    }
   },
   {
     accessorKey: "metodo",
