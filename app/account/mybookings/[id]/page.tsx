@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge'
 import { formatEnumValue } from '@/app/lib/formatEnum'
 import AnnullaPrenotazioneDialog from '@/components/AnnullaPrenotazioneDialog'
 import { redirect } from 'next/navigation'
+import BadgeStatoPrenotazione from '@/components/BadgeStatoPrenotazione'
 
 
 export default async function BookingInfoPage({ params }: { params: Promise<{ id: string }> }) {
@@ -157,30 +158,4 @@ export default async function BookingInfoPage({ params }: { params: Promise<{ id
     )
 }
 
-interface BadgeStatoPrenotazioneProps {
-    stato?: stato_prenotazione
-}
 
-const BadgeStatoPrenotazione: React.FC<BadgeStatoPrenotazioneProps> = ({ stato }) => {
-
-    const variant = () => {
-        switch (stato) {
-            case stato_prenotazione.PRENOTATA:
-                return "attesa"
-            case stato_prenotazione.CONFERMATA:
-                return "success"
-            case stato_prenotazione.ANNULLATA_HOST:
-            case stato_prenotazione.ANNULLATA_UTENTE:
-                return "destructive"
-            default:
-                return "outline"
-        }
-    }
-
-    return stato && (
-
-        <Badge variant={variant()}>
-            {formatEnumValue(stato).toUpperCase()}
-        </Badge>
-    )
-}
