@@ -9,7 +9,7 @@ import React from 'react'
 
 export default async function MyBookingsPage() {
 
-  const {userId} = await auth()
+  const { userId } = await auth()
 
   if (!userId) {
     return ("/")
@@ -35,32 +35,37 @@ export default async function MyBookingsPage() {
     },
     where: {
       codProfilo: userId
+    },
+    orderBy: {
+      dataInizio: 'desc'
     }
   })
 
   return (
     <div className='p-4 flex flex-col gap-3'>
       <h1 className="text-4xl font-bold">Le mie Prenotazioni</h1>
-      {
-      bookings.length > 0 ? 
-      
-      (bookings.map(booking => (
-        <div className='flex gap-2'>
-          <BookingCard
-            key={booking.idPrenotazione} 
-            idPrenotazione={booking.idPrenotazione} 
-            nome={booking.Stanze.nome} 
-            dataInizio={booking.dataInizio} 
-            dataFine={booking.dataFine} 
-            stato={booking.stato} 
-            urlFoto={booking.Stanze.FotoStanze[0]?.url}
-          />
-        </div>
-      )))
-      :
-      (<p>Non ci sono prenotazioni</p>)
-    }
-        
+      <div className='flex flex-col gap-2'>
+        {
+          bookings.length > 0 ?
+
+            (bookings.map(booking => (
+
+              <BookingCard
+                key={booking.idPrenotazione}
+                idPrenotazione={booking.idPrenotazione}
+                nome={booking.Stanze.nome}
+                dataInizio={booking.dataInizio}
+                dataFine={booking.dataFine}
+                stato={booking.stato}
+                urlFoto={booking.Stanze.FotoStanze[0]?.url}
+              />
+
+            )))
+            :
+            (<p>Non ci sono prenotazioni</p>)
+        }
+      </div>
+
     </div>
   )
 }

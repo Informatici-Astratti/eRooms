@@ -6,8 +6,8 @@ import { Ospiti, Prisma, ruolo, stato_prenotazione, tipo_documento } from "@pris
 import { differenceInDays } from "date-fns";
 import { z } from "zod";
 
-export async function getAllBookings() {
 
+export async function getPrenotazioni() {
     const user = await getUser()
 
     if (!user || user.ruolo !== ruolo.PROPRIETARIO) {
@@ -15,14 +15,19 @@ export async function getAllBookings() {
     }
 
     try {
-        const allBookings = await prisma.prenotazioni.findMany()
-        return allBookings
-
-    } catch (e) {
-        throw new Error("Errore nel Database")
+      const prenotazioni = await prisma.prenotazioni.findMany({
+        include: {
+          Stanze: true,
+          Profili_Prenotazioni_codProfiloToProfili: true,
+          Pagamenti: true
+        },
+      });
+      return prenotazioni;
+    } catch (error) {
+      console.error("Errore nel recupero delle prenotazioni:", error);
+      throw new Error("Si è verificato un errore nel recupero dei dati.");
     }
-
-}
+  }
 
 interface GetUserBookingProps {
     userId: string

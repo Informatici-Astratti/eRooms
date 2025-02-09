@@ -1,17 +1,18 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 
 import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
   } from "@/components/ui/dialog"
 import { Button } from './ui/button'
-import { Pencil } from 'lucide-react'
+import { Check, LoaderCircle, Pencil } from 'lucide-react'
 import { AvailableRooms, searchAvailableRooms } from '@/app/v/rooms/_BookingUtente/action'
 import { useToast } from '@/hooks/use-toast'
 
@@ -22,6 +23,8 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
+import { updateBookingStanza } from '@/app/admin/booking/bookingAction'
+import { useRouter } from 'next/navigation'
 
 export interface UpdateAvaiableRoomProps {
     idPrenotazione: string
@@ -35,6 +38,10 @@ export default function UpdateAvaiableRoom({idPrenotazione, dataInizio, dataFine
 
     const { toast } = useToast()
     const [room, setRoom] = React.useState<AvailableRooms[]>([])
+    const [selectedRoom, setSelectedRoom] = React.useState<string | null>(null)
+    const [open, setOpen] = React.useState(false)
+    const [isLoading, setIsLoading] = React.useState(false)
+    const router = useRouter()
 
     async function fetchAvaiableRooms() {
         const res = await searchAvailableRooms({dataInizio, dataFine, ospiti})
@@ -51,8 +58,35 @@ export default function UpdateAvaiableRoom({idPrenotazione, dataInizio, dataFine
 
     }
 
+    async function updateRoom() {
+        setIsLoading(true)
+        const res = await updateBookingStanza({idPrenotazione: idPrenotazione, idStanza: selectedRoom!})
+        setIsLoading(false)
+
+        if(!res.success){
+            toast({
+                title: "Errore",
+                description: res.error,
+                variant: "destructive"
+            })
+        }
+
+        if (res.success){
+            toast({
+                title: "Successo",
+                description: "Stanza aggiornata con successo",
+                variant: "success"
+            })
+            setOpen(false)
+            router.refresh()
+        }
+    }
+
     return (
-        <Dialog onOpenChange={() => fetchAvaiableRooms()}>
+        <Dialog open={open} onOpenChange={() => {
+            setOpen(!open)
+            fetchAvaiableRooms()
+        }}>
             <DialogTrigger asChild>
                 <Button variant={"outline"} disabled={disabled}>
                     <Pencil />
@@ -75,7 +109,7 @@ export default function UpdateAvaiableRoom({idPrenotazione, dataInizio, dataFine
                     )}
 
                     {room.length > 0 &&(
-                    <Select>
+                    <Select onValueChange={(value) => setSelectedRoom(value)}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Stanze disponibili" />
                         </SelectTrigger>
@@ -90,6 +124,22 @@ export default function UpdateAvaiableRoom({idPrenotazione, dataInizio, dataFine
                     )}
 
                 </div>
+
+                <DialogFooter>
+                    <Button onClick={updateRoom} disabled={!selectedRoom || isLoading}>
+                        {isLoading ? (
+                            <>
+                            <LoaderCircle className="animate-spin"/>
+                            Caricamento
+                            </>
+                        ) : (
+                            <>
+                            <Check />
+                            Salva
+                            </>
+                        )}
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     )

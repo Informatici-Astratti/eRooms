@@ -38,7 +38,17 @@ export type StanzeForm = Stanze & {
 }
 
 
-export default async function getAllRooms(): Promise<StanzeConTariffeFoto[]> {
+export async function getAllRooms() {
+  try {
+    const rooms = await prisma.stanze.findMany();
+    return rooms;
+  } catch (error) {
+    console.error("Errore nel recupero delle stanze:", error);
+    throw new Error("Si è verificato un errore nel recupero delle stanze.");
+  }
+}
+
+export default async function getAllRoomsWithFotoAndTariffe(): Promise<StanzeConTariffeFoto[]> {
   const roomsList: StanzeConTariffeFoto[] = await prisma.stanze.findMany({
     include:{
       Tariffe: true,

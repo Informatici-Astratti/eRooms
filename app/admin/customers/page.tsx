@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import { DataTable } from "./data-table"
 import { columns } from "./columns"
-import { getProfili } from "./action"
+import { getClienti } from "./action"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { CirclePlus } from "lucide-react"
@@ -9,7 +9,7 @@ import { CirclePlus } from "lucide-react"
 
 
 export default async function Clients() {
-  const profiles = await getProfili()
+  const profiles = await getClienti()
   return (
     <div className="p-4 w-full">
       

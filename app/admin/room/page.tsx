@@ -2,7 +2,7 @@ import RoomCard from "@/components/roomCardUI";
 import { Suspense } from "react";
 import RoomsList from "./roomsList";
 import { Skeleton } from "@/components/ui/skeleton";
-import getAllRooms, { StanzeConTariffeFoto } from "./action";
+import getAllRoomsWithFotoAndTariffe, { StanzeConTariffeFoto } from "./action";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CirclePlus } from "lucide-react";
@@ -14,7 +14,7 @@ import EditTariffaForm from "./EditTariffaForm";
 
 export default async function Rooms() {
 
-  const rooms: StanzeConTariffeFoto[] = await getAllRooms();
+  const rooms: StanzeConTariffeFoto[] = await getAllRoomsWithFotoAndTariffe();
 
   return (
     <div className="p-5 w-full">

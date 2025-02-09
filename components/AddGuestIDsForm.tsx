@@ -60,6 +60,7 @@ export default function AddGuestIDsForm({ idPrenotazione, disabled = false }: Ad
 
   const [guests, setGuests] = useState<Ospiti[]>([])
   const [errors, setErrors] = useState<UpdateOspitiFormErrors | null>(null)
+  const [tooltipOpen, setTooltipOpen] = useState(false)
   const [open, setOpen] = useState(false)
   const {toast} = useToast()
   const router = useRouter()
@@ -123,9 +124,9 @@ export default function AddGuestIDsForm({ idPrenotazione, disabled = false }: Ad
   return disabled ?
   (
     <TooltipProvider>
-      <Tooltip>
+      <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
         <TooltipTrigger asChild>
-          <Button variant={"outline"} >
+          <Button variant={"outline"} onClick={() => setTooltipOpen(true)}>
             <IdCard />
             Aggiungi Documenti
           </Button>

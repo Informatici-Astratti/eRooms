@@ -1,11 +1,11 @@
 import { Suspense } from "react"
-import { getPrenotazioni } from "./action"
+import { getPrenotazioni } from "./bookingAction"
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { CirclePlus } from "lucide-react"
-import { CreateReservationSheet } from "./create-reservation"
+import CreateBookingAdmin from "./_BookingAdmin/CreateBookingAdmin"
 
 
 
@@ -19,7 +19,7 @@ export default async function DemoPage() {
           <div className="flex flex-col gap-4">
           <div className="flex justify-between items-center">
           <h1 className="text-4xl font-bold">Prenotazioni</h1>
-          <CreateReservationSheet></CreateReservationSheet>
+          <CreateBookingAdmin />
         </div>
             <DataTable columns={columns} data={data} />
           </div>
