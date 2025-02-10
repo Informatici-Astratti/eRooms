@@ -7,13 +7,6 @@ const isProtectedRoute = createRouteMatcher(['/admin(.*)', "/signup/continue", "
 
 export default clerkMiddleware(async (auth, request) => {
   if (isProtectedRoute(request)) {
-
-    const user = await getUser()
-
-    if (user?.ruolo !== ruolo.PROPRIETARIO) {
-      return NextResponse.redirect("/")
-    }
-    
     await auth.protect()
   } 
 })
