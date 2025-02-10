@@ -1,11 +1,21 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import getUser from './app/lib/user'
+import { NextResponse } from 'next/server'
+import { ruolo } from '@prisma/client'
 
-const isProtectedRoute = createRouteMatcher(['/admin(.*)', "/signup/continue", "/account"])
+const isProtectedRoute = createRouteMatcher(['/admin(.*)', "/signup/continue", "/account(.*)"])
 
 export default clerkMiddleware(async (auth, request) => {
   if (isProtectedRoute(request)) {
+
+    const user = await getUser()
+
+    if (user?.ruolo !== ruolo.PROPRIETARIO) {
+      return NextResponse.redirect("/")
+    }
+    
     await auth.protect()
-  }
+  } 
 })
 
 export const config = {
