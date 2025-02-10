@@ -140,7 +140,7 @@ export default function AddGuestIDsForm({ idPrenotazione, disabled = false }: Ad
   )
   :
   (
-    <Sheet open={open} onOpenChange={() => setOpen(true)}>
+    <Sheet open={open} onOpenChange={(newState) => setOpen(newState)}>
       <SheetTrigger asChild>
         <Button variant={"outline"} >
           <IdCard />

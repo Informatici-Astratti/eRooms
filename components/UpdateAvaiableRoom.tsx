@@ -13,7 +13,7 @@ import {
   } from "@/components/ui/dialog"
 import { Button } from './ui/button'
 import { Check, LoaderCircle, Pencil } from 'lucide-react'
-import { AvailableRooms, searchAvailableRooms } from '@/app/v/rooms/_BookingUtente/action'
+import { AvailableRooms, searchAvailableRooms } from '@/app/admin/booking/bookingAction'
 import { useToast } from '@/hooks/use-toast'
 
 import {
@@ -116,7 +116,7 @@ export default function UpdateAvaiableRoom({idPrenotazione, dataInizio, dataFine
                         <SelectContent>
                             {room.map((room) => (
                                 <SelectItem key={room.idStanza} value={room.idStanza}>
-                                    {room.nome} - {room.costoEffettivo}€
+                                    {room.nome} - {room.capienza} posti letto
                                 </SelectItem>
                             ))}
                         </SelectContent>

@@ -7,6 +7,10 @@ import { redirect } from "next/navigation"
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const user = await getUser()
 
+  if (user?.ruolo !== ruolo.PROPRIETARIO) {
+    return redirect("/")
+  }
+
   const accountName = {
     nome: user?.nome,
     cognome: user?.cognome

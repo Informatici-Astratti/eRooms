@@ -1,9 +1,10 @@
 "use server"
 
 import prisma from "@/app/lib/db";
+import { stripe } from "@/app/lib/stripe";
 import getUser from "@/app/lib/user";
-import { Ospiti, Prisma, ruolo, stato_prenotazione, tipo_documento } from "@prisma/client";
-import { differenceInDays } from "date-fns";
+import { Ospiti, Prisma, ruolo, Stanze, stato_prenotazione, tipo_documento, tipo_pagamento } from "@prisma/client";
+import { differenceInDays, format } from "date-fns";
 import { z } from "zod";
 
 
@@ -182,16 +183,6 @@ export async function updateBookingStanza({ idPrenotazione, idStanza }: UpdateBo
                         ]
                     }
                 }
-            },
-            include: {
-                Tariffe: {
-                    where: {
-                        dataInizio: { lte: booking.dataInizio },
-                        dataFine: { gte: booking.dataFine }
-                    },
-                    select: { tipoVariazione: true, variazione: true },
-                    take: 1
-                }
             }
         });
 
@@ -210,49 +201,6 @@ export async function updateBookingStanza({ idPrenotazione, idStanza }: UpdateBo
 
         if (!updateBookingRoom) {
             throw new Error("Errore nell'aggiornamento della stanza")
-        }
-
-        const firstPagamento = await prisma.pagamenti.findFirst({
-            select: {
-                idPagamento: true
-            },
-            where: {
-                codPrenotazione: idPrenotazione,
-            },
-        });
-
-        if (!firstPagamento) {
-            throw new Error("Nessun pagamento trovato per questa prenotazione");
-        }
-
-        let costoEffettivo = stanzaDisponibile.costoStandard
-
-        if (stanzaDisponibile.Tariffe.length > 0) {
-            switch (stanzaDisponibile.Tariffe[0].tipoVariazione) {
-                case "AUMENTO_PERCENTUALE":
-                    costoEffettivo = stanzaDisponibile.costoStandard * (1 + (stanzaDisponibile.Tariffe[0].variazione / 100))
-                case "SCONTO_PERCENTUALE":
-                    costoEffettivo = stanzaDisponibile.costoStandard * (1 - (stanzaDisponibile.Tariffe[0].variazione / 100))
-                case "AUMENTO_FISSO":
-                    costoEffettivo = stanzaDisponibile.costoStandard + stanzaDisponibile.Tariffe[0].variazione
-                case "SCONTO_FISSO":
-                    costoEffettivo = stanzaDisponibile.costoStandard - stanzaDisponibile.Tariffe[0].variazione
-                case "NULLA":
-                    costoEffettivo = stanzaDisponibile.costoStandard
-            }
-        }
-
-        const updatePagamento = await prisma.pagamenti.update({
-            data: {
-                importo: costoEffettivo * booking.Ospiti.length * differenceInDays(booking.dataFine, booking.dataInizio),
-            },
-            where: {
-                idPagamento: firstPagamento.idPagamento,
-            }
-        });
-
-        if (!updatePagamento) {
-            throw new Error("Errore nell'aggiornamento del pagamento");
         }
 
         return {
@@ -400,4 +348,235 @@ export async function getGuestsAction(idPrenotazione: string): Promise<GetGuests
             success: false
         }
     }
+}
+
+export interface SearchAvailableRoomsParams {
+    dataInizio: Date
+    dataFine: Date
+    ospiti: number
+  }
+  
+  export type AvailableRooms = Stanze & {
+    fotoUrls: string[],
+    costoEffettivo: number
+  }
+  
+  export async function searchAvailableRooms(query: SearchAvailableRoomsParams): Promise<AvailableRooms[] | undefined> {
+  
+    const rooms = await prisma.stanze.findMany({
+      where: {
+        capienza: {
+          gte: query.ospiti,
+        },
+        Prenotazioni: {
+          // Se non esiste prenotazione che si sovrappone al periodo richiesto:
+          none: {
+            AND: [
+              { dataInizio: { lt: query.dataFine } },
+              { dataFine: { gt: query.dataInizio } },
+              { stato: { notIn: [stato_prenotazione.ANNULLATA_HOST, stato_prenotazione.ANNULLATA_UTENTE] } }
+            ]
+          }
+        }
+      },
+      include: {
+        FotoStanze: {
+          select: { url: true },
+        },
+        // Supponendo che esista una relazione "Tariffe" sulla stanza
+        Tariffe: {
+          where: {
+            dataInizio: { lte: query.dataInizio },
+            dataFine: { gte: query.dataFine }
+          },
+          select: { tipoVariazione: true, variazione: true },
+          take: 1
+        },
+      }
+    });
+  
+    if (!rooms) {
+      return []
+    }
+  
+    const avaiableRooms: AvailableRooms[] = rooms.map((room) => {
+  
+      let costoEffettivo = room.costoStandard
+  
+      if (room.Tariffe.length > 0) {
+        switch (room.Tariffe[0].tipoVariazione) {
+          case "AUMENTO_PERCENTUALE":
+            costoEffettivo = room.costoStandard * (1 + (room.Tariffe[0].variazione / 100))
+          case "SCONTO_PERCENTUALE":
+            costoEffettivo = room.costoStandard * (1 - (room.Tariffe[0].variazione / 100))
+          case "AUMENTO_FISSO":
+            costoEffettivo = room.costoStandard + room.Tariffe[0].variazione
+          case "SCONTO_FISSO":
+            costoEffettivo = room.costoStandard - room.Tariffe[0].variazione
+          case "NULLA":
+            costoEffettivo = room.costoStandard
+        }
+      }
+  
+      return {
+        idStanza: room.idStanza,
+        nome: room.nome,
+        capienza: room.capienza,
+        descrizione: room.descrizione,
+        costoStandard: room.costoStandard,
+        fotoUrls: room.FotoStanze.map(foto => foto.url),
+        costoEffettivo: costoEffettivo
+      }
+  
+    })
+  
+    return avaiableRooms
+  }
+  
+  export interface BookingData {
+    dataInizio: Date
+    dataFine: Date
+    ospiti: number
+    idStanza: string
+    nomeStanza: string
+    costoUnitario: number
+    userId: string
+    nome: string
+    cognome: string
+    dataNascita: Date
+  }
+  
+  const CreateBookingSchema = z.object({
+    dataInizio: z.date(),
+    dataFine: z.date(),
+    ospiti: z.number().min(1),
+    idStanza: z.string(),
+    costoUnitario: z.number().min(0.01),
+    userId: z.string()
+  })
+  
+  export async function createBooking(bookingData: Partial<BookingData>): Promise<boolean> {
+  
+    const validatedData = CreateBookingSchema.safeParse(bookingData)
+  
+    try {
+      if (!validatedData.success) {
+        throw new Error("Errore nei dati");
+      }
+  
+      const createdBooking = await prisma.prenotazioni.create({
+        data: {
+          dataInizio: validatedData.data.dataInizio.toISOString(),
+          dataFine: validatedData.data.dataFine.toISOString(),
+          codStanza: validatedData.data.idStanza,
+          codProfilo: validatedData.data.userId
+        }
+      });
+  
+      if (!createdBooking) throw new Error("Prenotazione non è stata creata")
+  
+      for (let i = 0; i < validatedData.data.ospiti; i++) {
+        const createdGuest = await prisma.ospiti.create({
+          data: {
+            codPrenotazione: createdBooking.idPrenotazione
+          }
+        })
+  
+        if (!createdGuest) throw new Error("Non è stato possibile creare gli ospiti")
+      }
+
+      // Verifca e creazione di un Customer Stripe per l'utente
+  
+      const userStripeCustomerId = await prisma.profili.findUnique({
+        where: {
+          idProfilo: validatedData.data.userId
+        }
+      })
+
+      let stripeCustomerId = userStripeCustomerId?.stripeCustomerId
+
+      if(!stripeCustomerId){
+        const customer = await stripe.customers.create({
+            email: userStripeCustomerId?.email,
+            name: userStripeCustomerId?.nome + " " + userStripeCustomerId?.cognome,
+        })
+
+        stripeCustomerId = customer.id
+
+        const updatedUser = await prisma.profili.update({
+            data: {
+                stripeCustomerId: stripeCustomerId
+            },
+            where: {
+                idProfilo: validatedData.data.userId
+            }
+        })
+
+        if(!updatedUser) throw new Error("Errore nell'aggiornamento Stripe utente")
+      }
+
+      // Calcolo importo del pernotto
+      const importoTotale = (validatedData.data.costoUnitario * validatedData.data.ospiti * differenceInDays(validatedData.data.dataFine, validatedData.data.dataInizio))
+
+      // Creazione Metadati per il pagamento
+
+      const roomData = await prisma.stanze.findUnique({
+        where: {
+          idStanza: validatedData.data.idStanza
+        },
+        select: {
+            nome: true
+        }
+      })
+
+      const propertyData = await prisma.proprieta.findFirst({
+        select: {
+            nome: true
+        }
+      })
+
+        const nomePagamento = `Prenotazione ${propertyData?.nome} - ${roomData?.nome}`
+        const descrizionePagamento = `Prenotazione dal ${format(validatedData.data.dataInizio, "dd/MM/yyyy")} al ${format(validatedData.data.dataFine, "dd/MM/yyyy")} x ${validatedData.data.ospiti} ospiti`
+
+      const paymentSession = await stripe.checkout.sessions.create({
+        customer: stripeCustomerId,
+        line_items: [
+            {
+                price_data: {
+                    currency: "EUR",
+                    product_data: {
+                        name: nomePagamento,
+                        description: descrizionePagamento,
+                    },
+                    unit_amount: importoTotale * 100,
+                },
+                quantity: 1,
+            }
+        ],
+        mode: "payment",
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/account/mybookings/${createdBooking.idPrenotazione}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/account/mybookings/${createdBooking.idPrenotazione}`
+
+      })
+
+      if (!paymentSession) throw new Error("Non è stato possibile creare il pagamento con Stripe")
+
+      const createPayment = await prisma.pagamenti.create({
+        data: {
+          codPrenotazione: createdBooking.idPrenotazione,
+          stripePaymentId: paymentSession.id,
+          nome: nomePagamento,
+          descrizione: descrizionePagamento,
+          importo: importoTotale,
+          tipoPagamento: tipo_pagamento.ALLOGGIO,
+        }
+      })
+  
+      if (!createPayment) throw new Error("Non è stato possibile creare il pagamento")
+    } catch (e) {
+     
+      return false;
+    }
+  
+    return true;
   }

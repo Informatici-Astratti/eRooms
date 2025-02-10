@@ -24,6 +24,8 @@ import { redirect } from 'next/navigation'
 import BadgeStatoPrenotazione from '@/components/BadgeStatoPrenotazione'
 import getUser from '@/app/lib/user'
 import { format } from 'date-fns'
+import Link from 'next/link'
+import { stripe } from '@/app/lib/stripe'
 
 interface BookingInfoComponentProps{
     idPrenotazione: string
@@ -62,6 +64,9 @@ export default async function BookingInfoComponent({ idPrenotazione }: BookingIn
         redirect('/account/mybookings')
     }
 
+    const stripePaymentId = bookingInfo.Pagamenti.at(0)?.stripePaymentId;
+    const paymentUrl = stripePaymentId ? (await stripe.checkout.sessions.retrieve(stripePaymentId)).url : null;
+
 
     return (
         <div className='p-5 w-full'>
@@ -96,7 +101,11 @@ export default async function BookingInfoComponent({ idPrenotazione }: BookingIn
                         <p>Importo Pagato</p>
                     </div>
                     <div className='flex gap-2'>
-                        <Button disabled={!(bookingInfo.stato === stato_prenotazione.PRENOTATA)}>Paga</Button>
+                        <Button disabled={!(bookingInfo.stato === stato_prenotazione.PRENOTATA) || !paymentUrl} >
+                            <Link href={paymentUrl ?? "#"}>
+                                Paga Ora
+                            </Link>
+                        </Button>
                     </div>
                 </div>
 
