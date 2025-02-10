@@ -1,6 +1,6 @@
 "use client"
 
-import type { Prenotazioni as PrenotazioniType, Stanze, Ospiti, Profili, Pagamenti } from "@prisma/client"
+import type { Prenotazioni as PrenotazioniType, Stanze, Profili, Pagamenti } from "@prisma/client"
 import type { ColumnDef } from "@tanstack/react-table"
 import { CalendarCog,  MoreHorizontal} from "lucide-react"
 

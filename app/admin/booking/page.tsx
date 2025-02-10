@@ -2,9 +2,6 @@ import { Suspense } from "react"
 import { getPrenotazioni } from "./bookingAction"
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { CirclePlus } from "lucide-react"
 import CreateBookingAdmin from "./_BookingAdmin/CreateBookingAdmin"
 
 

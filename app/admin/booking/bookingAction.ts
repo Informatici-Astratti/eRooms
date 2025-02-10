@@ -219,9 +219,6 @@ export async function updateBookingStanza({ idPrenotazione, idStanza }: UpdateBo
             where: {
                 codPrenotazione: idPrenotazione,
             },
-            orderBy: {
-                created_at: 'asc'
-            }
         });
 
         if (!firstPagamento) {
