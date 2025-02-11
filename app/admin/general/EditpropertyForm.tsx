@@ -42,7 +42,7 @@ export default function EditPropertyForm({ property }: EditPropertyFormProps) {
       }, [state?.success, toast, state?.message])
     
     return (
-        <form action={formAction}>
+        <form action={formAction} className="p-4 rounded-md bg-white border">
             <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 space-y-5">
                     <h1 className="text-xl font-bold">Informazioni di Contatto</h1>

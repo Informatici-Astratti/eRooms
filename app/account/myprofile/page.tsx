@@ -1,17 +1,10 @@
-import { Input } from "@/components/ui/input";
-import { getAccountProfile, getUserClerk } from "./action";
+import { getAccountProfile } from "./action";
 import EditAccountForm from "./editAccountForm";
-import { Label } from "@/components/ui/label";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { EmailDialog } from "./emailDialog";
 
 
 export default async function MyProfile() {
     
     const userProfile = await getAccountProfile()
-    const userClerk = await getUserClerk()
 
     return (
         <div className="p-5 w-full">

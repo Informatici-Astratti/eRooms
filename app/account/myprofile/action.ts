@@ -44,24 +44,17 @@ export async function getAccountProfile() {
         return profile
     }
 }
-export async function getUserClerk() {
-    const { userId } = await auth()
-    if (userId) {
-        const user = await (await clerkClient()).users.getUser(userId)
-        return user
-    }
-}
 
 interface ProfileResponse {
     success: boolean
-    fields?: Profili
+    fields?: Partial<Profili>
     errors?: any
     message?: string
 }
 
 export async function editAccountProfile(prevState: ProfileResponse, formData: FormData): Promise<ProfileResponse>{
     console.log("1")
-    const data: Profili = {
+    const data: Partial<Profili> = {
         idProfilo: formData.get("idProfilo") as string,
         nome: formData.get("nome") as string,
         cognome: formData.get("cognome") as string,

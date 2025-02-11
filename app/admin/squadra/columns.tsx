@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { removeTeamUser } from "./action"
 
-export type ProfiliInfo = Profili & { email: string }
+export type ProfiliInfo = Profili 
 
 export const columns: ColumnDef<ProfiliInfo>[] = [
   {

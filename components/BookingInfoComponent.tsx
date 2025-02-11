@@ -183,7 +183,7 @@ export default async function BookingInfoComponent({ idPrenotazione }: BookingIn
                         <p className='text-lg font-semibold'>{`CAMERA (${bookingInfo?.Stanze.capienza}) ${bookingInfo?.Stanze.nome}`}</p>
 
                         <div className='flex gap-2'>
-                            {user.ruolo === ruolo.PROPRIETARIO && <UpdateAvaiableRoom disabled={!(bookingInfo.stato === stato_prenotazione.PRENOTATA)} idPrenotazione={bookingInfo?.idPrenotazione} dataInizio={bookingInfo?.dataInizio} dataFine={bookingInfo?.dataFine} ospiti={bookingInfo?.Ospiti.length} />}
+                            {user.ruolo === ruolo.PROPRIETARIO && <UpdateAvaiableRoom idPrenotazione={bookingInfo?.idPrenotazione} dataInizio={bookingInfo?.dataInizio} dataFine={bookingInfo?.dataFine} ospiti={bookingInfo?.Ospiti.length} />}
                         </div>
                     </div>
 

@@ -1,6 +1,6 @@
 "use client"
 
-import type { Prenotazioni as PrenotazioniType, Stanze, Profili, Pagamenti } from "@prisma/client"
+import { type Prenotazioni as PrenotazioniType, type Stanze, type Profili, type Pagamenti, tipo_pagamento } from "@prisma/client"
 import type { ColumnDef } from "@tanstack/react-table"
 import { CalendarCog, MoreHorizontal } from "lucide-react"
 
@@ -102,16 +102,17 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
 
       return (
         <>
-          <div className="text-sm font-bold text-green-600">
-            {prenotazioni.stato === "CONFERMATA" && pagamenti[0].importo.toFixed(2).concat(" €")}
+          <div className={`text-sm font-bold ${prenotazioni.stato === "CONFERMATA" ? 'text-green-600' : 'text-red-600'}`}>
+            {pagamenti.reduce((sum, pagamento) => sum + (pagamento.importo || 0), 0).toFixed(2)}
           </div>
-          <div className="text-sm font-bold text-red-600">
-            {(prenotazioni.stato === "ANNULLATA_HOST" || prenotazioni.stato === "ANNULLATA_UTENTE" || prenotazioni.stato === "PRENOTATA") && pagamenti[0].importo.toFixed(2).concat(" €")}
-          </div>
+          
           <div className="text-sm text-muted-foreground">
-            {pagamenti[0].dataSaldo?.toLocaleDateString("it-IT", {
-              timeZone: "UTC",
-            }) ?? "Non pagata"}
+            {(() => {
+              const pagamentoAlloggio = pagamenti.find(p => p.tipoPagamento === tipo_pagamento.ALLOGGIO);
+              return pagamentoAlloggio?.dataSaldo
+                ? pagamentoAlloggio.dataSaldo.toLocaleDateString("it-IT", { timeZone: "UTC" })
+                : "Non Pagata";
+            })()}
           </div>
         </>
       );

@@ -14,9 +14,6 @@ export async function getUsers() {
   }
 
   try {
-    const clerk = await clerkClient()
-    const user = await clerk.users.getUser(userId)
-    const email = user.emailAddresses[0]?.emailAddress
 
     const users = await prisma.profili.findMany({
       where: {
@@ -26,17 +23,7 @@ export async function getUsers() {
       },
     })
 
-    const usersWithEmails = await Promise.all(
-      users.map(async (userProfile) => {
-        const clerkUser = await clerk.users.getUser(userProfile.idProfilo)
-        return {
-          ...userProfile,
-          email: clerkUser.emailAddresses[0]?.emailAddress || "N/A",
-        }
-      }),
-    )
-
-    return { email, users: usersWithEmails }
+    return users
   } catch (error) {
     console.error("Errore nel recupero degli utenti:", error)
     throw new Error("Si è verificato un errore nel recupero dei dati.")

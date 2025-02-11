@@ -23,10 +23,10 @@ import {
 } from "@/components/ui/select"
 
 import { Button } from '../../../../components/ui/button'
-import { BedDouble, CalendarCheck, CalendarFold, CalendarSearch, ChevronLeft, CirclePlus, CircleUserRound, ReceiptEuro, Search, SquareArrowOutUpRight, UserCircle2, UserRound, UsersRound } from 'lucide-react'
+import { BedDouble, CalendarCheck, CalendarFold, CalendarSearch, ChevronLeft, CirclePlus, CircleUserRound, LoaderCircle, ReceiptEuro, Search, SquareArrowOutUpRight, UserCircle2, UserRound, UsersRound } from 'lucide-react'
 import { defineStepper } from "@stepperize/react";
 import { DateRange } from 'react-day-picker'
-import { addDays, differenceInDays, format, formatDate } from 'date-fns'
+import { addDays, differenceInDays, format, formatDate, set } from 'date-fns'
 import { Label } from '@/components/ui/label'
 import { Calendar } from '@/components/ui/calendar'
 import NumericInput from '@/components/numericInputUI'
@@ -482,6 +482,7 @@ const ViewBookingData: React.FC = () => {
     const stepper = BookingStepper.useStepper()
     const bookingData: BookingData = { ...stepper.getMetadata("step1"), ...stepper.getMetadata("step2"), ...stepper.getMetadata("step3") } as BookingData
     const { toast } = useToast()
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
 
     return stepper.when("step4", () => (
@@ -550,6 +551,8 @@ const ViewBookingData: React.FC = () => {
                 <Button className='w-full' onClick={() => {
                     stepper.beforeNext(async () => {
 
+                        setIsLoading(true)
+
                         const res = await createBooking({
                             userId: bookingData.userId,
                             idStanza: bookingData.idStanza,
@@ -558,6 +561,8 @@ const ViewBookingData: React.FC = () => {
                             ospiti: bookingData.ospiti,
                             costoUnitario: bookingData.costoUnitario,
                         })
+
+                        setIsLoading(false)
 
                         if (!res) {
                             toast({
@@ -570,7 +575,7 @@ const ViewBookingData: React.FC = () => {
                         return true;
                     })
                 }}>
-                    Conferma
+                    {isLoading ? (<><LoaderCircle className='animate-spin'/> Caricamento...</>) : "Conferma"}
                 </Button>
             </SheetFooter>
 

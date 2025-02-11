@@ -5,12 +5,8 @@ import { DataTable } from "./data-table"
 import { AggiungiMembro } from "./addSquadra"
 
 export default async function DemoPage() {
-  const { users } = await getUsers()
+  const users = await getUsers()
 
-  const combinedData = users.map((user) => ({
-    ...user,
-    email: user.email || "N/A",
-  }))
 
   return (
     <div className="p-4 w-full">
@@ -20,7 +16,7 @@ export default async function DemoPage() {
             <h1 className="text-4xl font-bold">Squadra</h1>
             <AggiungiMembro />
           </div>
-          <DataTable columns={columns} data={combinedData} />
+          <DataTable columns={columns} data={users} />
         </div>
       </Suspense>
     </div>
