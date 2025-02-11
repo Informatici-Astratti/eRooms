@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/app/lib/db"
-import { auth, clerkClient } from "@clerk/nextjs/server"
+import { auth, clerkClient, Invitation } from "@clerk/nextjs/server"
 import { ruolo } from "@prisma/client"
 import { z } from "zod"
 
@@ -53,7 +53,7 @@ export async function addSquadra(prevState: any, formData: FormData) {
   });
 
   const parsedData = schema.safeParse({
-    email: formData.get("email"),
+    email: formData.get("email") as string,
     ruolo: formData.get("ruolo"),
   });
 
@@ -67,7 +67,7 @@ export async function addSquadra(prevState: any, formData: FormData) {
     const client = await clerkClient()
     const response = await client.invitations.createInvitation({
       emailAddress: email,
-      redirectUrl: `${process.env.APP_URL}/signup`,
+      redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/signup`,
       publicMetadata: { ruolo }, 
     })
 
@@ -81,10 +81,12 @@ export async function addSquadra(prevState: any, formData: FormData) {
 
 export async function removeTeamUser(id: string) {
     // Il profilo non viene eliminato, ma cambiato in cliente
-    const profile = await prisma.profili.update({
-      where: {idProfilo: id},
-      data: {ruolo: ruolo.CLIENTE}
+    const profile = await prisma.profili.delete({
+      where: {idProfilo: id}
     })
+
+    const clerk = await clerkClient()
+    await clerk.users.deleteUser(id)
     return {success: true}
 }
 
