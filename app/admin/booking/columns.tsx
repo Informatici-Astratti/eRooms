@@ -45,8 +45,9 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
     },
     filterFn: (row, columId, value) => {
       const nomeCliente = row.original
-      const nomeCompleto = nomeCliente.Profili_Prenotazioni_codProfiloToProfili.nome && nomeCliente.Profili_Prenotazioni_codProfiloToProfili.cognome ? nomeCliente.Profili_Prenotazioni_codProfiloToProfili.nome.concat(" ", nomeCliente.Profili_Prenotazioni_codProfiloToProfili.cognome) : "N/A" 
-      return nomeCompleto.toLowerCase().includes(value.toLowerCase());
+      const idPrenotazione = row.original.idPrenotazione
+      const nomeCompleto = nomeCliente.Profili_Prenotazioni_codProfiloToProfili.nome && nomeCliente.Profili_Prenotazioni_codProfiloToProfili.cognome ? nomeCliente.Profili_Prenotazioni_codProfiloToProfili.nome.concat(" ", nomeCliente.Profili_Prenotazioni_codProfiloToProfili.cognome) : "N/A"
+      return nomeCompleto.toLowerCase().includes(value.toLowerCase()) || idPrenotazione.includes(value.toLowerCase());
     }
   },
   {

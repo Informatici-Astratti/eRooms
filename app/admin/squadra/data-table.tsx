@@ -84,7 +84,7 @@ export function DataTable<TData, TValue>({
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
                             Colonne <ChevronDown className="ml-2 h-4 w-4" />
-                        </Button> 
+                        </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         {table
@@ -113,7 +113,7 @@ export function DataTable<TData, TValue>({
                 <Table>
                     <TableHeader className="bg-black">
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow className="hover: bg-black" key={headerGroup.id}>
+                            <TableRow className="hover: !bg-black hover:!bg-black" key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
                                         <TableHead className="text-white" key={header.id}>
@@ -153,25 +153,25 @@ export function DataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-              <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="flex items-center justify-end space-x-2 py-4">
                 {/*    <div className="flex-1 text-sm text-muted-foreground">
                       {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
                       selected.
                     </div>*/}
-                    <div className="space-x-2">
-                      <Button
+                <div className="space-x-2">
+                    <Button
                         variant="outline"
                         size="sm"
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
-                      >
+                    >
                         Precedente
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
                         Sucessivo
-                      </Button>
-                    </div>
-                  </div>
+                    </Button>
+                </div>
+            </div>
         </div>
     )
 }

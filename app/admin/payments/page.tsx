@@ -3,9 +3,7 @@ import { Suspense } from "react";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { getPayments } from "./action";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { CirclePlus } from "lucide-react";
+
 
 
 export default async function PaymentView() {

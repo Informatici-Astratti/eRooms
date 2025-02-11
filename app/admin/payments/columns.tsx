@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button"
 import { ArrowUpDown, Copy, MoreHorizontal } from "lucide-react"
 import type { stato_prenotazione } from "@prisma/client"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Badge } from "@/components/ui/badge"
 
 // Update the Payment type to match the structure of the fetched data
 type Payment = {
   idPagamento: string
-  metodo: string | null
+  tipoPagamento: string 
   importo: number
+  created_at: Date
+  descrizione: string | null
   dataSaldo: Date | null
   Prenotazioni: {
     idPrenotazione: string
@@ -48,59 +51,86 @@ export const columns: ColumnDef<Payment>[] = [
     }
   },
   {
-    accessorKey: "metodo",
+    accessorKey: "tipoPagamento",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Metodo
+        <Button variant="ghost" className="w-full" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Tipo di Pagamento
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
+    },
+    cell: ({ row }) => {
+      const tipo = row.original.tipoPagamento
+      return(
+        <div className="font-bold text-center">{tipo}</div>
+      )
+    }
+  },
+  {
+    accessorKey: "descrizione",
+    header: "Descrizione",
+    cell: ({ row }) => {
+      const descrizione = row.original.descrizione
+
+      return (
+        <>
+          <div>
+            {descrizione}
+          </div>
+        </>
+      );
+    },
+  },
+  {
+    accessorKey: "created_at",
+    header: "Data Creazione",
+    cell: ({ row }) => {
+      const dataCreazione = row.original.created_at
+
+      return (
+        <>
+          <div>
+            {dataCreazione.toLocaleDateString()}
+          </div>
+        </>
+      );
     },
   },
   {
     accessorKey: "importo",
-    header: ({ column }) => {
-      return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Importo
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
+    header: "Importo",
     cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue("importo"))
-      const formatted = new Intl.NumberFormat("it-IT", {
-        style: "currency",
-        currency: "EUR",
-      }).format(amount)
-      return <div className="font-medium">{formatted}</div>
-    },
-  },
-  {
-    accessorKey: "dataSaldo",
-    header: ({ column }) => {
+      const pagamenti = row.original ;
+      const prenotazioni = row.original.Prenotazioni
+
       return (
-        <Button  variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Data Saldo
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => {
-      const date = row.getValue("dataSaldo") as Date | null
-      if (!date) return "N/A"
-      return date.toLocaleDateString("it-IT")
+        <>
+          <div className="text-sm font-bold text-green-600">
+            {prenotazioni?.stato === "CONFERMATA" && pagamenti.importo.toFixed(2).concat(" €")}
+          </div>
+          <div className="text-sm font-bold text-red-600">
+            {(prenotazioni?.stato === "ANNULLATA_HOST" || prenotazioni?.stato === "ANNULLATA_UTENTE" || prenotazioni?.stato === "PRENOTATA") && pagamenti.importo.toFixed(2).concat(" €")}
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {pagamenti.dataSaldo?.toLocaleDateString() ?? "Non pagata"}
+          </div>
+        </>
+      );
     },
   },
   {
     accessorKey: "Prenotazioni.stato",
     header: "Stato Pagamento",
     cell: ({ row }) => {
-      const stato = row.original.Prenotazioni?.stato
-      if (stato == "CONFERMATA") {return "EFFETTUATO"}
-      else if (stato == "PRENOTATA") {return "NON EFFETTUATO"}
-      else {return "N/A"}
+      const stato = row.original
+      if (stato.Prenotazioni?.stato === "CONFERMATA"){
+        return (<Badge variant="success">EFFETTUATO</Badge>)
+      }else if (stato.Prenotazioni?.stato === "PRENOTATA"){
+        return (<Badge variant="destructive">NON EFFETTUATO</Badge>)
+      }else{
+        return ("Non definito")
+      }
     },
   },
   {
