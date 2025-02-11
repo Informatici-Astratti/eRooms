@@ -61,7 +61,9 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
     cell: ({ row }) => {
       const dataInzio = row.original;
       if (dataInzio.TurniPulizie && dataInzio.TurniPulizie.length > 0) {
-        return dataInzio.TurniPulizie[0].dataInizio.toLocaleDateString();
+        return dataInzio.TurniPulizie[0].dataInizio.toLocaleDateString("it-IT", {
+          timeZone: "UTC",  
+        });
       } else {
         return "Non definita";
       }
@@ -73,7 +75,9 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
     cell: ({ row }) => {
       const dataFine = row.original;
       if (dataFine.TurniPulizie && dataFine.TurniPulizie.length > 0 && dataFine.TurniPulizie[0].dataFine) {
-        return dataFine.TurniPulizie[0].dataFine.toLocaleDateString();
+        return dataFine.TurniPulizie[0].dataFine.toLocaleDateString("it-IT", {
+        timeZone: "UTC",  
+      });
       } else {
         return "Non definita";
       }
@@ -85,10 +89,19 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
     header: "Check-out",
     cell: ({ row }) => {
       const stanza = row.original
-      const hasCheckoutToday = stanza.Prenotazioni && stanza.Prenotazioni.length > 0
+      const today = new Date()
+      const todayDate = new Date(today.setHours(0, 0, 0, 0)) 
+  
+      const hasCheckoutToday = stanza.Prenotazioni && stanza.Prenotazioni.some(p => {
+        const prenotazioniFine = new Date(p.dataFine)
+        const prenotazioniFineDate = new Date(prenotazioniFine.setHours(0, 0, 0, 0)) 
+        return prenotazioniFineDate.getTime() === todayDate.getTime() // Confronta le date
+      })
+  
       return hasCheckoutToday ? "Si" : "No"
-    },
+    }
   },
+  
   {
     id: "actions",
     cell: ({ row }) => {

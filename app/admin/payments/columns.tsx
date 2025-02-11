@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 // Update the Payment type to match the structure of the fetched data
 type Payment = {
   idPagamento: string
-  tipoPagamento: string 
+  tipoPagamento: string
   importo: number
   created_at: Date
   descrizione: string | null
@@ -46,7 +46,7 @@ export const columns: ColumnDef<Payment>[] = [
     },
     filterFn: (row, columId, value) => {
       const nomeCliente = row.original.Prenotazioni?.Profili_Prenotazioni_codProfiloToProfili
-      const nomeCompleto = nomeCliente?.nome && nomeCliente.cognome ? nomeCliente.nome.concat(" ", nomeCliente.cognome) : "N/A" 
+      const nomeCompleto = nomeCliente?.nome && nomeCliente.cognome ? nomeCliente.nome.concat(" ", nomeCliente.cognome) : "N/A"
       return nomeCompleto.toLowerCase().includes(value.toLowerCase());
     }
   },
@@ -62,7 +62,7 @@ export const columns: ColumnDef<Payment>[] = [
     },
     cell: ({ row }) => {
       const tipo = row.original.tipoPagamento
-      return(
+      return (
         <div className="font-bold text-center">{tipo}</div>
       )
     }
@@ -91,7 +91,9 @@ export const columns: ColumnDef<Payment>[] = [
       return (
         <>
           <div>
-            {dataCreazione.toLocaleDateString()}
+            {dataCreazione.toLocaleDateString("it-IT", {
+              timeZone: "UTC",
+            })}
           </div>
         </>
       );
@@ -101,7 +103,7 @@ export const columns: ColumnDef<Payment>[] = [
     accessorKey: "importo",
     header: "Importo",
     cell: ({ row }) => {
-      const pagamenti = row.original ;
+      const pagamenti = row.original;
       const prenotazioni = row.original.Prenotazioni
 
       return (
@@ -124,11 +126,11 @@ export const columns: ColumnDef<Payment>[] = [
     header: "Stato Pagamento",
     cell: ({ row }) => {
       const stato = row.original
-      if (stato.Prenotazioni?.stato === "CONFERMATA"){
+      if (stato.Prenotazioni?.stato === "CONFERMATA") {
         return (<Badge variant="success">EFFETTUATO</Badge>)
-      }else if (stato.Prenotazioni?.stato === "PRENOTATA"){
+      } else if (stato.Prenotazioni?.stato === "PRENOTATA") {
         return (<Badge variant="destructive">NON EFFETTUATO</Badge>)
-      }else{
+      } else {
         return ("Non definito")
       }
     },
@@ -149,16 +151,16 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Azioni</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => {
-            if (payment.Prenotazioni) {
-              navigator.clipboard.writeText(payment.Prenotazioni.idPrenotazione)
-            }
+              if (payment.Prenotazioni) {
+                navigator.clipboard.writeText(payment.Prenotazioni.idPrenotazione)
+              }
             }}>
-            Copia ID Prenotazione
+              Copia ID Prenotazione
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
     },
   },
-    
+
 ]

@@ -55,7 +55,10 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
     header: "Data Creazione",
     cell: ({ row }) => {
       const date = row.original
-      const formattedDate = new Date(date.dataCreazione).toLocaleDateString()
+      const formattedDate = new Date(date.dataCreazione)
+      .toLocaleDateString("it-IT", {
+        timeZone: "UTC", 
+      });
       return formattedDate
     },
   },
@@ -64,8 +67,12 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
     header: "Check-in / Check-out",
     cell: ({ row }) => {
       const date = row.original
-      const dataInizio = new Date(date.dataInizio).toLocaleDateString()
-      const dataFine = new Date(date.dataFine).toLocaleDateString()
+      const dataInizio = new Date(date.dataInizio).toLocaleDateString("it-IT", {
+        timeZone: "UTC",  
+      });
+      const dataFine = new Date(date.dataFine).toLocaleDateString("it-IT", {
+        timeZone: "UTC",  
+      });
       return (
         <>
           <div>
