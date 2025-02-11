@@ -135,8 +135,12 @@ export default function Dashboard({ initialStats }: { initialStats: Stats }) {
                     <TableCell>
                       {bookings.map((booking) => (
                         <div key={booking.idPrenotazione} className="text-sm">
-                          <div>{new Date(booking.dataInizio).toLocaleDateString()}</div>
-                          <div>{new Date(booking.dataFine).toLocaleDateString()}</div>
+                          <div>{new Date(booking.dataInizio).toLocaleDateString("it-IT", {
+                            timeZone: "UTC",
+                          })}</div>
+                          <div>{new Date(booking.dataFine).toLocaleDateString("it-IT", {
+                            timeZone: "UTC",
+                          })}</div>
                         </div>
                       ))}
                     </TableCell>
@@ -158,7 +162,9 @@ export default function Dashboard({ initialStats }: { initialStats: Stats }) {
                         <div key={booking.idPrenotazione}>
                           <div className="text-sm font-medium">{booking.importo.toFixed(2)} €</div>
                           <div className="text-xs text-muted-foreground">
-                            {booking.dataPagamento ? new Date(booking.dataPagamento).toLocaleDateString() : "N/A"}
+                            {booking.dataPagamento ? new Date(booking.dataPagamento).toLocaleDateString("it-IT", {
+                            timeZone: "UTC",
+                          }) : "N/A"}
                           </div>
                         </div>
                       ))}

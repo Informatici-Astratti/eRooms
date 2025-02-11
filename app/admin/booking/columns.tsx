@@ -2,7 +2,7 @@
 
 import type { Prenotazioni as PrenotazioniType, Stanze, Profili, Pagamenti } from "@prisma/client"
 import type { ColumnDef } from "@tanstack/react-table"
-import { CalendarCog,  MoreHorizontal} from "lucide-react"
+import { CalendarCog, MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -56,9 +56,9 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
     cell: ({ row }) => {
       const date = row.original
       const formattedDate = new Date(date.dataCreazione)
-      .toLocaleDateString("it-IT", {
-        timeZone: "UTC", 
-      });
+        .toLocaleDateString("it-IT", {
+          timeZone: "UTC",
+        });
       return formattedDate
     },
   },
@@ -68,10 +68,10 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
     cell: ({ row }) => {
       const date = row.original
       const dataInizio = new Date(date.dataInizio).toLocaleDateString("it-IT", {
-        timeZone: "UTC",  
+        timeZone: "UTC",
       });
       const dataFine = new Date(date.dataFine).toLocaleDateString("it-IT", {
-        timeZone: "UTC",  
+        timeZone: "UTC",
       });
       return (
         <>
@@ -109,7 +109,9 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
             {(prenotazioni.stato === "ANNULLATA_HOST" || prenotazioni.stato === "ANNULLATA_UTENTE" || prenotazioni.stato === "PRENOTATA") && pagamenti[0].importo.toFixed(2).concat(" €")}
           </div>
           <div className="text-sm text-muted-foreground">
-            {pagamenti[0].dataSaldo?.toLocaleDateString() ?? "Non pagata"}
+            {pagamenti[0].dataSaldo?.toLocaleDateString("it-IT", {
+              timeZone: "UTC",
+            }) ?? "Non pagata"}
           </div>
         </>
       );
@@ -149,8 +151,8 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
             <DropdownMenuItem asChild>
               <Button variant="ghost" asChild>
                 <Link href={`/admin/booking/${prenotazione.idPrenotazione}`}>
-                    <CalendarCog className="size-4" />
-                    Dettagli Prenotazione
+                  <CalendarCog className="size-4" />
+                  Dettagli Prenotazione
                 </Link>
               </Button>
             </DropdownMenuItem>

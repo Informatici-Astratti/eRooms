@@ -115,7 +115,9 @@ export const columns: ColumnDef<Payment>[] = [
             {(prenotazioni?.stato === "ANNULLATA_HOST" || prenotazioni?.stato === "ANNULLATA_UTENTE" || prenotazioni?.stato === "PRENOTATA") && pagamenti.importo.toFixed(2).concat(" €")}
           </div>
           <div className="text-sm text-muted-foreground">
-            {pagamenti.dataSaldo?.toLocaleDateString() ?? "Non pagata"}
+            {pagamenti.dataSaldo?.toLocaleDateString("it-IT", {
+              timeZone: "UTC",
+            }) ?? "Non pagata"}
           </div>
         </>
       );
