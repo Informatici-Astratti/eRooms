@@ -116,9 +116,6 @@ export async function getStatistics() {
           dataSaldo: {
             gte: firstDayOfMonth,
           },
-          Prenotazioni: {
-            stato: "CONFERMATA",
-          },
         },
       }),
       // Pagamenti confermati per quest'anno
@@ -130,10 +127,7 @@ export async function getStatistics() {
           dataSaldo: {
             gte: firstDayOfYear,
             lte: lastDayOfYear,
-          },
-          Prenotazioni: {
-            stato: "CONFERMATA",
-          },
+          }
         },
       }),
       // Statistiche giornaliere

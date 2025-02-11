@@ -81,7 +81,6 @@ interface BookingResponse {
 }
 
 export async function annullaBooking(idPrenotazione: string): Promise<BookingResponse> {
-
     try {
         const user = await getUser()
 
@@ -114,11 +113,26 @@ export async function annullaBooking(idPrenotazione: string): Promise<BookingRes
             throw new Error("Ruolo non riconosciuto")
         }
 
-
-
         if (!userBooking) {
             throw new Error("Questa prenotazione non è esistente o non appartiene all'utente loggato")
         }
+
+        const allBookingPayments = await prisma.pagamenti.findMany({
+            where: {
+                codPrenotazione: idPrenotazione
+            }
+        })
+
+        if (!allBookingPayments) {
+            throw new Error("Pagamenti non trovati")
+        }
+
+        allBookingPayments.forEach(async payment => {
+            const res = await stripe.checkout.sessions.expire(payment.stripePaymentId)
+            if (!res) {
+                throw new Error(`Errore nell'annullamento del pagamento ${payment.stripePaymentId}`)
+            }
+        })
 
         return {
             success: true

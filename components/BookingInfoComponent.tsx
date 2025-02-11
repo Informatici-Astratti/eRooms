@@ -26,6 +26,8 @@ import getUser from '@/app/lib/user'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { stripe } from '@/app/lib/stripe'
+import AddAdminPaymentForm from './AddAdminPaymentForm'
+import { Separator } from './ui/separator'
 
 interface BookingInfoComponentProps{
     idPrenotazione: string
@@ -54,19 +56,29 @@ export default async function BookingInfoComponent({ idPrenotazione }: BookingIn
     const bookingInfo = await prisma.prenotazioni.findUnique({
         where: { idPrenotazione: idPrenotazione },
         include: {
-            Pagamenti: true,
+            Pagamenti: {
+                orderBy: {
+                    created_at: 'asc'
+                }
+            },
             Ospiti: true,
             Stanze: true
         }
     })
 
-    if(!bookingInfo){
+    if (!bookingInfo) {
         redirect('/account/mybookings')
     }
 
-    const stripePaymentId = bookingInfo.Pagamenti.at(0)?.stripePaymentId;
-    const paymentUrl = stripePaymentId ? (await stripe.checkout.sessions.retrieve(stripePaymentId)).url : null;
-
+    const paymentUrlList = await Promise.all(
+        bookingInfo.Pagamenti.map(async (pagamento) => {
+            if (pagamento.stripePaymentId) {
+                const session = await stripe.checkout.sessions.retrieve(pagamento.stripePaymentId)
+                return session.url || ""
+            }
+            return ""
+        })
+    )
 
     return (
         <div className='p-5 w-full'>
@@ -85,28 +97,85 @@ export default async function BookingInfoComponent({ idPrenotazione }: BookingIn
                     </div>
                 </div>
 
-                <div className='py-8 px-4 border rounded-md flex justify-around items-center gap-2 *:items-center'>
-                    <div className='flex flex-col gap-2'>
+                <div className='py-8 px-4 border rounded-md flex flex-col gap-4'>
+                    <div className='flex justify-around items-center gap-2 *:items-center'>
+                        <div className='flex flex-col gap-2'>
+                            <p className='text-2xl font-bold'>{`${bookingInfo.Pagamenti.reduce((acc, pagamento) => acc + pagamento.importo, 0).toFixed(2)} €`}</p>
+                            <p>Totale Importo</p>
+                        </div>
+                        <div className='flex flex-col gap-2'>
+                            <p className='text-2xl font-bold'>{`${bookingInfo.Pagamenti.filter(pagamento => pagamento.dataSaldo === null).reduce((acc, pagamento) => acc + pagamento.importo, 0).toFixed(2)} €`}</p>
+                            <p>Importo Dovuto</p>
+                        </div>
                         
-                        <p className='text-2xl font-bold'>{`${bookingInfo.Pagamenti.reduce((acc, pagamento) => acc + pagamento.importo, 0).toFixed(2)} €`}</p>
-                        <p>Totale Importo</p>
+                        <div className='flex flex-col gap-2'>
+                            <p className='text-2xl font-bold'>{`${bookingInfo.Pagamenti.filter(pagamento => pagamento.dataSaldo !== null).reduce((acc, pagamento) => acc + pagamento.importo, 0).toFixed(2)} €`}</p>
+                            <p>Importo Pagato</p>
+                        </div>
+                        { user.ruolo === ruolo.PROPRIETARIO &&
+                            <div className='flex gap-2'>
+                                <AddAdminPaymentForm codPrenotazione={idPrenotazione} />
+                            </div>
+                        }
                     </div>
-                    <div className='flex flex-col gap-2'>
-                        <p className='text-2xl font-bold'>{`${bookingInfo.Pagamenti.filter(pagamento => pagamento.dataSaldo === null).reduce((acc, pagamento) => acc + pagamento.importo, 0).toFixed(2)} €`}</p>
-                        <p>Importo Dovuto</p>
+                    <Separator />
+                    <div className='flex flex-col gap-2 px-4'>
+                        <h3 className='text-md font-semibold'>Riassunto</h3>
+
+                        {
+                            bookingInfo?.Pagamenti.map((pagamento, i) => (
+                                <React.Fragment key={pagamento.idPagamento}>
+                                    <div className="flex flex-row w-full h-fit gap-4 items-center">
+                                        <div className='basis-2/5'>
+                                            <p className="font-semibold">{pagamento.nome}</p>
+                                            <p className="text-sm text-muted-foreground text-wrap break-words line-clamp-2">
+                                                {pagamento.descrizione}
+                                            </p>
+                                        </div>
+
+
+                                        <div className="self-stretch my-2">
+                                            <Separator orientation="vertical" />
+                                        </div>
+
+
+                                        <div className='basis-1/5 flex items-center justify-center'>
+                                            <p>€ {pagamento.importo.toFixed(2)}</p>
+                                        </div>
+
+                                        <div className="self-stretch my-2">
+                                            <Separator orientation="vertical" />
+                                        </div>
+
+                                        <div className='basis-1/5 flex flex-col gap-1 items-center justify-center'>
+                                            {pagamento.dataSaldo ? (<Badge variant={"success"}>Pagato</Badge>) : (<Badge variant={"destructive"}>Non Pagato</Badge>)}
+                                            {pagamento.dataSaldo && <p className='text-sm'>{format(pagamento.dataSaldo, "dd/MM/yyyy")}</p>}
+                                        </div>
+                                        { user.ruolo === ruolo.CLIENTE && <>
+                                        <div className="self-stretch my-2">
+                                            <Separator orientation="vertical" />
+                                        </div>
+                                        <div className='basis-1/5 flex items-center justify-center'>
+                                            {
+                                                pagamento.dataSaldo ?
+                                                (
+                                                    <Button disabled>Pagato</Button>
+                                                ) : (
+                                                    <Button asChild>
+                                                        <Link href={paymentUrlList[i]}>Paga</Link>
+                                                    </Button>
+                                                )
+                                            }
+                                        </div>
+                                        </>}
+                                    </div>
+
+                                    {i < bookingInfo.Pagamenti.length-1 && <Separator />}
+                                </React.Fragment>
+                            ))
+                        }
                     </div>
                     
-                    <div className='flex flex-col gap-2'>
-                        <p className='text-2xl font-bold'>{`${bookingInfo.Pagamenti.filter(pagamento => pagamento.dataSaldo !== null).reduce((acc, pagamento) => acc + pagamento.importo, 0).toFixed(2)} €`}</p>
-                        <p>Importo Pagato</p>
-                    </div>
-                    <div className='flex gap-2'>
-                        <Button disabled={!(bookingInfo.stato === stato_prenotazione.PRENOTATA) || !paymentUrl} >
-                            <Link href={paymentUrl ?? "#"}>
-                                Paga Ora
-                            </Link>
-                        </Button>
-                    </div>
                 </div>
 
                 <div className='py-4 border rounded-md flex flex-col'>
