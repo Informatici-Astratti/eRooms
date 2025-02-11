@@ -5,7 +5,7 @@ import { subYears, parseISO, formatISO } from "date-fns";
 import { z } from "zod"
 import prisma from "@/app/lib/db";
 import { genere, Prisma, ruolo } from "@prisma/client";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 
 const signUpContinueSchema = z.object({
     nome: z.string().min(2).max(50, {message: "Nome non valido"}),
@@ -25,7 +25,7 @@ const signUpContinueSchema = z.object({
 
 export async function signUpContinue(prevState: any, formData: FormData) {
 
-    const { userId } = await auth()
+    const userId = await currentUser()
 
     const result = signUpContinueSchema.safeParse(Object.fromEntries(formData))
     if (!result.success) {
@@ -40,11 +40,12 @@ export async function signUpContinue(prevState: any, formData: FormData) {
 
     try {
         const ruoloCheck = await clerkClient();
-        const user = await ruoloCheck.users.getUser(userId);
+        const user = await ruoloCheck.users.getUser(userId.id);
         const ruoloUtente = user.publicMetadata?.ruolo as keyof typeof ruolo ?? "CLIENTE"; // Di default cliente, altrimenti il ruolo default è CLIENTE
         const dbUser = await prisma.profili.create({
             data: {
-                idProfilo: userId,
+                idProfilo: userId.id,
+                email: userId.primaryEmailAddress?.emailAddress ?? "",
                 nome: result.data.nome ?? "",
                 cognome: result.data.cognome ?? "",
                 telefono: result.data.telefono ?? "",
