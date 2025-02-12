@@ -32,8 +32,8 @@ model Pagamenti {
   updated_at      DateTime       @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamptz(6)
   stripePaymentId String         @unique @default("")
   tipoPagamento   tipo_pagamento @default(ALTRO)
-  nome            String?
-  descrizione     String?
+  nome            String
+  descrizione     String
   Prenotazioni    Prenotazioni   @relation(fields: [codPrenotazione], references: [idPrenotazione])
 }
 
@@ -55,6 +55,7 @@ model Profili {
   idProfilo                                     String         @id
   nome                                          String
   cognome                                       String
+  email                                         String         @default("")
   telefono                                      String?
   cf                                            String?
   piva                                          String?
@@ -63,7 +64,6 @@ model Profili {
   indirizzo                                     String?
   ruolo                                         ruolo
   stripeCustomerId                              String?
-  email                                         String         @default("")
   Prenotazioni_Prenotazioni_codProfiloToProfili Prenotazioni[] @relation("Prenotazioni_codProfiloToProfili")
   TurniPulizie                                  TurniPulizie[]
 }

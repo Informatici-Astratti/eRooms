@@ -14,7 +14,10 @@ CREATE TYPE "tipo_documento" AS ENUM ('CARTAIDENTITA', 'PATENTE', 'PASSAPORTO');
 CREATE TYPE "stato_pulizia" AS ENUM ('PULITA', 'DA_PULIRE');
 
 -- CreateEnum
-CREATE TYPE "tipo_variazione" AS ENUM ('AUMENTO_PERCENTUALE', 'SCONTO_PERCENTUALE', 'AUMENTO_FISSO', 'SCONTO_FISSO');
+CREATE TYPE "tipo_variazione" AS ENUM ('AUMENTO_PERCENTUALE', 'SCONTO_PERCENTUALE', 'AUMENTO_FISSO', 'SCONTO_FISSO', 'NULLA');
+
+-- CreateEnum
+CREATE TYPE "tipo_pagamento" AS ENUM ('ALLOGGIO', 'TASSA', 'ALTRO');
 
 -- CreateTable
 CREATE TABLE "Ospiti" (
@@ -35,10 +38,15 @@ CREATE TABLE "Ospiti" (
 -- CreateTable
 CREATE TABLE "Pagamenti" (
     "idPagamento" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "metodo" TEXT,
     "importo" REAL NOT NULL,
     "dataSaldo" TIMESTAMP(6),
-    "codPrenotazione" UUID,
+    "codPrenotazione" UUID NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT (now() AT TIME ZONE 'utc'::text),
+    "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT (now() AT TIME ZONE 'utc'::text),
+    "stripePaymentId" TEXT NOT NULL DEFAULT '',
+    "tipoPagamento" "tipo_pagamento" NOT NULL DEFAULT 'ALTRO',
+    "nome" TEXT NOT NULL,
+    "descrizione" TEXT NOT NULL,
 
     CONSTRAINT "Pagamenti_pkey" PRIMARY KEY ("idPagamento")
 );
@@ -61,6 +69,7 @@ CREATE TABLE "Profili" (
     "idProfilo" TEXT NOT NULL,
     "nome" TEXT NOT NULL,
     "cognome" TEXT NOT NULL,
+    "email" TEXT NOT NULL DEFAULT '',
     "telefono" TEXT,
     "cf" TEXT,
     "piva" TEXT,
@@ -68,6 +77,7 @@ CREATE TABLE "Profili" (
     "genere" "genere" NOT NULL,
     "indirizzo" TEXT,
     "ruolo" "ruolo" NOT NULL,
+    "stripeCustomerId" TEXT,
 
     CONSTRAINT "Profili_pkey" PRIMARY KEY ("idProfilo")
 );
@@ -75,24 +85,24 @@ CREATE TABLE "Profili" (
 -- CreateTable
 CREATE TABLE "Stanze" (
     "idStanza" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "nome" TEXT,
-    "capienza" SMALLINT,
-    "descrizione" TEXT,
-    "foto" TEXT[],
-    "costoStandard" REAL,
-    "codProprieta" UUID,
+    "nome" TEXT NOT NULL,
+    "capienza" SMALLINT NOT NULL,
+    "descrizione" TEXT NOT NULL,
+    "costoStandard" REAL NOT NULL,
 
     CONSTRAINT "Stanze_pkey" PRIMARY KEY ("idStanza")
 );
 
 -- CreateTable
 CREATE TABLE "Tariffe" (
+    "idTariffa" UUID NOT NULL DEFAULT gen_random_uuid(),
     "codStanza" UUID NOT NULL,
     "dataInizio" DATE NOT NULL,
-    "dataFine" DATE,
-    "costoProcapite" REAL NOT NULL,
+    "dataFine" DATE NOT NULL,
+    "tipoVariazione" "tipo_variazione" NOT NULL,
+    "variazione" REAL NOT NULL,
 
-    CONSTRAINT "Tariffe_pkey" PRIMARY KEY ("codStanza","dataInizio")
+    CONSTRAINT "Tariffe_pkey" PRIMARY KEY ("idTariffa")
 );
 
 -- CreateTable
@@ -113,8 +123,8 @@ CREATE TABLE "Proprieta" (
 -- CreateTable
 CREATE TABLE "Pulizie" (
     "codStanza" UUID NOT NULL,
-    "stato" "stato_pulizia" NOT NULL,
-    "ultimoAggiornamento" TIMESTAMP(6) NOT NULL,
+    "stato" "stato_pulizia" NOT NULL DEFAULT 'PULITA',
+    "ultimoAggiornamento" TIMESTAMPTZ(6) NOT NULL DEFAULT (now() AT TIME ZONE 'utc'::text),
 
     CONSTRAINT "Pulizie_pkey" PRIMARY KEY ("codStanza")
 );
@@ -130,6 +140,18 @@ CREATE TABLE "TurniPulizie" (
     CONSTRAINT "TurniPulizie_pkey" PRIMARY KEY ("idTurno")
 );
 
+-- CreateTable
+CREATE TABLE "FotoStanze" (
+    "idFoto" TEXT NOT NULL,
+    "codStanza" UUID,
+    "url" TEXT NOT NULL,
+
+    CONSTRAINT "FotoStanze_pkey" PRIMARY KEY ("idFoto")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Pagamenti_stripePaymentId_key" ON "Pagamenti"("stripePaymentId");
+
 -- AddForeignKey
 ALTER TABLE "Ospiti" ADD CONSTRAINT "Ospiti_codPrenotazione_fkey" FOREIGN KEY ("codPrenotazione") REFERENCES "Prenotazioni"("idPrenotazione") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -143,9 +165,6 @@ ALTER TABLE "Prenotazioni" ADD CONSTRAINT "Prenotazioni_codProfilo_fkey" FOREIGN
 ALTER TABLE "Prenotazioni" ADD CONSTRAINT "Prenotazioni_codStanza_fkey" FOREIGN KEY ("codStanza") REFERENCES "Stanze"("idStanza") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Stanze" ADD CONSTRAINT "Stanze_codProprieta_fkey" FOREIGN KEY ("codProprieta") REFERENCES "Proprieta"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Tariffe" ADD CONSTRAINT "Tariffe_codStanza_fkey" FOREIGN KEY ("codStanza") REFERENCES "Stanze"("idStanza") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -156,3 +175,6 @@ ALTER TABLE "TurniPulizie" ADD CONSTRAINT "TurniPulizie_codGovernante_fkey" FORE
 
 -- AddForeignKey
 ALTER TABLE "TurniPulizie" ADD CONSTRAINT "TurniPulizie_codStanza_fkey" FOREIGN KEY ("codStanza") REFERENCES "Stanze"("idStanza") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FotoStanze" ADD CONSTRAINT "FotoStanze_codStanza_fkey" FOREIGN KEY ("codStanza") REFERENCES "Stanze"("idStanza") ON DELETE CASCADE ON UPDATE CASCADE;
