@@ -101,9 +101,12 @@ const SelectDateOspiti: React.FC = () => {
         ospiti: z.number().min(1, { message: "Il minimo di ospiti è 1" }).max(10, { message: "Il numero massimo di ospiti è 10" })
     }).refine((data) => data.dataFine > data.dataInizio, { message: "Le date non sono valide", path: ["dataInizio"] })
 
+    const from = new Date()
+        from.setHours(0, 0, 0, 0)
+    
     const [data, setData] = useState<DateRange | undefined>({
-        from: new Date(),
-        to: addDays(new Date(), 7)
+        from: from,
+        to: addDays(from, 7)
     })
 
     const [ospiti, setOspiti] = useState<number>(1)

@@ -49,16 +49,19 @@ export default function RoomCard({
     }
 
   return (
-    <div className="flex bg-white rounded-lg shadow-lg overflow-hidden min-w-2xl w-full">
-      <div className="w-1/3 relative m-2">
+    <div className="flex bg-white rounded-md border overflow-hidden w-full">
+      <div className="basis-1/3 relative p-4">
         <AspectRatio ratio={16/9}>
           <Image fill src={(urlFoto && urlFoto[0]) ?? "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"} alt="Immagine Vetrina Stanza" className="rounded-md object-cover"  />
         </AspectRatio>
       </div>
-      <div className="w-2/3 p-4 flex flex-col justify-between">
-        <h2 className="text-xl font-semibold mb-2">{nome}</h2>
-        <p className="text-gray-600">Capienza: {capienza}</p>
-        <p className="text-gray-600">Costo Standard: {costoStandard?.toFixed(2)} €</p>
+      <div className="basis-2/3 p-4 flex flex-col justify-around">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-xl font-semibold">{nome}</h2>
+          <p className="text-gray-600">Capienza: {capienza}</p>
+          <p className="text-gray-600">Costo Standard: {costoStandard?.toFixed(2)} €</p>
+          
+        </div>
         <div className="flex justify-end space-x-2">
           <Button asChild>
             <Link href={`/admin/room/${idStanza}`}>

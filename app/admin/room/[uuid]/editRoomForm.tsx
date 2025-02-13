@@ -154,7 +154,10 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
           <CardContent className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
               <Label>Prezzo Standard</Label>
-              <Input name="costoStandard" type="number" defaultValue={state?.fields?.costoStandard ?? ""} required />
+              <div className="flex items-center gap-3">
+                <p>€</p>
+                <Input name="costoStandard" type="number" defaultValue={state?.fields?.costoStandard ?? ""} required />
+              </div>
               <ErrorForm errors={state?.errors?.costoStandard} />
             </div>
           </CardContent>
@@ -165,9 +168,9 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
             <CardTitle className="text-xl">Immagini</CardTitle>
             <CardDescription>Inserisci le immagini per la tua stanza</CardDescription>
           </CardHeader>
-          <CardContent className="flex items-center gap-3">
+          <CardContent className="flex items-center gap-3 ">
             <UploadButton 
-              className="p-4 items-center"
+              className=" items-center"
               endpoint="roomPicture"
               onClientUploadComplete={(res) => {
                 res.forEach((foto) => {
@@ -175,7 +178,9 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
                 });
               }}
             />
-            <div className="border rounded-md p-4 grid grid-cols-5 w-full gap-3">
+            {
+            foto.length > 0 ?
+            <div className="border rounded-md p-4 grid grid-cols-5 w-full h-full gap-3">
               {foto.map((idFoto, index) => (
                 fotoURLs[index] && (
                   <RoomPicture
@@ -186,6 +191,10 @@ export default function EditRoomForm({ room }: EditRoomFormProps) {
                 )
               ))}
             </div>
+            :
+            <div className="border rounded-md p-4 flex items-center justify-center w-full h-full"><p className="text-gray-600">Nessuna immagine caricata</p></div>
+            
+            }
           </CardContent>
         </Card>
         <Input type="hidden" name="foto" value={JSON.stringify(foto)} />

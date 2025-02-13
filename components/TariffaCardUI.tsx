@@ -53,7 +53,7 @@ export default function TariffaCard({ tariffa }: TariffaCardProps) {
   }
 
   return (
-    <div className="flex items-center justify-between bg-white rounded-lg shadow-lg overflow-hidden w-4/5 p-3">
+    <div className="flex items-center justify-between bg-white rounded-md border overflow-hidden w-4/5 p-3">
       <p className="font-bold">{formatEnumValue(tariffa.tipoVariazione)}</p>
       <p>{tariffa.variazione + " " + (tariffa.tipoVariazione === tipo_variazione.AUMENTO_PERCENTUALE || tariffa.tipoVariazione === tipo_variazione.SCONTO_PERCENTUALE ? "%" : "€")}</p>
       <div className="flex flex-col gap-2 text-sm">

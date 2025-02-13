@@ -151,7 +151,7 @@ export default async function BookingInfoComponent({ idPrenotazione }: BookingIn
                                             {pagamento.dataSaldo ? (<Badge variant={"success"}>Pagato</Badge>) : (<Badge variant={"destructive"}>Non Pagato</Badge>)}
                                             {pagamento.dataSaldo && <p className='text-sm'>{format(pagamento.dataSaldo, "dd/MM/yyyy")}</p>}
                                         </div>
-                                        { user.ruolo === ruolo.CLIENTE && <>
+                                        { user.ruolo === ruolo.CLIENTE && (bookingInfo.stato !== stato_prenotazione.ANNULLATA_HOST && bookingInfo.stato !== stato_prenotazione.ANNULLATA_UTENTE) && <>
                                         <div className="self-stretch my-2">
                                             <Separator orientation="vertical" />
                                         </div>

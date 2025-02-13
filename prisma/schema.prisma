@@ -84,8 +84,8 @@ model Stanze {
 model Tariffe {
   idTariffa      String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   codStanza      String          @db.Uuid
-  dataInizio     DateTime        @db.Date
-  dataFine       DateTime        @db.Date
+  dataInizio     DateTime        @db.Timestamp(6)
+  dataFine       DateTime        @db.Timestamp(6)
   tipoVariazione tipo_variazione
   variazione     Float           @db.Real
   Stanze         Stanze          @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)

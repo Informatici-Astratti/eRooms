@@ -17,6 +17,8 @@ import { ArrowUpDown } from "lucide-react"
 
 import BadgeStatoPrenotazione from "@/components/BadgeStatoPrenotazione"
 import Link from "next/link"
+import { format } from "date-fns"
+import { formatInTimeZone } from "date-fns-tz"
 
 export type PrenotazioneWithRelations = PrenotazioniType & {
   Stanze: Stanze
@@ -67,12 +69,8 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
     header: "Check-in / Check-out",
     cell: ({ row }) => {
       const date = row.original
-      const dataInizio = new Date(date.dataInizio).toLocaleDateString("it-IT", {
-        timeZone: "UTC",
-      });
-      const dataFine = new Date(date.dataFine).toLocaleDateString("it-IT", {
-        timeZone: "UTC",
-      });
+      const dataInizio = formatInTimeZone(date.dataInizio, "Europe/Rome", "dd/MM/yyyy");
+      const dataFine = formatInTimeZone(date.dataFine, "Europe/Rome", "dd/MM/yyyy");
       return (
         <>
           <div>

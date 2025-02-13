@@ -233,7 +233,7 @@ export default function AddGuestIDsForm({ idPrenotazione, disabled = false }: Ad
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
-                            selected={guest.dataRilascio ?? new Date()}
+                            selected={guest.dataRilascio ? new Date(guest.dataRilascio) : undefined}
                             onSelect={(val) => handleGuestChange(i, 'dataRilascio', val ?? null)}
                             initialFocus
                             captionLayout="dropdown-buttons"
@@ -266,7 +266,7 @@ export default function AddGuestIDsForm({ idPrenotazione, disabled = false }: Ad
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
-                            selected={guest.dataScadenza ?? new Date()}
+                            selected={guest.dataScadenza ? new Date(guest.dataScadenza) : undefined}
                             onSelect={(val) => handleGuestChange(i, 'dataScadenza', val ?? null)}
                             initialFocus
                             captionLayout="dropdown-buttons"

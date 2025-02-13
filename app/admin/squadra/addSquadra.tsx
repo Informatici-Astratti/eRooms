@@ -13,9 +13,10 @@ import {
 } from "@/components/ui/sheet"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CirclePlus } from "lucide-react"
-import { useActionState, useState } from "react"
+import { use, useActionState, useEffect, useState } from "react"
 import { addSquadra } from "./action"
 import { ruolo } from "@prisma/client"
+import { useToast } from "@/hooks/use-toast"
 
 export function AggiungiMembro() {
     const [formData, setFormData] = useState({
@@ -25,6 +26,8 @@ export function AggiungiMembro() {
 
     const initialState = { message: "", success: false, errors: { descrizione: "" } }
     const [state, formAction] = useActionState(addSquadra, initialState)
+
+    const [open, setOpen] = useState(false)
 
     const handleChange = (field: string, value: string) => {
         setFormData((prev) => ({
@@ -37,8 +40,26 @@ export function AggiungiMembro() {
         return formData.email !== "" && formData.ruolo !== ""
     }
 
+    const {toast} = useToast()
+
+    useEffect(() => {
+
+        toast({
+            title: state.success ? "Successo" : "Errore",
+            description: state.success ? state.message : state.errors.descrizione,
+            variant: state.success ? "success" : "destructive",
+            duration: 2000,
+        })
+
+        if (state.success) {
+            setFormData({ email: "", ruolo: "" })
+            setOpen(false)
+        }
+    }, [state.success])
+    
+
     return (
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
                 <Button>
                     <CirclePlus />
@@ -91,7 +112,7 @@ export function AggiungiMembro() {
                         </div>
                     </div>
                     {state.errors.descrizione && <div className="text-red-600 mt-2 mb-4">{state.errors.descrizione}</div>}
-                    {state.success && <div className="text-green-600 mt-2 mb-4">{state.message}</div>}
+                    
                     <SheetFooter>
                         <Button type="submit" disabled={!isFormValid()}>
                             Aggiungi

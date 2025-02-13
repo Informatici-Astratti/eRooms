@@ -421,14 +421,19 @@ export interface SearchAvailableRoomsParams {
         switch (room.Tariffe[0].tipoVariazione) {
           case "AUMENTO_PERCENTUALE":
             costoEffettivo = room.costoStandard * (1 + (room.Tariffe[0].variazione / 100))
+            break
           case "SCONTO_PERCENTUALE":
             costoEffettivo = room.costoStandard * (1 - (room.Tariffe[0].variazione / 100))
+            break
           case "AUMENTO_FISSO":
             costoEffettivo = room.costoStandard + room.Tariffe[0].variazione
+            break
           case "SCONTO_FISSO":
             costoEffettivo = room.costoStandard - room.Tariffe[0].variazione
+            break
           case "NULLA":
             costoEffettivo = room.costoStandard
+            break
         }
       }
   
