@@ -25,7 +25,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={itIT}>
+    <ClerkProvider localization={itIT} appearance={{
+      variables: {
+          colorPrimary: 'hsl(222.2 47.4% 11.2%)', // change this value (you can get it from you're css variables, make sure to include 'hsl' and commas)
+              },
+          }}
+      >
       <html lang="en">
       <body
         className={`${poppins.className} antialiased h-screen`}
