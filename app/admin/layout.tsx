@@ -7,7 +7,7 @@ import { headers } from "next/headers";
  
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const user = await getUser()
-
+  /*
   if (user?.ruolo !== ruolo.PROPRIETARIO && user?.ruolo !== ruolo.GOVERNANTE) {
     return redirect("/")
   }
@@ -17,7 +17,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
       if (!currentUrl.pathname.startsWith("/admin/pulizie")) {
         return redirect("/admin/pulizie");
       }
-  }
+  } */
 
   const accountName = {
     nome: user?.nome,

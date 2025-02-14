@@ -5,10 +5,27 @@ import { ruolo } from '@prisma/client'
 
 const isProtectedRoute = createRouteMatcher(['/admin(.*)', "/signup/continue", "/account(.*)"])
 
+const isAdminRoute = createRouteMatcher(['/admin(.*)'])
+const isGovernanteRoute = createRouteMatcher(['/admin/pulizie(.*)'])
+
 export default clerkMiddleware(async (auth, request) => {
   if (isProtectedRoute(request)) {
     await auth.protect()
-  } 
+  }
+
+  if (isAdminRoute(request)) {
+    const { sessionClaims } = await auth();
+
+    if (sessionClaims?.ruolo === ruolo.PROPRIETARIO) {
+      return;
+    }
+
+    if (isGovernanteRoute(request) && sessionClaims?.ruolo === ruolo.GOVERNANTE) {
+      return;
+    }
+
+    return NextResponse.redirect('/');
+  }
 })
 
 export const config = {
