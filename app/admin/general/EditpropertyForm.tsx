@@ -89,83 +89,89 @@ export default function EditPropertyForm({ property }: EditPropertyFormProps) {
                         <div className="w-[80%]">
                             <Label>Paese</Label>
                             <Select name="paese" defaultValue={state.fields?.paese}>
-                                <SelectTrigger className="w-[280px]">
+                                <SelectTrigger className="w-[280px]" defaultValue={state.fields?.paese}>
                                     <SelectValue placeholder="Seleziona" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent defaultValue={state.fields?.paese}>
                                     <SelectGroup>
                                     <SelectLabel>Europa</SelectLabel>
-                                        <SelectItem value="uk">United Kingdom</SelectItem>
-                                        <SelectItem value="fr">France</SelectItem>
-                                        <SelectItem value="de">Germany</SelectItem>
-                                        <SelectItem value="es">Spain</SelectItem>
-                                        <SelectItem value="it">Italy</SelectItem>
-                                        <SelectItem value="ru">Russia</SelectItem>
-                                        <SelectItem value="nl">Netherlands</SelectItem>
-                                        <SelectItem value="be">Belgium</SelectItem>
-                                        <SelectItem value="ch">Switzerland</SelectItem>
-                                        <SelectItem value="se">Sweden</SelectItem>
-                                        <SelectItem value="no">Norway</SelectItem>
-                                        <SelectItem value="dk">Denmark</SelectItem>
-                                        <SelectItem value="fi">Finland</SelectItem>
-                                        <SelectItem value="pl">Poland</SelectItem>
-                                        <SelectItem value="gr">Greece</SelectItem>
-                                        <SelectItem value="pt">Portugal</SelectItem>
-                                        <SelectItem value="ie">Ireland</SelectItem>
-                                        <SelectItem value="at">Austria</SelectItem>
-                                        <SelectItem value="hu">Hungary</SelectItem>
-                                        <SelectItem value="cz">Czech Republic</SelectItem>
+                                    <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                                    <SelectItem value="France">France</SelectItem>
+                                    <SelectItem value="Germany">Germany</SelectItem>
+                                    <SelectItem value="Spain">Spain</SelectItem>
+                                    <SelectItem value="Italia">Italy</SelectItem>
+                                    <SelectItem value="Russia">Russia</SelectItem>
+                                    <SelectItem value="Netherlands">Netherlands</SelectItem>
+                                    <SelectItem value="Belgium">Belgium</SelectItem>
+                                    <SelectItem value="Switzerland">Switzerland</SelectItem>
+                                    <SelectItem value="Sweden">Sweden</SelectItem>
+                                    <SelectItem value="Norway">Norway</SelectItem>
+                                    <SelectItem value="Denmark">Denmark</SelectItem>
+                                    <SelectItem value="Finland">Finland</SelectItem>
+                                    <SelectItem value="Poland">Poland</SelectItem>
+                                    <SelectItem value="Greece">Greece</SelectItem>
+                                    <SelectItem value="Portugal">Portugal</SelectItem>
+                                    <SelectItem value="Ireland">Ireland</SelectItem>
+                                    <SelectItem value="Austria">Austria</SelectItem>
+                                    <SelectItem value="Hungary">Hungary</SelectItem>
+                                    <SelectItem value="Czech Republic">Czech Republic</SelectItem>
                                     </SelectGroup>
+
                                     <SelectGroup>
                                     <SelectLabel className="mt-5">Nord America</SelectLabel>
-                                        <SelectItem value="us">United States</SelectItem>
-                                        <SelectItem value="ca">Canada</SelectItem>
-                                        <SelectItem value="mx">Mexico</SelectItem>
+                                    <SelectItem value="United States">United States</SelectItem>
+                                    <SelectItem value="Canada">Canada</SelectItem>
+                                    <SelectItem value="Mexico">Mexico</SelectItem>
                                     </SelectGroup>
+
                                     <SelectGroup>
                                     <SelectLabel className="mt-5">Sud America</SelectLabel>
-                                        <SelectItem value="br">Brazil</SelectItem>
-                                        <SelectItem value="ar">Argentina</SelectItem>
-                                        <SelectItem value="co">Colombia</SelectItem>
-                                        <SelectItem value="cl">Chile</SelectItem>
-                                        <SelectItem value="pe">Peru</SelectItem>
+                                    <SelectItem value="Brazil">Brazil</SelectItem>
+                                    <SelectItem value="Argentina">Argentina</SelectItem>
+                                    <SelectItem value="Colombia">Colombia</SelectItem>
+                                    <SelectItem value="Chile">Chile</SelectItem>
+                                    <SelectItem value="Peru">Peru</SelectItem>
                                     </SelectGroup>
+
                                     <SelectGroup>
                                     <SelectLabel className="mt-5">Medio Oriente</SelectLabel>
-                                        <SelectItem value="tr">Turkey</SelectItem>
-                                        <SelectItem value="sa">Saudi Arabia</SelectItem>
-                                        <SelectItem value="ae">United Arab Emirates</SelectItem>
-                                        <SelectItem value="il">Israel</SelectItem>
-                                        <SelectItem value="ir">Iran</SelectItem>
+                                    <SelectItem value="Turkey">Turkey</SelectItem>
+                                    <SelectItem value="Saudi Arabia">Saudi Arabia</SelectItem>
+                                    <SelectItem value="United Arab Emirates">United Arab Emirates</SelectItem>
+                                    <SelectItem value="Israel">Israel</SelectItem>
+                                    <SelectItem value="Iran">Iran</SelectItem>
                                     </SelectGroup>
+
                                     <SelectGroup>
                                     <SelectLabel className="mt-5">Asia</SelectLabel>
-                                        <SelectItem value="cn">China</SelectItem>
-                                        <SelectItem value="jp">Japan</SelectItem>
-                                        <SelectItem value="in">India</SelectItem>
-                                        <SelectItem value="kr">South Korea</SelectItem>
-                                        <SelectItem value="th">Thailand</SelectItem>
-                                        <SelectItem value="my">Malaysia</SelectItem>
-                                        <SelectItem value="sg">Singapore</SelectItem>
-                                        <SelectItem value="id">Indonesia</SelectItem>
-                                        <SelectItem value="ph">Philippines</SelectItem>
-                                        <SelectItem value="vn">Vietnam</SelectItem>
-                                        <SelectItem value="bd">Bangladesh</SelectItem>
-                                        <SelectItem value="pk">Pakistan</SelectItem>
+                                    <SelectItem value="China">China</SelectItem>
+                                    <SelectItem value="Japan">Japan</SelectItem>
+                                    <SelectItem value="India">India</SelectItem>
+                                    <SelectItem value="South Korea">South Korea</SelectItem>
+                                    <SelectItem value="Thailand">Thailand</SelectItem>
+                                    <SelectItem value="Malaysia">Malaysia</SelectItem>
+                                    <SelectItem value="Singapore">Singapore</SelectItem>
+                                    <SelectItem value="Indonesia">Indonesia</SelectItem>
+                                    <SelectItem value="Philippines">Philippines</SelectItem>
+                                    <SelectItem value="Vietnam">Vietnam</SelectItem>
+                                    <SelectItem value="Bangladesh">Bangladesh</SelectItem>
+                                    <SelectItem value="Pakistan">Pakistan</SelectItem>
                                     </SelectGroup>
+
                                     <SelectGroup>
                                     <SelectLabel className="mt-5">Africa</SelectLabel>
-                                        <SelectItem value="za">South Africa</SelectItem>
-                                        <SelectItem value="eg">Egypt</SelectItem>
-                                        <SelectItem value="ng">Nigeria</SelectItem>
-                                        <SelectItem value="ke">Kenya</SelectItem>
-                                        <SelectItem value="ma">Morocco</SelectItem>
-                                        <SelectItem value="dz">Algeria</SelectItem>
+                                    <SelectItem value="South Africa">South Africa</SelectItem>
+                                    <SelectItem value="Egypt">Egypt</SelectItem>
+                                    <SelectItem value="Nigeria">Nigeria</SelectItem>
+                                    <SelectItem value="Kenya">Kenya</SelectItem>
+                                    <SelectItem value="Morocco">Morocco</SelectItem>
+                                    <SelectItem value="Algeria">Algeria</SelectItem>
                                     </SelectGroup>
+
                                     <SelectGroup>
                                     <SelectLabel className="mt-5">Oceania</SelectLabel>
-                                        <SelectItem value="au">Australia</SelectItem>
-                                        <SelectItem value="nz">New Zealand</SelectItem>
+                                    <SelectItem value="Australia">Australia</SelectItem>
+                                    <SelectItem value="New Zealand">New Zealand</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>  

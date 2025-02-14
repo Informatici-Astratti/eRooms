@@ -38,7 +38,7 @@ const PropertyFormSchema = z.object({
 });
 
 export async function editPropertyForm(prevState: PropertyResponse, formData: FormData): Promise<PropertyResponse>{
-    console.log("0")
+    
     const data: Proprieta = {
         id: formData.get("id") as string,
         nome: formData.get("nome") as string,
