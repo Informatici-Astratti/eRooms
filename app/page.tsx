@@ -8,8 +8,12 @@ export default async function Home() {
 
   const user = await getUser()
 
-  if (user && (user.ruolo === ruolo.PROPRIETARIO || user.ruolo === ruolo.GOVERNANTE)){
-    redirect("/admin")
+  if (user && (user.ruolo === ruolo.PROPRIETARIO)){
+    redirect("/admin/dashboard")
+  }
+
+  if (user && (user.ruolo === ruolo.GOVERNANTE)){
+    redirect("/admin/pulizie")
   }
 
   redirect("/v")
