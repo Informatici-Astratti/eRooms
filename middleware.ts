@@ -24,7 +24,7 @@ export default clerkMiddleware(async (auth, request) => {
       return NextResponse.next();
     }
 
-    return NextResponse.redirect(new URL("/v", process.env.NEXT_PUBLIC_APP_URL));
+    return NextResponse.redirect(new URL("/", process.env.NEXT_PUBLIC_APP_URL));
   }
 })
 
