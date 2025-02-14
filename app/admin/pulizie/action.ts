@@ -63,7 +63,7 @@ export async function updatePuliziaStato(prevState: any, formData: FormData) {
     if (puliziaAttuale.stato === newStato) {
       return {
         message: "",
-        success: true,
+        success: false,
         errors: { descrizione: "Lo stato attuale è già quello selezionato" },
       }
     }

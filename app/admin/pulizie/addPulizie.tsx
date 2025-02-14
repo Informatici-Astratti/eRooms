@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import { addTurnoPulizia } from "./action"
 import { useActionState } from "react"
 import { Input } from "@/components/ui/input"
+import { useToast } from "@/hooks/use-toast"
 
 interface AddPulizieProps {
     stanza: {
@@ -31,21 +32,35 @@ export default function AddPulizie({ stanza, governanti, onClose }: AddPuliziePr
     const initialState = { message: "", success: false, errors: { descrizione: "" } }
     const [state, formAction] = useActionState(addTurnoPulizia, initialState)
 
-    const router = useRouter()
-
     const handleChange = (field: string, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }))
     }
 
+    const { toast } = useToast()
+    const router = useRouter()
+
     useEffect(() => {
-        if (state.message) {
-            const timer = setTimeout(() => {
-                onClose();
-                router.refresh();
-            }, 2000);
-            return () => clearTimeout(timer);
+        if (state.message || state.errors.descrizione) {
+
+            toast({
+                title: state.success ? "Successo" : "Errore",
+                description: state.success ? state.message : state.errors.descrizione,
+                variant: state.success ? "success" : "destructive",
+                duration: 2000,
+            });
         }
-    }, [state.success]); // oppure [state.message, state.success] se necessario
+
+        if (state.success || state.errors) {
+            setFormData({
+                codStanza: stanza.idStanza,
+                codGovernante: "",
+                dataInizio: new Date().toISOString().split("T")[0],
+                dataFine: new Date().toISOString().split("T")[0],
+            });
+            onClose();
+            router.refresh()
+        }
+    }, [state]);
 
 
     const isFormValid = () => {
@@ -79,11 +94,15 @@ export default function AddPulizie({ stanza, governanti, onClose }: AddPuliziePr
                                 <SelectValue placeholder="Seleziona un addetto" />
                             </SelectTrigger>
                             <SelectContent>
-                                {governanti.map((governante) => (
-                                    <SelectItem key={governante.idProfilo} value={governante.idProfilo}>
-                                        {`${governante.nome} ${governante.cognome}`}
-                                    </SelectItem>
-                                ))}
+                                {governanti.length > 0 ? (
+                                    governanti.map((governante) => (
+                                        <SelectItem key={governante.idProfilo} value={governante.idProfilo}>
+                                            {`${governante.nome} ${governante.cognome}`}
+                                        </SelectItem>
+                                    ))
+                                ) : (
+                                    <div className="text-gray-500 py-2 col-span-3">Nessun governante disponibile</div>
+                                )}
                             </SelectContent>
                         </Select>
                     </div>
@@ -114,8 +133,8 @@ export default function AddPulizie({ stanza, governanti, onClose }: AddPuliziePr
                         />
                     </div>
                 </div>
-                {state.errors.descrizione && <div className="text-red-600 mt-2 mb-4">{state.errors.descrizione}</div>}
-                {state.message && <div className="text-green-600 mt-2 mb-4">{state.message}</div>}
+                {/* {state.errors.descrizione && <div className="text-red-600 mt-2 mb-4">{state.errors.descrizione}</div>}
+                {state.message && <div className="text-green-600 mt-2 mb-4">{state.message}</div>} */}
                 <DialogFooter>
                     <Button className="mt-4" type="submit" disabled={!isFormValid()}>
                         Salva modifiche

@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import { updatePuliziaStato } from "./action"
 import { useActionState } from "react"
 import { formatEnumValue } from "@/app/lib/formatEnum"
+import { useToast } from "@/hooks/use-toast"
 
 interface ModificaStatusProps {
   pulizie: Pulizie | null
@@ -24,11 +25,13 @@ export default function ModificaStatus({ pulizie, onClose }: ModificaStatusProps
   const initialState = { message: "", success:false, errors: { descrizione: "" } }
   const [state, formAction] = useActionState(updatePuliziaStato, initialState)
 
-  const router = useRouter()
 
   const handleChange = (value: string) => {
     setFormData((prev) => ({ ...prev, stato: value as stato_pulizia }))
   }
+
+  const { toast } = useToast()
+  const router = useRouter()
 
   useEffect(() => {
     if (pulizie) {
@@ -40,14 +43,26 @@ export default function ModificaStatus({ pulizie, onClose }: ModificaStatusProps
   }, [pulizie])
 
   useEffect(() => {
-    if (state.message) {
-      const timer = setTimeout(() => {
-        onClose()
-        router.refresh()
-      }, 2000)
-      return () => clearTimeout(timer)
+    if (state.message || state.errors.descrizione) {
+
+      toast({
+        title: state.success ? "Successo" : "Errore",
+        description: state.success ? state.message : state.errors.descrizione,
+        variant: state.success ? "success" : "destructive",
+        duration: 2000,
+    });
     }
-  }, [state.success])
+
+    if (state.success || state.errors) {
+      setFormData({
+        codStanza: pulizie?.codStanza || "",
+        stato: pulizie?.stato,
+      });
+      onClose();
+      router.refresh()
+  }
+
+  }, [state])
 
 
 
@@ -79,8 +94,8 @@ export default function ModificaStatus({ pulizie, onClose }: ModificaStatusProps
             </Select>
           </div>
         </div>
-        {state.errors.descrizione && <div className="text-red-600 mt-2 mb-4">{state.errors.descrizione}</div>}
-        {state.message && <div className="text-green-600 mt-2 mb-4">{state.message}</div>}
+        {/* {state.errors.descrizione && <div className="text-red-600 mt-2 mb-4">{state.errors.descrizione}</div>}
+        {state.message && <div className="text-green-600 mt-2 mb-4">{state.message}</div>} */}
         <DialogFooter>
           <Button className="mt-4" type="submit">
             Salva modifiche
