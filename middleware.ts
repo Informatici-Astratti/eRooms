@@ -17,14 +17,14 @@ export default clerkMiddleware(async (auth, request) => {
     const { sessionClaims } = await auth();
 
     if (sessionClaims?.ruolo === ruolo.PROPRIETARIO) {
-      return;
+      return NextResponse.next();
     }
 
     if (isGovernanteRoute(request) && sessionClaims?.ruolo === ruolo.GOVERNANTE) {
-      return;
+      return NextResponse.next();
     }
 
-    return NextResponse.redirect('/');
+    return NextResponse.redirect(new URL("/v", process.env.NEXT_PUBLIC_APP_URL));
   }
 })
 
