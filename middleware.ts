@@ -16,7 +16,7 @@ export default clerkMiddleware(async (auth, request) => {
   if (isAdminRoute(request)) {
     const { sessionClaims } = await auth();
 
-    if (sessionClaims?.ruolo === ruolo.PROPRIETARIO) {
+    if (sessionClaims?.metadata.ruolo === ruolo.PROPRIETARIO) {
       return NextResponse.next();
     }
 
