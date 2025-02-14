@@ -43,19 +43,22 @@ export function AggiungiMembro() {
     const {toast} = useToast()
 
     useEffect(() => {
-
-        toast({
-            title: state.success ? "Successo" : "Errore",
-            description: state.success ? state.message : state.errors.descrizione,
-            variant: state.success ? "success" : "destructive",
-            duration: 2000,
-        })
-
-        if (state.success) {
-            setFormData({ email: "", ruolo: "" })
-            setOpen(false)
+       
+        if (state.message || state.errors.descrizione) {
+            toast({
+                title: state.success ? "Successo" : "Errore",
+                description: state.success ? state.message : state.errors.descrizione,
+                variant: state.success ? "success" : "destructive",
+                duration: 2000,
+            });
+    
+            if (state.success || state.errors) {
+                setFormData({ email: "", ruolo: "" });
+                setOpen(false);
+            }
         }
-    }, [state.success])
+    }, [state]);
+    
     
 
     return (
@@ -111,7 +114,7 @@ export function AggiungiMembro() {
                             </Select>
                         </div>
                     </div>
-                    {state.errors.descrizione && <div className="text-red-600 mt-2 mb-4">{state.errors.descrizione}</div>}
+                    {/* {state.errors.descrizione && <div className="text-red-600 mt-2 mb-4">{state.errors.descrizione}</div>} */}
                     
                     <SheetFooter>
                         <Button type="submit" disabled={!isFormValid()}>
