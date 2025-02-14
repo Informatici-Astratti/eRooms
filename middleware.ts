@@ -20,7 +20,7 @@ export default clerkMiddleware(async (auth, request) => {
       return NextResponse.next();
     }
 
-    if (isGovernanteRoute(request) && sessionClaims?.ruolo === ruolo.GOVERNANTE) {
+    if (isGovernanteRoute(request) && sessionClaims?.metadata.ruolo === ruolo.GOVERNANTE) {
       return NextResponse.next();
     }
 
