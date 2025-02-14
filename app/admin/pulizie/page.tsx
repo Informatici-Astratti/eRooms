@@ -2,9 +2,7 @@ import { Suspense } from "react"
 import { getPulizie } from "./action"
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { CirclePlus } from "lucide-react"
+
 
 export default async function DemoPage() {
   const data = await getPulizie()
