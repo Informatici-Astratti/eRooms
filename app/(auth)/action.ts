@@ -41,7 +41,7 @@ export async function signUpContinue(prevState: any, formData: FormData) {
     try {
         const ruoloCheck = await clerkClient();
         const user = await ruoloCheck.users.getUser(userId.id);
-        const ruoloUtente = user.publicMetadata?.ruolo as keyof typeof ruolo ?? "CLIENTE"; // Di default cliente, altrimenti il ruolo default è CLIENTE
+        const ruoloUtente = user.publicMetadata?.ruolo as keyof typeof ruolo ?? ruolo.CLIENTE; // Di default cliente, altrimenti il ruolo default è CLIENTE
         const dbUser = await prisma.profili.create({
             data: {
                 idProfilo: userId.id,
@@ -55,6 +55,15 @@ export async function signUpContinue(prevState: any, formData: FormData) {
                 ruolo: ruolo[ruoloUtente]
             }
         })
+
+        if (!user.publicMetadata?.ruolo) {
+            await ruoloCheck.users.updateUser(userId.id, {
+                publicMetadata: {
+                    ruolo: ruolo.CLIENTE
+                }
+            })
+        }
+
     }
     catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
