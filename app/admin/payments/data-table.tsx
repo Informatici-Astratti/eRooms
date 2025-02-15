@@ -60,15 +60,15 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter prenotazioni..."
-          value={(table.getColumn("Prenotazioni")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("Prenotazioni")?.setFilterValue(event.target.value)}
+          placeholder="Filtra per clienti..."
+          value={(table.getColumn("cliente")?.getFilterValue() as string) ?? ""}
+          onChange={(event) => table.getColumn("cliente")?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
+              Colonne <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -121,7 +121,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  Nessun Risultato.
                 </TableCell>
               </TableRow>
             )}
@@ -140,10 +140,10 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            Precedente
           </Button>
           <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            Next
+            Successivo
           </Button>
         </div>
       </div>

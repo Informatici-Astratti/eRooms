@@ -66,11 +66,12 @@ async function getTodayBookings() {
       b.dataInizio >= today &&
       b.dataInizio < tomorrow &&
       b.stato !== "ANNULLATA_UTENTE" &&
-      b.stato !== "ANNULLATA_HOST",
+      b.stato !== "ANNULLATA_HOST" &&
+      b.stato != "PRENOTATA"
   )
   const todayDepartures = bookings.filter( //PARTENZE
     (b) =>
-      b.dataFine >= today && b.dataFine < tomorrow && b.stato !== "ANNULLATA_UTENTE" && b.stato !== "ANNULLATA_HOST",
+      b.dataFine >= today && b.dataFine < tomorrow && b.stato !== "ANNULLATA_UTENTE" && b.stato !== "ANNULLATA_HOST" && b.stato != "PRENOTATA",
   )
   const todayCurrentStays = bookings.filter( //PERNOTTAMENTI (ESCLUDENDO LE PARTENZE)
     (b) =>
@@ -78,7 +79,8 @@ async function getTodayBookings() {
       b.dataFine > today &&
       b.dataFine >= tomorrow && // Esclude le prenotazioni che terminano oggi
       b.stato !== "ANNULLATA_UTENTE" &&
-      b.stato !== "ANNULLATA_HOST",
+      b.stato !== "ANNULLATA_HOST" &&
+      b.stato != "PRENOTATA"
   )
 
   return {
@@ -114,9 +116,6 @@ export async function getStatistics() {
           dataSaldo: {
             gte: firstDayOfMonth,
           },
-          Prenotazioni: {
-            stato: "CONFERMATA",
-          },
         },
       }),
       // Pagamenti confermati per quest'anno
@@ -128,10 +127,7 @@ export async function getStatistics() {
           dataSaldo: {
             gte: firstDayOfYear,
             lte: lastDayOfYear,
-          },
-          Prenotazioni: {
-            stato: "CONFERMATA",
-          },
+          }
         },
       }),
       // Statistiche giornaliere
@@ -175,7 +171,7 @@ async function getDailyStatistics() {
           lt: tomorrow,
         },
         NOT: {
-          stato: { in: ["ANNULLATA_UTENTE", "ANNULLATA_HOST"] },
+          stato: { in: ["ANNULLATA_UTENTE", "ANNULLATA_HOST", "PRENOTATA"] },
         },
       },
     }),
@@ -187,7 +183,7 @@ async function getDailyStatistics() {
           lt: tomorrow,
         },
         NOT: {
-          stato: { in: ["ANNULLATA_UTENTE", "ANNULLATA_HOST"] },
+          stato: { in: ["ANNULLATA_UTENTE", "ANNULLATA_HOST", "PRENOTATA"] },
         },
       },
     }),
@@ -198,7 +194,7 @@ async function getDailyStatistics() {
           { dataInizio: { lt: tomorrow } },
           { dataFine: { gt: today } },
           { dataFine: { gte: tomorrow } }, // Esclude le prenotazioni che terminano oggi
-          { NOT: { stato: { in: ["ANNULLATA_UTENTE", "ANNULLATA_HOST"] } } },
+          { NOT: { stato: { in: ["ANNULLATA_UTENTE", "ANNULLATA_HOST", "PRENOTATA"] } } },
         ],
       },
     }),
@@ -279,14 +275,16 @@ export async function searchBookings(query: string) {
         new Date(b.dataInizio) >= today &&
         new Date(b.dataInizio) < tomorrow &&
         b.stato !== "ANNULLATA_UTENTE" &&
-        b.stato !== "ANNULLATA_HOST",
+        b.stato !== "ANNULLATA_HOST" &&
+        b.stato != "PRENOTATA"
     ),
     todayDepartures: mappedBookings.filter(
       (b) =>
         new Date(b.dataFine) >= today &&
         new Date(b.dataFine) < tomorrow &&
         b.stato !== "ANNULLATA_UTENTE" &&
-        b.stato !== "ANNULLATA_HOST",
+        b.stato !== "ANNULLATA_HOST" &&
+        b.stato != "PRENOTATA"
     ),
     todayCurrentStays: mappedBookings.filter(
       (b) =>
@@ -294,7 +292,8 @@ export async function searchBookings(query: string) {
         new Date(b.dataFine) > today &&
         new Date(b.dataFine) >= tomorrow && // Esclude le prenotazioni che terminano oggi
         b.stato !== "ANNULLATA_UTENTE" &&
-        b.stato !== "ANNULLATA_HOST",
+        b.stato !== "ANNULLATA_HOST" &&
+        b.stato != "PRENOTATA"
     ),
   }
 }

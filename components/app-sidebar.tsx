@@ -1,5 +1,5 @@
 import * as React from "react"
-import { BedDouble, BedSingle, Calendar, ChevronRight, ChevronUp, Home, Info, LogOut, ReceiptText, SquareActivity, User2, UserRoundCog, Users, WashingMachine } from "lucide-react"
+import { BedDouble, BedSingle, Calendar, ChevronRight, ChevronUp, Home, Info, LogOut, ReceiptText, ShieldQuestion, SquareActivity, User2, UserRoundCog, Users, WashingMachine } from "lucide-react"
 
 import {
   Collapsible,
@@ -88,6 +88,11 @@ const data = {
           url: "/admin/payments",
           icon: ReceiptText,
         },
+        {
+          title: "Squadra",
+          url: "/admin/squadra",
+          icon: ShieldQuestion,
+        },
       ],
     }
   ]
@@ -102,7 +107,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({accountName} : AppSidebarProps) {
   return (
-    <Sidebar variant="inset" collapsible="none" className="h-screen bg-white">
+    <Sidebar variant="inset" collapsible="none" className="h-screen bg-white border border-x-zinc-200">
         <SidebarHeader>
             <div className="flex gap-2 justify-center items-center py-5">
                 <div className="flex size-6 bg-primarflex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
@@ -168,10 +173,10 @@ export function AppSidebar({accountName} : AppSidebarProps) {
             <SidebarMenu>
                 <SidebarMenuItem>
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger className="group" asChild>
                     <SidebarMenuButton>
                         <User2 /> {accountName?.nome + " " + accountName?.cognome}
-                        <ChevronUp className="ml-auto" />
+                        <ChevronUp className="ml-auto transition-transform group-data-[state=open]:rotate-180" />
                     </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
@@ -180,11 +185,11 @@ export function AppSidebar({accountName} : AppSidebarProps) {
                     >
                     <DropdownMenuItem>
                         <UserRoundCog />
-                        <Link href={"/account"}>
+                        <Link href={"/account/myprofile"}>
                           Impostazioni Account
                         </Link>
                     </DropdownMenuItem>
-                    <SignOutButton>
+                    <SignOutButton redirectUrl="/">
                       <DropdownMenuItem>
                         <LogOut />
                         Logout

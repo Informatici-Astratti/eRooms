@@ -7,19 +7,21 @@ interface NumericInputProps {
   step?: number
   defaultValue: number
   name: string
+  onValueChange?: (value: number) => void
 }
 
 const NumericInput = forwardRef<HTMLInputElement, NumericInputProps>(
-  ({ min = 0, max = 100, step = 1, defaultValue, name }, ref) => {
+  ({ min = 0, max = 100, step = 1, defaultValue, name, onValueChange }, ref) => {
     const inputRef = useRef<HTMLInputElement>(null)
 
     const updateValue = (newValue: number) => {
       if (inputRef.current) {
         inputRef.current.value = newValue.toString()
-        // Trigger a change event to ensure form data is updated
         const event = new Event("input", { bubbles: true })
         inputRef.current.dispatchEvent(event)
       }
+      // Richiama la callback esterna in caso di cambio valore
+      onValueChange?.(newValue)
     }
 
     const handleIncrease = () => {

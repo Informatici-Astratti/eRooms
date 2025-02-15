@@ -173,8 +173,8 @@ export default function EditTariffaForm({ tariffa, codStanza }: EditTariffaFormP
             </Popover>
             <ErrorForm errors={typeof state.errors === 'object' ? state.errors?.dataInizio : undefined} />
             <ErrorForm errors={typeof state.errors === 'object' ? state.errors?.dataFine : undefined} />
-            <Input type="hidden" value={data?.from ? format(data.from, "yyyy-MM-dd") : ''} name="dataInizio" />
-            <Input type="hidden" value={data?.to ? format(data.to, "yyyy-MM-dd") : ''} name="dataFine" />
+            <Input type="hidden" value={data?.from?.toISOString()} name="dataInizio" />
+            <Input type="hidden" value={data?.to?.toISOString()} name="dataFine" />
           </div>
 
           <Input type="hidden" value={state.fields?.idTariffa} name="idTariffa" />

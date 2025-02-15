@@ -36,7 +36,14 @@ export const columns: ColumnDef<Profili>[] = [
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
+    },
+
+    filterFn: (row, columId, value) => {
+      const cognomeCliente = row.original.cognome;
+      const filtro = cognomeCliente;
+      return filtro.toLowerCase().includes(value.toLowerCase());
     }
+    
   },
   {
     accessorKey: "telefono",
@@ -58,31 +65,5 @@ export const columns: ColumnDef<Profili>[] = [
     accessorKey: "genere",
     header: "Genere",
   },
-/*{
-    id: "actions",
-    cell: ({ row }) => {
-      const profile = row.original
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(profile.idProfilo)}>
-              Copy profile ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View profile details</DropdownMenuItem>
-            <DropdownMenuItem>Edit profile</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
-  },*/
 ]
 

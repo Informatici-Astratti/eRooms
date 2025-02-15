@@ -4,11 +4,12 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState, useEffect } from "react"
-import type { stato_pulizia, Pulizie } from "@prisma/client"
+import { stato_pulizia, Pulizie } from "@prisma/client"
 import { useRouter } from "next/navigation"
 import { updatePuliziaStato } from "./action"
 import { useActionState } from "react"
 import { formatEnumValue } from "@/app/lib/formatEnum"
+import { useToast } from "@/hooks/use-toast"
 
 interface ModificaStatusProps {
   pulizie: Pulizie | null
@@ -21,14 +22,16 @@ export default function ModificaStatus({ pulizie, onClose }: ModificaStatusProps
     stato: pulizie?.stato,
   })
 
-  const initialState = { message: "", errors: { descrizione: "" } }
+  const initialState = { message: "", success:false, errors: { descrizione: "" } }
   const [state, formAction] = useActionState(updatePuliziaStato, initialState)
 
-  const router = useRouter()
 
   const handleChange = (value: string) => {
     setFormData((prev) => ({ ...prev, stato: value as stato_pulizia }))
   }
+
+  const { toast } = useToast()
+  const router = useRouter()
 
   useEffect(() => {
     if (pulizie) {
@@ -40,16 +43,27 @@ export default function ModificaStatus({ pulizie, onClose }: ModificaStatusProps
   }, [pulizie])
 
   useEffect(() => {
-    if (state.message) {
-      const timer = setTimeout(() => {
-        onClose()
-        router.refresh()
-      }, 2000)
-      return () => clearTimeout(timer)
-    }
-  }, [state.message, onClose, router])
+    if (state.message || state.errors.descrizione) {
 
-  const availableStates: stato_pulizia[] = ["PULITA", "DA_PULIRE"]
+      toast({
+        title: state.success ? "Successo" : "Errore",
+        description: state.success ? state.message : state.errors.descrizione,
+        variant: state.success ? "success" : "destructive",
+        duration: 2000,
+    });
+    }
+
+    if (state.success || state.errors) {
+      setFormData({
+        codStanza: pulizie?.codStanza || "",
+        stato: pulizie?.stato,
+      });
+      onClose();
+      router.refresh()
+  }
+
+  }, [state])
+
 
 
   return (
@@ -71,17 +85,17 @@ export default function ModificaStatus({ pulizie, onClose }: ModificaStatusProps
                 <SelectValue placeholder="Seleziona uno stato" />
               </SelectTrigger>
               <SelectContent>
-              {availableStates.map((stato) => (
-                <SelectItem key={stato} value={stato}>
-                  {formatEnumValue(stato)} {/* Visualizza "DA PULIRE" anziché "DA_PULIRE" */}
-                </SelectItem>
-              ))}
+                {Object.values(stato_pulizia).map((stato) => (
+                  <SelectItem key={stato} value={stato}>
+                    {formatEnumValue(stato)}
+                  </SelectItem>
+                ))}
             </SelectContent>
             </Select>
           </div>
         </div>
-        {state.errors.descrizione && <div className="text-red-600 mt-2 mb-4">{state.errors.descrizione}</div>}
-        {state.message && <div className="text-green-600 mt-2 mb-4">{state.message}</div>}
+        {/* {state.errors.descrizione && <div className="text-red-600 mt-2 mb-4">{state.errors.descrizione}</div>}
+        {state.message && <div className="text-green-600 mt-2 mb-4">{state.message}</div>} */}
         <DialogFooter>
           <Button className="mt-4" type="submit">
             Salva modifiche

@@ -5,14 +5,13 @@ import { subYears, parseISO, formatISO } from "date-fns";
 import { z } from "zod"
 import prisma from "@/app/lib/db";
 import { genere, Prisma, ruolo } from "@prisma/client";
-import { headers } from "next/headers";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 
 const signUpContinueSchema = z.object({
     nome: z.string().min(2).max(50, {message: "Nome non valido"}),
     cognome: z.string().min(2).max(50, {message: "Cognome non valido"}),
     cf: z.string().trim().length(16)
-        .regex(/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/i, {message: "Codice Fiscale non valido"}),
+        .regex(/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/i, { message: "Codice Fiscale non valido" }),
     telefono: z.string().trim(),
     dataNascita: z.string().date().refine((date) => {
         const parsedDate = parseISO(date);
@@ -21,39 +20,54 @@ const signUpContinueSchema = z.object({
     }, {
         message: "L'Utente deve avere più di 18 anni"
     }),
-    genere: z.nativeEnum(genere, {message: "Genere non Valido"})
+    genere: z.nativeEnum(genere, { message: "Genere non Valido" })
 });
 
-export async function signUpContinue(prevState: any, formData: FormData){
+export async function signUpContinue(prevState: any, formData: FormData) {
 
-    const { userId } = await auth()
+    const {userId} = await auth()
 
     const result = signUpContinueSchema.safeParse(Object.fromEntries(formData))
-    if (!result.success){
+    if (!result.success) {
         return {
             errors: result.error.flatten().fieldErrors
         }
     }
-    
-    if(!userId){
+
+    if (!userId) {
         redirect("/login")
     }
 
-    try{
+    try {
+        const clerk = await clerkClient();
+        const user = await clerk.users.getUser(userId);
+
+        console.log(user.publicMetadata)
+        const ruoloUtente = user.publicMetadata?.ruolo as keyof typeof ruolo ?? ruolo.CLIENTE; // Di default cliente, altrimenti il ruolo default è CLIENTE
         const dbUser = await prisma.profili.create({
             data: {
                 idProfilo: userId,
+                email: user.primaryEmailAddress?.emailAddress ?? "",
                 nome: result.data.nome ?? "",
                 cognome: result.data.cognome ?? "",
                 telefono: result.data.telefono ?? "",
                 cf: result.data.cf ?? "",
                 dataNascita: formatISO(result.data.dataNascita) ?? "",
                 genere: result.data.genere ?? genere.NS,
-                ruolo: ruolo.CLIENTE 
+                ruolo: ruolo[ruoloUtente]
             }
         })
+
+        if (!(user.publicMetadata?.ruolo as keyof typeof ruolo)) {
+            await clerk.users.updateUser(userId, {
+                publicMetadata: {
+                    ruolo: ruolo.CLIENTE
+                }
+            })
+        }
+
     }
-    catch(e){
+    catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
             // Errore noto di Prisma
             console.error("Errore noto di Prisma:", e.message, e.code);
@@ -75,8 +89,8 @@ export async function signUpContinue(prevState: any, formData: FormData){
         }
     }
 
-    
+
 
     revalidatePath('/', 'layout')
-    redirect("/admin")
+    redirect("/")
 }

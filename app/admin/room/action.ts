@@ -34,10 +34,21 @@ export type StanzeConTariffeFoto = Prisma.StanzeGetPayload<{
 
 export type StanzeForm = Stanze & {
   foto?: string[]
+  urlFoto?: string[]
 }
 
 
-export default async function getAllRooms(): Promise<StanzeConTariffeFoto[]> {
+export async function getAllRooms() {
+  try {
+    const rooms = await prisma.stanze.findMany();
+    return rooms;
+  } catch (error) {
+    console.error("Errore nel recupero delle stanze:", error);
+    throw new Error("Si è verificato un errore nel recupero delle stanze.");
+  }
+}
+
+export default async function getAllRoomsWithFotoAndTariffe(): Promise<StanzeConTariffeFoto[]> {
   const roomsList: StanzeConTariffeFoto[] = await prisma.stanze.findMany({
     include:{
       Tariffe: true,
@@ -56,7 +67,8 @@ export async function getRoomById(idStanza: string): Promise<StanzeForm | null> 
       include: {
         FotoStanze: {
           select:{
-            idFoto: true
+            idFoto: true,
+            url: true
           }
         }
       }
@@ -68,7 +80,8 @@ export async function getRoomById(idStanza: string): Promise<StanzeForm | null> 
       descrizione: room?.descrizione,
       capienza: room?.capienza,
       costoStandard: room?.costoStandard,
-      foto: room?.FotoStanze.map((foto) => foto.idFoto)
+      foto: room?.FotoStanze.map((foto) => foto.idFoto),
+      urlFoto: room?.FotoStanze.map(foto => foto.url)
     } as StanzeForm
     
   } catch (error) {
@@ -259,20 +272,23 @@ export async function deleteRoomPicture(idFoto: string): Promise<boolean>{
   }
 }
 
-export async function createRoomPicture(idFoto: string): Promise<boolean>{
+export async function createRoomPicture(idFoto: string): Promise<FotoStanze | null>{
   try{
     const createdFoto = await prisma.fotoStanze.create({
-      data: {idFoto: idFoto}
+      data: {
+        idFoto: idFoto,
+        url: getFotoURL(idFoto)
+      }
     })
 
-    return true;
+    return createdFoto;
   } catch (e){
 
-    return false;
+    return null;
   }
 }
 
-export async function getFotoURL(idFoto: string): Promise<string>{
+function getFotoURL(idFoto: string): string{
   return `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${idFoto}`
 }
 

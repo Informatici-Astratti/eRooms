@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { searchBookings } from "./action"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 
 interface Booking {
   idPrenotazione: string
@@ -134,32 +135,36 @@ export default function Dashboard({ initialStats }: { initialStats: Stats }) {
                     <TableCell>
                       {bookings.map((booking) => (
                         <div key={booking.idPrenotazione} className="text-sm">
-                          <div>{new Date(booking.dataInizio).toLocaleDateString()}</div>
-                          <div>{new Date(booking.dataFine).toLocaleDateString()}</div>
+                          <div>{new Date(booking.dataInizio).toLocaleDateString("it-IT", {
+                            timeZone: "UTC",
+                          })}</div>
+                          <div>{new Date(booking.dataFine).toLocaleDateString("it-IT", {
+                            timeZone: "UTC",
+                          })}</div>
                         </div>
                       ))}
                     </TableCell>
                     <TableCell>
-                      {bookings.map((booking) => (
-                        <div
-                          key={booking.idPrenotazione}
-                          className={`text-sm font-medium ${booking.stato === "CONFERMATA"
-                            ? "status-confermata"
-                            : booking.stato === "PRENOTATA"
-                              ? "status-prenotata"
-                              : "status-default"
-                            }`}
-                        >
-                          {booking.stato}
-                        </div>
-                      ))}
+                      <div className="flex flex-col gap-2">
+                        {bookings.map((booking) => (
+                          <Badge
+                            key={booking.idPrenotazione}
+                            variant={booking.stato === "PRENOTATA" ? "attesa" : booking.stato === "CONFERMATA" ? "success" : "default"}
+                            className="w-fit"
+                          >
+                            {booking.stato}
+                          </Badge>
+                        ))}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       {bookings.map((booking) => (
                         <div key={booking.idPrenotazione}>
                           <div className="text-sm font-medium">{booking.importo.toFixed(2)} €</div>
                           <div className="text-xs text-muted-foreground">
-                            {booking.dataPagamento ? new Date(booking.dataPagamento).toLocaleDateString() : "N/A"}
+                            {booking.dataPagamento ? new Date(booking.dataPagamento).toLocaleDateString("it-IT", {
+                            timeZone: "UTC",
+                          }) : "N/A"}
                           </div>
                         </div>
                       ))}

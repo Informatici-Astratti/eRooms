@@ -24,12 +24,17 @@ model Ospiti {
 }
 
 model Pagamenti {
-  idPagamento     String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  metodo          String?
-  importo         Float         @db.Real
-  dataSaldo       DateTime?     @db.Timestamp(6)
-  codPrenotazione String?       @db.Uuid
-  Prenotazioni    Prenotazioni? @relation(fields: [codPrenotazione], references: [idPrenotazione], onDelete: Restrict)
+  idPagamento     String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  importo         Float          @db.Real
+  dataSaldo       DateTime?      @db.Timestamp(6)
+  codPrenotazione String         @db.Uuid
+  created_at      DateTime       @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamptz(6)
+  updated_at      DateTime       @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamptz(6)
+  stripePaymentId String         @unique @default("")
+  tipoPagamento   tipo_pagamento @default(ALTRO)
+  nome            String
+  descrizione     String
+  Prenotazioni    Prenotazioni   @relation(fields: [codPrenotazione], references: [idPrenotazione])
 }
 
 model Prenotazioni {
@@ -50,6 +55,7 @@ model Profili {
   idProfilo                                     String         @id
   nome                                          String
   cognome                                       String
+  email                                         String         @default("")
   telefono                                      String?
   cf                                            String?
   piva                                          String?
@@ -57,16 +63,17 @@ model Profili {
   genere                                        genere
   indirizzo                                     String?
   ruolo                                         ruolo
+  stripeCustomerId                              String?
   Prenotazioni_Prenotazioni_codProfiloToProfili Prenotazioni[] @relation("Prenotazioni_codProfiloToProfili")
   TurniPulizie                                  TurniPulizie[]
 }
 
 model Stanze {
   idStanza      String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  nome          String?
-  capienza      Int?           @db.SmallInt
-  descrizione   String?
-  costoStandard Float?         @db.Real
+  nome          String
+  capienza      Int            @db.SmallInt
+  descrizione   String
+  costoStandard Float          @db.Real
   FotoStanze    FotoStanze[]
   Prenotazioni  Prenotazioni[]
   Pulizie       Pulizie?
@@ -77,8 +84,8 @@ model Stanze {
 model Tariffe {
   idTariffa      String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   codStanza      String          @db.Uuid
-  dataInizio     DateTime        @db.Date
-  dataFine       DateTime        @db.Date
+  dataInizio     DateTime        @db.Timestamp(6)
+  dataFine       DateTime        @db.Timestamp(6)
   tipoVariazione tipo_variazione
   variazione     Float           @db.Real
   Stanze         Stanze          @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
@@ -119,6 +126,7 @@ model TurniPulizie {
 model FotoStanze {
   idFoto    String  @id
   codStanza String? @db.Uuid
+  url       String
   Stanze    Stanze? @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
 }
 
@@ -158,4 +166,10 @@ enum tipo_variazione {
   AUMENTO_FISSO
   SCONTO_FISSO
   NULLA
+}
+
+enum tipo_pagamento {
+  ALLOGGIO
+  TASSA
+  ALTRO
 }

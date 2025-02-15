@@ -1,10 +1,30 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import getUser from './app/lib/user'
+import { NextResponse } from 'next/server'
+import { ruolo } from '@prisma/client'
 
-const isProtectedRoute = createRouteMatcher(['/admin(.*)', "/signup/continue", "/account"])
+const isProtectedRoute = createRouteMatcher(['/admin(.*)', "/signup/continue", "/account(.*)"])
+
+const isAdminRoute = createRouteMatcher(['/admin(.*)'])
+const isGovernanteRoute = createRouteMatcher(['/admin/pulizie(.*)'])
 
 export default clerkMiddleware(async (auth, request) => {
   if (isProtectedRoute(request)) {
     await auth.protect()
+  }
+
+  if (isAdminRoute(request)) {
+    const { sessionClaims } = await auth();
+
+    if (sessionClaims?.metadata.ruolo === ruolo.PROPRIETARIO) {
+      return NextResponse.next();
+    }
+
+    if (isGovernanteRoute(request) && sessionClaims?.metadata.ruolo === ruolo.GOVERNANTE) {
+      return NextResponse.next();
+    }
+
+    return NextResponse.redirect(new URL("/", process.env.NEXT_PUBLIC_APP_URL));
   }
 })
 

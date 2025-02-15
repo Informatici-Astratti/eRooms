@@ -7,11 +7,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import type { Stanze as StanzaType, Pulizie, TurniPulizie, Profili, Prenotazioni } from "@prisma/client"
 import type { ColumnDef } from "@tanstack/react-table"
 import { CirclePlus, MoreHorizontal, Pencil } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ModificaStatus from "./editStatus"
+import AddPulizie from "./addPulizie"
+import getGovernanti from "./action"
+import getUser from "@/app/lib/user"
 
 export type StanzeWithRelations = StanzaType & {
-  Pulizie: Pulizie | null
+  Pulizie: Pulizie
   TurniPulizie: (TurniPulizie & {
     Profili: Profili
   })[]
@@ -59,9 +62,11 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
     cell: ({ row }) => {
       const dataInzio = row.original;
       if (dataInzio.TurniPulizie && dataInzio.TurniPulizie.length > 0) {
-        return dataInzio.TurniPulizie[0].dataInizio.toLocaleDateString();
+        return dataInzio.TurniPulizie[0].dataInizio.toLocaleDateString("it-IT", {
+          timeZone: "UTC",
+        });
       } else {
-        return "Non definita"; 
+        return "Non definita";
       }
     },
   },
@@ -71,7 +76,9 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
     cell: ({ row }) => {
       const dataFine = row.original;
       if (dataFine.TurniPulizie && dataFine.TurniPulizie.length > 0 && dataFine.TurniPulizie[0].dataFine) {
-        return dataFine.TurniPulizie[0].dataFine.toLocaleDateString();
+        return dataFine.TurniPulizie[0].dataFine.toLocaleDateString("it-IT", {
+          timeZone: "UTC",
+        });
       } else {
         return "Non definita";
       }
@@ -83,54 +90,101 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
     header: "Check-out",
     cell: ({ row }) => {
       const stanza = row.original
-      const hasCheckoutToday = stanza.Prenotazioni && stanza.Prenotazioni.length > 0
+      const today = new Date()
+      const todayDate = new Date(today.setHours(0, 0, 0, 0))
+
+      const hasCheckoutToday = stanza.Prenotazioni && stanza.Prenotazioni.some(p => {
+        const prenotazioniFine = new Date(p.dataFine)
+        const prenotazioniFineDate = new Date(prenotazioniFine.setHours(0, 0, 0, 0))
+        return prenotazioniFineDate.getTime() === todayDate.getTime() // Confronta le date
+      })
+
       return hasCheckoutToday ? "Si" : "No"
-    },
+    }
   },
+
   {
     id: "actions",
     cell: ({ row }) => {
       const pulizie = row.original.Pulizie
       const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+      const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+      const [governanti, setGovernanti] = useState<Profili[]>([])
+      const [role, setRole] = useState<String>()
+
+      useEffect(() => {
+        const fetchRooms = async () => {
+          const governantiData = await getGovernanti();
+          setGovernanti(governantiData || []);
+        };
+        fetchRooms();
+        const userRole = async () => {
+          const userData = await getUser()
+          setRole(userData?.ruolo)
+        }
+        userRole();
+      }, []);
+
 
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
+
             <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-400 bg-gray-200">
               <span className="sr-only">Apri menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
+
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Azioni</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Dialog>
-              <DialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}><CirclePlus />Assegna Pulizia</DropdownMenuItem>
-              </DialogTrigger>
-              {/*<GuestsTable ospiti={prenotazione.Ospiti} /> -*/}
-            </Dialog>
-            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-              <DialogTrigger asChild>
-                <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault()
-                    setIsEditModalOpen(true)
-                  }}
-                >
-                  <Pencil />
-                  Modifica Stato
-                </DropdownMenuItem>
-              </DialogTrigger>
-              <ModificaStatus
-                pulizie={pulizie}
-                onClose={() => setIsEditModalOpen(false)}
-              />
-            </Dialog>
+
+            {/* Condizionale: se l'utente è PROPRIETARIO */}
+            {role === "PROPRIETARIO" ? (
+              <>
+                {/* Dialog per Assegnare Pulizia */}
+                <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                      <CirclePlus /> Assegna Pulizia
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <AddPulizie
+                    stanza={row.original}
+                    governanti={governanti}
+                    onClose={() => setIsAddModalOpen(false)}
+                  />
+                </Dialog>
+
+                {/* Dialog per Modifica Stato */}
+                <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setIsEditModalOpen(true);
+                      }}
+                    >
+                      <Pencil />
+                      Modifica Stato
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <ModificaStatus
+                    pulizie={pulizie}
+                    onClose={() => setIsEditModalOpen(false)}
+                  />
+                </Dialog>
+              </>
+            ) : (
+              <DropdownMenuItem>
+                Accesso non disponibile
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
 ]
