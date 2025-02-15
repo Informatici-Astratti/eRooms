@@ -25,7 +25,7 @@ const signUpContinueSchema = z.object({
 
 export async function signUpContinue(prevState: any, formData: FormData) {
 
-    const userId = await currentUser()
+    const {userId} = await auth()
 
     const result = signUpContinueSchema.safeParse(Object.fromEntries(formData))
     if (!result.success) {
@@ -39,13 +39,15 @@ export async function signUpContinue(prevState: any, formData: FormData) {
     }
 
     try {
-        const ruoloCheck = await clerkClient();
-        const user = await ruoloCheck.users.getUser(userId.id);
+        const clerk = await clerkClient();
+        const user = await clerk.users.getUser(userId);
+
+        console.log(user.publicMetadata)
         const ruoloUtente = user.publicMetadata?.ruolo as keyof typeof ruolo ?? ruolo.CLIENTE; // Di default cliente, altrimenti il ruolo default è CLIENTE
         const dbUser = await prisma.profili.create({
             data: {
-                idProfilo: userId.id,
-                email: userId.primaryEmailAddress?.emailAddress ?? "",
+                idProfilo: userId,
+                email: user.primaryEmailAddress?.emailAddress ?? "",
                 nome: result.data.nome ?? "",
                 cognome: result.data.cognome ?? "",
                 telefono: result.data.telefono ?? "",
@@ -56,8 +58,8 @@ export async function signUpContinue(prevState: any, formData: FormData) {
             }
         })
 
-        if (!user.publicMetadata?.ruolo) {
-            await ruoloCheck.users.updateUser(userId.id, {
+        if (!(user.publicMetadata?.ruolo as keyof typeof ruolo)) {
+            await clerk.users.updateUser(userId, {
                 publicMetadata: {
                     ruolo: ruolo.CLIENTE
                 }

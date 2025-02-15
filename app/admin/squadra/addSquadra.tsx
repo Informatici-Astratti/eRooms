@@ -103,13 +103,8 @@ export function AggiungiMembro() {
                                     <SelectValue placeholder="Seleziona un ruolo" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {Object.values(ruolo)
-                                        .filter((stato) => stato === "GOVERNANTE" || stato === "PROPRIETARIO")
-                                        .map((stato) => (
-                                            <SelectItem key={stato} value={stato}>
-                                                {stato}
-                                            </SelectItem>
-                                        ))}
+                                    <SelectItem value={ruolo.PROPRIETARIO}>Proprietario</SelectItem>
+                                    <SelectItem value={ruolo.GOVERNANTE}>Governante</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

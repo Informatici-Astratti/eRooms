@@ -36,26 +36,28 @@ export async function getUsers() {
 export async function addSquadra(prevState: any, formData: FormData) {
   const schema = z.object({
     email: z.string().email("Formato email non valido"),
-    ruolo: z.enum(["PROPRIETARIO", "GOVERNANTE"], { message: "Ruolo non valido" }),
+    role: z.nativeEnum(ruolo, { message: "Ruolo non valido" }),
   });
 
   const parsedData = schema.safeParse({
     email: formData.get("email") as string,
-    ruolo: formData.get("ruolo"),
+    role: formData.get("ruolo")  as ruolo,
   });
 
   if (!parsedData.success) {
     return { success: false, message: "", errors: { descrizione: parsedData.error.errors[0].message } };
   }
 
-  const { email, ruolo } = parsedData.data;
+  const { email, role } = parsedData.data;
 
   try {
     const client = await clerkClient()
     const response = await client.invitations.createInvitation({
       emailAddress: email,
       redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/signup`,
-      publicMetadata: { ruolo }, 
+      publicMetadata: {
+        "ruolo": role
+      }, 
     })
 
     return { success: true, message: "Invito inviato con successo!", errors: {} };
