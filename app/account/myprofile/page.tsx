@@ -17,8 +17,7 @@ export default async function MyProfile() {
         
             <div className="flex flex-col">
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 space-y-5">
-                        <h1 className="text-xl font-bold">Informazioni Generali</h1>
+                    <div className="p-4">
                         <EditAccountForm profile={userProfile ?? null} ></EditAccountForm>
                     </div>
                 </div>  

@@ -41,7 +41,7 @@ export function AppSidebar({accountName}: AppSidebarProps) {
   ]
 
     return (
-      <Sidebar variant="inset" collapsible="none" className="h-screen bg-white">
+      <Sidebar variant="inset" collapsible="none" className="h-screen bg-white border border-x-zinc-200">
         <SidebarHeader>
             <div>
               <Button variant={"ghost"} className="pl-0.5">

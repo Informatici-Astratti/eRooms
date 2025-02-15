@@ -41,11 +41,9 @@ export default function EditAccountForm({ profile }: EditAccountFormProps) {
        
     const [date , setDate] = useState<Date | undefined>(state.fields?.dataNascita ?? undefined)
     return (
-        <form action={formAction}>
+        <form action={formAction} className="p-4 rounded-md bg-white border">
             <div className="space-y-5">
-                <Input className="hidden" name="idProfilo" type="text" defaultValue={state.fields?.idProfilo} required/>
-                <Input className="hidden" name="piva" type="text" defaultValue={state.fields?.piva ?? ""}/>
-                <Input className="hidden" name="ruolo" type="text" defaultValue={state.fields?.ruolo}/>
+                <h1 className="text-xl font-bold">Informazioni Generali</h1>
                 <div className="w-[80%]">
                     <Label htmlFor="nome">Nome</Label>
                     <Input name="nome" type="text" defaultValue={state.fields?.nome} required />
@@ -118,7 +116,10 @@ export default function EditAccountForm({ profile }: EditAccountFormProps) {
                     </Select>
                     <ErrorForm errors={state.errors?.genere} />
                 </div>
-                <div>
+                <Input className="hidden" name="idProfilo" type="text" defaultValue={state.fields?.idProfilo} required/>
+                <Input className="hidden" name="piva" type="text" defaultValue={state.fields?.piva ?? ""}/>
+                <Input className="hidden" name="ruolo" type="text" defaultValue={state.fields?.ruolo}/>
+                <div className="flex justify-end">
                     <Button type="submit">
                         Modifica Informazioni
                     </Button>
