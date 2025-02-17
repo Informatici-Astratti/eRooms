@@ -6,7 +6,9 @@ const uploadThing = createUploadthing();
 
 export const uploadRouter = {
 
-    roomPicture: uploadThing(["image"])
+    roomPicture: uploadThing({
+        image: {maxFileCount: 10}
+    })
         .middleware( async ({req, res}) => {
             const {userId} = await auth()
             
