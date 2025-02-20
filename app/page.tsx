@@ -18,4 +18,5 @@ export default async function Home() {
 
   redirect("/v")
   
+  
 }
