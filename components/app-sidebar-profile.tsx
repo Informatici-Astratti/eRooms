@@ -47,7 +47,7 @@ export function AppSidebar({accountName}: AppSidebarProps) {
               <Button variant={"ghost"} className="pl-0.5">
                 <Link href="/" className="flex items-center gap-2">
                   <ChevronLeft />
-                  Torna alla Home
+                  Indietro
                 </Link>
               </Button>
             </div>

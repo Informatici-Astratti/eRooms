@@ -1,5 +1,5 @@
 import * as React from "react"
-import { BedDouble, BedSingle, Calendar, ChevronRight, ChevronUp, Home, Info, LogOut, ReceiptText, ShieldQuestion, SquareActivity, User2, UserRoundCog, Users, WashingMachine } from "lucide-react"
+import { BedDouble, BedSingle, Calendar, ChevronLeft, ChevronRight, ChevronUp, Home, Info, LogOut, ReceiptText, ShieldQuestion, SquareActivity, User2, UserRoundCog, Users, WashingMachine } from "lucide-react"
 
 import {
   Collapsible,
@@ -25,6 +25,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { SignOutButton } from "@clerk/nextjs"
 import Link from "next/link"
+import { Button } from "./ui/button"
 
 // This is sample data.
 const data = {
@@ -109,6 +110,14 @@ export function AppSidebar({accountName} : AppSidebarProps) {
   return (
     <Sidebar variant="inset" collapsible="none" className="h-screen bg-white border border-x-zinc-200">
         <SidebarHeader>
+        <div>
+              <Button variant={"ghost"} className="pl-0.5">
+                <Link href="/v" className="flex items-center gap-2">
+                  <ChevronLeft />
+                  Torna alla Home
+                </Link>
+              </Button>
+            </div>
             <div className="flex gap-2 justify-center items-center py-5">
                 <div className="flex size-6 bg-primarflex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
                     <BedDouble className="size-4" />

@@ -3,7 +3,7 @@ import Image from 'next/image'
 import React from 'react'
 import { Button } from './ui/button'
 import prisma from '@/app/lib/db'
-import { CalendarCheck2, House, LogIn, LogOut, UserRound, UserRoundCog } from 'lucide-react'
+import { CalendarCheck2, FileSliders, House, LogIn, LogOut, UserRound, UserRoundCog } from 'lucide-react'
 import getUser from '@/app/lib/user'
 
 import {
@@ -18,13 +18,13 @@ import { SignOutButton } from '@clerk/nextjs'
 import CreateBookingCliente from '../app/v/rooms/_BookingUtente/CreateBookingCliente'
 import { Proprieta } from '@prisma/client'
 
-interface NavBarProps{
-    propertyInfo: Proprieta 
+interface NavBarProps {
+  propertyInfo: Proprieta
 }
 
-export default async function NavBar({propertyInfo} : NavBarProps) {
+export default async function NavBar({ propertyInfo }: NavBarProps) {
 
-  
+
 
   const user = await getUser()
 
@@ -89,29 +89,41 @@ export default async function NavBar({propertyInfo} : NavBarProps) {
                         Impostazioni Account
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <SignOutButton redirectUrl="/">
-                      <DropdownMenuItem>
-                        <LogOut />
-                        Logout
-                      </DropdownMenuItem>
-                    </SignOutButton>
-                  </DropdownMenuContent>
+                    <>
+                      {(user.ruolo === "PROPRIETARIO" || user.ruolo === "GOVERNANTE") && (
+                        <>
+                          <DropdownMenuItem asChild>
+                            <Link href={"/"}>
+                            <FileSliders />
+                              Dashboard
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                        </>
+                      )}
+                    </>
+                  <SignOutButton redirectUrl="/">
+                    <DropdownMenuItem>
+                      <LogOut />
+                      Logout
+                    </DropdownMenuItem>
+                  </SignOutButton>
+                </DropdownMenuContent>
                 </DropdownMenu>
-              )
-              :
-              (
-                <Button variant={'outline'} className='shadow-none' asChild>
-                  <Link href={"/login"}>
-                    <LogIn />
-                    Log-In
-                  </Link>
-                </Button>
-              )
+        )
+        :
+        (
+        <Button variant={'outline'} className='shadow-none' asChild>
+          <Link href={"/login"}>
+            <LogIn />
+            Log-In
+          </Link>
+        </Button>
+        )
           }
-          <CreateBookingCliente />
-        </div>
+        <CreateBookingCliente />
       </div>
-    </header>
+    </div>
+    </header >
   )
 }
