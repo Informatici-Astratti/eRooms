@@ -39,7 +39,7 @@ export default async function NavBar({ propertyInfo }: NavBarProps) {
     },
     {
       title: "Contatti",
-      link: "#"
+      link: "#footer"
     }
   ]
 

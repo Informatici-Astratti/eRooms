@@ -16,14 +16,10 @@ export default function FooterWebsite({ propertyInfo }: FooterWebsiteProps) {
         {
             title: "Stanze",
             link: "/v/rooms"
-        },
-        {
-            title: "Contatti",
-            link: "/v/contacts"
         }
     ]
     return (
-        <footer className='bg-muted py-16 px-4 mt-auto'>
+        <footer id="footer" className='bg-muted py-16 px-4 mt-auto'>
             <div className='flex items-center justify-around'>
                 {/*LOGO*/}
                 <div className='flex items-center'>
