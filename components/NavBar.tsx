@@ -89,41 +89,41 @@ export default async function NavBar({ propertyInfo }: NavBarProps) {
                         Impostazioni Account
                       </Link>
                     </DropdownMenuItem>
-                    <>
-                      {(user.ruolo === "PROPRIETARIO" || user.ruolo === "GOVERNANTE") && (
-                        <>
-                          <DropdownMenuItem asChild>
-                            <Link href={"/"}>
-                            <FileSliders />
-                              Dashboard
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                        </>
-                      )}
-                    </>
-                  <SignOutButton redirectUrl="/">
-                    <DropdownMenuItem>
-                      <LogOut />
-                      Logout
-                    </DropdownMenuItem>
-                  </SignOutButton>
-                </DropdownMenuContent>
+                    <SignOutButton redirectUrl="/">
+                      <DropdownMenuItem>
+                        <LogOut />
+                        Logout
+                      </DropdownMenuItem>
+                    </SignOutButton>
+                  </DropdownMenuContent>
                 </DropdownMenu>
-        )
-        :
-        (
-        <Button variant={'outline'} className='shadow-none' asChild>
-          <Link href={"/login"}>
-            <LogIn />
-            Log-In
-          </Link>
-        </Button>
-        )
+              )
+              :
+              (
+                <Button variant={'outline'} className='shadow-none' asChild>
+                  <Link href={"/login"}>
+                    <LogIn />
+                    Log-In
+                  </Link>
+                </Button>
+              )
           }
-        <CreateBookingCliente />
+          <>
+            {user?.ruolo === "CLIENTE" ? (
+              <CreateBookingCliente />
+            ) : (
+              <Button className="mx-auto">
+                <Link href="/" className="inline-flex items-center">
+                  <FileSliders className="mr-2" />
+                  Dashboard
+                </Link>
+              </Button>
+
+            )}
+          </>
+
+        </div>
       </div>
-    </div>
     </header >
   )
 }

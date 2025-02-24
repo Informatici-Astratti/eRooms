@@ -135,12 +135,8 @@ export default function Dashboard({ initialStats }: { initialStats: Stats }) {
                     <TableCell>
                       {bookings.map((booking) => (
                         <div key={booking.idPrenotazione} className="text-sm">
-                          <div>{new Date(booking.dataInizio).toLocaleDateString("it-IT", {
-                            timeZone: "UTC",
-                          })}</div>
-                          <div>{new Date(booking.dataFine).toLocaleDateString("it-IT", {
-                            timeZone: "UTC",
-                          })}</div>
+                          <div>{new Date(booking.dataInizio).toLocaleDateString()}</div>
+                          <div>{new Date(booking.dataFine).toLocaleDateString()}</div>
                         </div>
                       ))}
                     </TableCell>
