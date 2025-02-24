@@ -131,7 +131,7 @@ export const columns: ColumnDef<StanzeWithRelations>[] = [
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
 
-            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-400 bg-gray-200">
+            <Button variant="outline" size={"icon"}>
               <span className="sr-only">Apri menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>

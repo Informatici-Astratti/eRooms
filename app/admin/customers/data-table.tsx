@@ -109,11 +109,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<Profi
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row, index) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}
-                className={cn(
-                    "transition-colors hover:bg-zinc-200",
-                    index % 2 === 0 ? "bg-white" : "bg-zinc-100"
-                  )}>
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}

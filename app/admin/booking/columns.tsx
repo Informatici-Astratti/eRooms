@@ -121,7 +121,7 @@ export const columns: ColumnDef<PrenotazioneWithRelations>[] = [
     accessorKey: "stato",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button variant="ghost" className="hover:text-white hover:bg-primary-700" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Stato
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>

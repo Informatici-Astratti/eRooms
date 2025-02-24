@@ -20,7 +20,7 @@ export const columns: ColumnDef<Profili>[] = [
     accessorKey: "nome",
     header: ({ column }) => {
       return (
-        <Button className="" variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button className="hover:text-white hover:bg-primary-700" variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Nome
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
@@ -31,7 +31,7 @@ export const columns: ColumnDef<Profili>[] = [
     accessorKey: "cognome",
     header: ({ column }) => {
         return (
-          <Button className="" variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Button className="hover:text-white hover:bg-primary-700" variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
             Cognome
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
