@@ -109,7 +109,7 @@ export default async function NavBar({ propertyInfo }: NavBarProps) {
               )
           }
           <>
-            {user?.ruolo === "CLIENTE" ? (
+            {!(user?.ruolo === "PROPRIETARIO" || user?.ruolo === "GOVERNANTE") ? (
               <CreateBookingCliente />
             ) : (
               <Button className="mx-auto">
