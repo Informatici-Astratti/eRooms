@@ -104,6 +104,11 @@ export async function addTurnoPulizia(prevState: any, formData: FormData) {
     return { message: "", success: false, errors: { descrizione: "Dati mancanti" } }
   }
 
+  if(dataFine < dataInizio){
+    return { message: "", success: false, errors: { descrizione: "Formato data non valido" } }
+  }
+
+
   try {
     // Verifica se per una specifica stanza esiste già una prenotazione per quel giorno
     const existingShift = await prisma.turniPulizie.findFirst({

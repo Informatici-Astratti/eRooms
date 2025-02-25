@@ -10,6 +10,12 @@ import { addTurnoPulizia } from "./action"
 import { useActionState } from "react"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
+import { Calendar } from "@/components/ui/calendar"
+import React from "react"
+import { format } from "date-fns"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { CalendarIcon } from "lucide-react"
+import { cn } from "@/app/lib/utils"
 
 interface AddPulizieProps {
     stanza: {
@@ -24,9 +30,7 @@ interface AddPulizieProps {
 export default function AddPulizie({ stanza, governanti, onClose }: AddPulizieProps) {
     const [formData, setFormData] = useState({
         codStanza: stanza.idStanza,
-        codGovernante: "",
-        dataInizio: new Date().toISOString().split("T")[0],
-        dataFine: new Date().toISOString().split("T")[0],
+        codGovernante: ""
     })
 
     const initialState = { message: "", success: false, errors: { descrizione: "" } }
@@ -54,9 +58,10 @@ export default function AddPulizie({ stanza, governanti, onClose }: AddPuliziePr
             setFormData({
                 codStanza: stanza.idStanza,
                 codGovernante: "",
-                dataInizio: new Date().toISOString().split("T")[0],
-                dataFine: new Date().toISOString().split("T")[0],
+
             });
+            setDataInizio(new Date());
+            setDataFine(new Date());
             onClose();
             router.refresh()
         }
@@ -65,12 +70,12 @@ export default function AddPulizie({ stanza, governanti, onClose }: AddPuliziePr
 
     const isFormValid = () => {
         return (
-            formData.codGovernante !== "" &&
-            formData.dataInizio !== "" &&
-            formData.dataFine !== "" &&
-            new Date(formData.dataInizio) <= new Date(formData.dataFine)
+            formData.codGovernante !== ""
         )
     }
+
+    const [dataInizio, setDataInizio] = React.useState<Date | undefined>(new Date())
+    const [dataFine, setDataFine] = React.useState<Date | undefined>(new Date())
 
     return (
         <DialogContent className="sm:max-w-[425px]">
@@ -110,27 +115,67 @@ export default function AddPulizie({ stanza, governanti, onClose }: AddPuliziePr
                         <Label htmlFor="dataInizio" className="text-right">
                             Data Inizio
                         </Label>
-                        <Input
-                            id="dataInizio"
-                            name="dataInizio"
-                            type="date"
-                            value={formData.dataInizio}
-                            onChange={(e) => handleChange("dataInizio", e.target.value)}
-                            className="col-span-3"
-                        />
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                        "justify-start text-left font-normal col-span-2",
+                                        !dataInizio && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon />
+                                    {dataInizio ? format(dataInizio, "dd/MM/yyyy") : <span>Seleziona</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="center">
+                                <Calendar
+                                    mode="single"
+                                    captionLayout="dropdown-buttons"
+                                    selected={dataInizio}
+                                    onSelect={setDataInizio}
+                                    fromYear={1960}
+                                    toYear={2030}
+                                    disabled={(dataInizio) =>
+                                        dataInizio < new Date()
+                                    }
+                                />
+                            </PopoverContent>
+                        </Popover>
+                        <Input type="hidden" value={dataInizio ? format(dataInizio, "yyyy-MM-dd") : ''} name="dataInizio" />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="dataFine" className="text-right">
                             Data Fine
                         </Label>
-                        <Input
-                            id="dataFine"
-                            name="dataFine"
-                            type="date"
-                            value={formData.dataFine}
-                            onChange={(e) => handleChange("dataFine", e.target.value)}
-                            className="col-span-3"
-                        />
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                        "justify-start text-left font-normal col-span-2",
+                                        !dataFine && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon />
+                                    {dataFine ? format(dataFine, "dd/MM/yyyy") : <span>Seleziona</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="center">
+                                <Calendar
+                                    mode="single"
+                                    captionLayout="dropdown-buttons"
+                                    selected={dataFine}
+                                    onSelect={setDataFine}
+                                    fromYear={1960}
+                                    toYear={2030}
+                                    disabled={(dataFine) =>
+                                        dataFine < new Date()
+                                    }
+                                />
+                            </PopoverContent>
+                        </Popover>
+                        <Input type="hidden" value={dataFine ? format(dataFine, "yyyy-MM-dd") : ''} name="dataFine" />
                     </div>
                 </div>
                 {/* {state.errors.descrizione && <div className="text-red-600 mt-2 mb-4">{state.errors.descrizione}</div>}
