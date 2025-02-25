@@ -116,8 +116,8 @@ model TurniPulizie {
   idTurno       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   codStanza     String    @db.Uuid
   codGovernante String
-  dataInizio    DateTime  @db.Date
-  dataFine      DateTime? @db.Date
+  dataInizio    DateTime  @db.Timestamp(6)
+  dataFine      DateTime? @db.Timestamp(6)
   Profili       Profili   @relation(fields: [codGovernante], references: [idProfilo], onDelete: Cascade)
   Stanze        Stanze    @relation(fields: [codStanza], references: [idStanza], onDelete: Cascade)
 }
