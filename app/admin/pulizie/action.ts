@@ -6,6 +6,7 @@ import type { stato_pulizia } from "@prisma/client"
 export async function getPulizie() {
   try {
     const today = new Date()
+    today.setHours(0,0,0,0)
 
     const stanze = await prisma.stanze.findMany({
       include: {
@@ -111,23 +112,34 @@ export async function addTurnoPulizia(prevState: any, formData: FormData) {
 
   try {
     // Verifica se per una specifica stanza esiste già una prenotazione per quel giorno
-    const existingShift = await prisma.turniPulizie.findFirst({
-      where: {
-        codStanza,
-        OR: [
-          {
-            dataInizio: {
-              gte: new Date(dataInizio),  
-            },
-          },
-          {
-            dataFine: {
-              gte: new Date(dataInizio),
-            },
-          },
+const existingShift = await prisma.turniPulizie.findFirst({
+  where: {
+    codStanza,
+    OR: [
+      {
+        // Caso 1: Il nuovo turno inizia dentro un turno esistente
+        AND: [
+          { dataInizio: { lte: new Date(dataInizio) } },
+          { dataFine: { gte: new Date(dataInizio) } },
         ],
       },
-    })
+      {
+        // Caso 2: Il nuovo turno finisce dentro un turno esistente
+        AND: [
+          { dataInizio: { lte: new Date(dataFine) } },
+          { dataFine: { gte: new Date(dataFine) } },
+        ],
+      },
+      {
+        // Caso 3: Il nuovo turno contiene completamente un turno esistente
+        AND: [
+          { dataInizio: { gte: new Date(dataInizio) } },
+          { dataFine: { lte: new Date(dataFine) } },
+        ],
+      },
+    ],
+  },
+})
 
     if (existingShift) {
       return {
